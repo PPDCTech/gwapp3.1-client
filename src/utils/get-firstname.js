@@ -1,4 +1,6 @@
 export const getFirstName = (fullName) => {
-  const parts = fullName.split(" ");
-  return parts[0];
+  if (fullName) {
+    const parts = fullName.split(" ");
+    return parts[0];
+  }
 };

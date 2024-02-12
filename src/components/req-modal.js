@@ -414,7 +414,8 @@ const ReqModal = (props) => {
               }}
             >
               <Typography variant="h6">Requisition Details</Typography>
-              <IconButton color="error" onClick={handleClose}>
+              <IconButton color="error"
+onClick={handleClose}>
                 <XCircleIcon />
               </IconButton>
             </Box>
@@ -427,26 +428,32 @@ const ReqModal = (props) => {
               }}
             >
               <Box sx={{ mr: 2 }}>
-                <Typography variant="body1" className="text-item-header">
+                <Typography variant="body1"
+className="text-item-header">
                   Type
                 </Typography>
-                <Typography variant="subtitle1" className="text-item">
+                <Typography variant="subtitle1"
+className="text-item">
                   {reqData?.type}
                 </Typography>
               </Box>
               <Box sx={{ mr: 2 }}>
-                <Typography variant="body1" className="text-item-header">
+                <Typography variant="body1"
+className="text-item-header">
                   Raised By
                 </Typography>
-                <Typography variant="subtitle1" className="text-item">
+                <Typography variant="subtitle1"
+className="text-item">
                   {reqData?.name}
                 </Typography>
               </Box>
               <Box sx={{ mr: 2 }}>
-                <Typography variant="body1" className="text-item-header">
+                <Typography variant="body1"
+className="text-item-header">
                   Date
                 </Typography>
-                <Typography variant="subtitle1" className="text-item">
+                <Typography variant="subtitle1"
+className="text-item">
                   {getDateMDY(reqData?.date)}
                 </Typography>
               </Box>
@@ -461,21 +468,26 @@ const ReqModal = (props) => {
               }}
             >
               <Box sx={{ mr: 2 }}>
-                <Typography variant="body1" className="text-item-header">
+                <Typography variant="body1"
+className="text-item-header">
                   Description
                 </Typography>
-                <Typography variant="subtitle1" className="text-item">
+                <Typography variant="subtitle1"
+className="text-item">
                   {reqData?.title}
                 </Typography>
                 {page === "dashboard" && (
-                  <Chip sx={{ mt: 1 }} label={`status: ${reqData?.status}`} variant="outlined" />
+                  <Chip sx={{ mt: 1 }}
+label={`status: ${reqData?.status}`}
+variant="outlined" />
                 )}
               </Box>
             </Box>
 
             {/* invoices section */}
             <Box sx={{ mt: 3 }}>
-              <Typography variant="body1" className="text-item-header">
+              <Typography variant="body1"
+className="text-item-header">
                 Invoice(s)
               </Typography>
               <hr />
@@ -490,7 +502,10 @@ const ReqModal = (props) => {
                   }}
                 >
                   {invoices.map((invoice, index) => (
-                    <a href={invoice?.url} target="_blank" rel="noreferrer" key={index}>
+                    <a href={invoice?.url}
+target="_blank"
+rel="noreferrer"
+key={index}>
                       <iframe
                         src={invoice?.url}
                         title={invoice?.name}
@@ -514,10 +529,13 @@ const ReqModal = (props) => {
 
             {/* items table */}
             <TableContainer sx={{ mt: 5, maxHeight: "60vh" }}>
-              <Typography variant="body1" className="text-item-header">
+              <Typography variant="body1"
+className="text-item-header">
                 Item List
               </Typography>
-              <Table stickyHeader className="reqmodal-table" sx={{ mt: 1 }}>
+              <Table stickyHeader
+className="reqmodal-table"
+sx={{ mt: 1 }}>
                 <TableHead className="table-head">
                   <TableRow>
                     <TableCell>Description</TableCell>
@@ -552,26 +570,32 @@ const ReqModal = (props) => {
                 }}
               >
                 <Box sx={{ mr: 2 }}>
-                  <Typography variant="body1" className="text-item-header">
+                  <Typography variant="body1"
+className="text-item-header">
                     Beneficiary
                   </Typography>
-                  <Typography variant="subtitle1" className="text-item">
+                  <Typography variant="subtitle1"
+className="text-item">
                     {reqData?.accountName}
                   </Typography>
                 </Box>
                 <Box sx={{ mr: 2 }}>
-                  <Typography variant="body1" className="text-item-header">
+                  <Typography variant="body1"
+className="text-item-header">
                     Beneficiary Bank
                   </Typography>
-                  <Typography variant="subtitle1" className="text-item">
+                  <Typography variant="subtitle1"
+className="text-item">
                     {reqData?.bankName}
                   </Typography>
                 </Box>
                 <Box sx={{ mr: 2 }}>
-                  <Typography variant="body1" className="text-item-header">
+                  <Typography variant="body1"
+className="text-item-header">
                     Beneficiary Account Number
                   </Typography>
-                  <Typography variant="subtitle1" className="text-item">
+                  <Typography variant="subtitle1"
+className="text-item">
                     {reqData?.accountNumber}
                   </Typography>
                 </Box>
@@ -583,7 +607,8 @@ const ReqModal = (props) => {
               <>
                 {reqData?.status === "approved" || reqData?.status === "paid" ? null : (
                   <Box sx={{ mt: 4 }}>
-                    <Typography variant="body1" className="text-item-header">
+                    <Typography variant="body1"
+className="text-item-header">
                       Select Budget code & Project
                     </Typography>
                     <Box
@@ -610,7 +635,8 @@ const ReqModal = (props) => {
                           >
                             {budgetCodes ? (
                               budgetCodes.map((code) => (
-                                <MenuItem key={code._id} value={code._id}>
+                                <MenuItem key={code._id}
+value={code._id}>
                                   {code.description}
                                 </MenuItem>
                               ))
@@ -641,7 +667,8 @@ const ReqModal = (props) => {
                           >
                             {accountCodes ? (
                               accountCodes.map((account, index) => (
-                                <MenuItem key={index} value={account._id}>
+                                <MenuItem key={index}
+value={account._id}>
                                   {account.description}
                                 </MenuItem>
                               ))
@@ -666,7 +693,8 @@ const ReqModal = (props) => {
                           >
                             {projectCodes.length > 0 ? (
                               projectCodes.map((project, index) => (
-                                <MenuItem key={index} value={project?._id}>
+                                <MenuItem key={index}
+value={project?._id}>
                                   {project.projectName}
                                 </MenuItem>
                               ))
@@ -683,7 +711,8 @@ const ReqModal = (props) => {
             )}
 
             {/* source account details */}
-            <Box sx={{ mt: 2, p: 1 }} className="light-bg-green">
+            <Box sx={{ mt: 2, p: 1 }}
+className="light-bg-green">
               <Box
                 sx={{
                   display: "flex",
@@ -691,10 +720,12 @@ const ReqModal = (props) => {
                 }}
               >
                 <Box sx={{ mr: 2 }}>
-                  <Typography variant="body1" className="text-item-header">
+                  <Typography variant="body1"
+className="text-item-header">
                     {page === "dashboard" ? "Source Account" : "Project"}
                   </Typography>
-                  <Typography variant="subtitle1" className="text-item">
+                  <Typography variant="subtitle1"
+className="text-item">
                     {page === "dashboard"
                       ? reqData?.status === "approved" || reqData?.status === "paid"
                         ? `${reqData?.sourceBankName}`
@@ -703,10 +734,12 @@ const ReqModal = (props) => {
                   </Typography>
                 </Box>
                 <Box sx={{ mr: 2 }}>
-                  <Typography variant="body1" className="text-item-header">
+                  <Typography variant="body1"
+className="text-item-header">
                     Bank
                   </Typography>
-                  <Typography variant="subtitle1" className="text-item">
+                  <Typography variant="subtitle1"
+className="text-item">
                     {page === "dashboard"
                       ? reqData?.status === "approved" || reqData?.status === "paid"
                         ? `${reqData?.sourceBankName}`
@@ -715,10 +748,12 @@ const ReqModal = (props) => {
                   </Typography>
                 </Box>
                 <Box sx={{ mr: 2 }}>
-                  <Typography variant="body1" className="text-item-header">
+                  <Typography variant="body1"
+className="text-item-header">
                     Account Number
                   </Typography>
-                  <Typography variant="subtitle1" className="text-item">
+                  <Typography variant="subtitle1"
+className="text-item">
                     {page === "dashboard"
                       ? reqData?.status === "approved" || reqData?.status === "paid"
                         ? `${reqData?.sourceAccountNumber}`
@@ -734,8 +769,12 @@ const ReqModal = (props) => {
               <>
                 {reqData?.status !== "approved" && reqData?.status !== "paid" && (
                   <Box sx={{ mt: 4 }}>
-                    <Box display="flex" alignItems="center" mb={1}>
-                      <Typography mr={2} variant="body1" className="text-item-header">
+                    <Box display="flex"
+alignItems="center"
+mb={1}>
+                      <Typography mr={2}
+variant="body1"
+className="text-item-header">
                         Upload Receipts:
                       </Typography>
                       <Button
@@ -745,7 +784,10 @@ const ReqModal = (props) => {
                         size="small"
                       >
                         Choose File
-                        <input type="file" onChange={handleUpload} multiple hidden />
+                        <input type="file"
+onChange={handleUpload}
+multiple
+hidden />
                       </Button>
                     </Box>
                     {receipts.length > 0 ? (
@@ -782,7 +824,8 @@ const ReqModal = (props) => {
             {page === "dashboard" && (
               <Box sx={{ mt: 4 }}>
                 <Divider />
-                <Box sx={{ mt: 2 }} className="row">
+                <Box sx={{ mt: 2 }}
+className="row">
                   <Box className="col-md-7">
                     <TableContainer
                       component={Box}
@@ -792,7 +835,8 @@ const ReqModal = (props) => {
                         p: 1,
                       }}
                     >
-                      <Typography variant="body1" className="text-item-header">
+                      <Typography variant="body1"
+className="text-item-header">
                         Check History
                       </Typography>
                       <Table>
@@ -816,11 +860,13 @@ const ReqModal = (props) => {
                     </TableContainer>
                   </Box>
                   <Box className="col-md-5">
-                    <Typography variant="body1" className="text-item-header">
+                    <Typography variant="body1"
+className="text-item-header">
                       Actions
                     </Typography>
                     <Box className="button-container">
-                      <Button onClick={openMessageModal} className="btn btn-type-info btn-sm">
+                      <Button onClick={openMessageModal}
+className="btn btn-type-info btn-sm">
                         Message
                       </Button>
                       <Box sx={{ mt: 2 }}>
@@ -967,7 +1013,8 @@ const ReqModal = (props) => {
                 </Box>
                 <Divider />
                 <Box className="mt-2 d-flex justify-content-end">
-                  <Button className="text-danger" onClick={() => handleClose()}>
+                  <Button className="text-danger"
+onClick={() => handleClose()}>
                     Close Requisition
                   </Button>
                 </Box>
@@ -976,27 +1023,37 @@ const ReqModal = (props) => {
 
             {/* signature sections */}
             {page === "gwapplytics" && (
-              <Grid container spacing={2} sx={{ mt: 4 }}>
-                <Grid item xs={3}>
-                  <Typography variant="subtitle2" className="text-item-header">
+              <Grid container
+spacing={2}
+sx={{ mt: 4 }}>
+                <Grid item
+xs={3}>
+                  <Typography variant="subtitle2"
+className="text-item-header">
                     Budget Holder Check
                   </Typography>
                   <Typography variant="body1">{reqData?.holderCheck?.name}</Typography>
                 </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="subtitle2" className="text-item-header">
+                <Grid item
+xs={3}>
+                  <Typography variant="subtitle2"
+className="text-item-header">
                     Finance Check
                   </Typography>
                   <Typography variant="body1">{reqData?.checkedBy?.name}</Typography>
                 </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="subtitle2" className="text-item-header">
+                <Grid item
+xs={3}>
+                  <Typography variant="subtitle2"
+className="text-item-header">
                     Finance Reviewed
                   </Typography>
                   <Typography variant="body1">{reqData?.reviewedBy?.name}</Typography>
                 </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="subtitle2" className="text-item-header">
+                <Grid item
+xs={3}>
+                  <Typography variant="subtitle2"
+className="text-item-header">
                     Approved By
                   </Typography>
                   <Typography variant="body1">{reqData?.approvedBy?.name}</Typography>

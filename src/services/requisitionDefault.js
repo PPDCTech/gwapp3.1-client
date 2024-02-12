@@ -15,6 +15,7 @@ const requisitionDefaults = {
     signatureUrl: "",
   },
   hoderCheckDate: null,
+  holderCheckDate: null,
   checkedBy: {
     email: "",
     name: "",

@@ -11,8 +11,8 @@ export const printDocument = async (req) => {
   let SignatureSection, SourceSection, ref;
 
   let userDate = formatDate(req.date);
-  let budgetHolderDate = formatDate(req.hoderCheckDate);
-  let checkDate = formatDate(req.checkedDate);
+  let budgetHolderDate = formatDate(req.hoderCheckDate || req.holderCheckDate);
+  let checkDate = formatDate(req.checkDate);
   let approveDate = formatDate(req.approvedDate);
   let reqDate = formatDate(req.date);
   let date = formatDateSpace(req.date);
@@ -47,7 +47,7 @@ export const printDocument = async (req) => {
         { image: budgetHolderSig, width: 30, height: 30 },
       ],
       [
-        { text: "Checked By", style: "labelStyle" },
+        { text: "Reviewed By", style: "labelStyle" },
         { text: req.checkedBy.name, style: "fieldStyle" },
         { text: checkDate, style: "fieldStyle" },
         { image: checkedSignature, width: 30, height: 30 },

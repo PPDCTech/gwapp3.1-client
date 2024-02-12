@@ -27,16 +27,20 @@ const NotificationDropdown = (props) => {
       onClose={onClose}
     >
       <Box p={2}>
-        <Typography variant="subtitle1" gutterBottom>
+        <Typography variant="subtitle1"
+gutterBottom>
           Notifications
         </Typography>
         {notifications.map((notification, index) => (
-          <ListItem key={index} disablePadding>
-            <ListItemText primary={notification.message} secondary={notification.date} />
+          <ListItem key={index}
+disablePadding>
+            <ListItemText primary={notification.message}
+secondary={notification.date} />
           </ListItem>
         ))}
         {notifications.length === 0 && (
-          <Typography variant="body2" color="textSecondary">
+          <Typography variant="body2"
+color="textSecondary">
             No new notifications.
           </Typography>
         )}

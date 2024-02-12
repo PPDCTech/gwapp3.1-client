@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   FormHelperText,
+  IconButton,
   Link,
   Stack,
   Tab,
@@ -18,6 +19,7 @@ import {
 } from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const Page = () => {
   const router = useRouter();
@@ -66,6 +68,16 @@ const Page = () => {
     },
     [auth, router]
   );
+
+  const [showPassword, setShowPassword] = useState(false);
+
+const handleClickShowPassword = () => {
+  setShowPassword(!showPassword);
+};
+
+const handleMouseDownPassword = (event) => {
+  event.preventDefault();
+};
 
   return (
     <>
@@ -162,10 +174,22 @@ const Page = () => {
                     name="password"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="password"
+                    type={showPassword ? "text" : "password" }
                     value={formik.values.password}
+                    InputProps={{
+                      endAdornment: (
+                        <IconButton
+                          edge="end"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                        >
+                          {showPassword ? <Visibility /> : <VisibilityOff />}
+                        </IconButton>
+                      ),
+                    }}
                   />
                 </Stack>
+                
                 {formik.errors.submit && (
                   <Typography
                     color="error"

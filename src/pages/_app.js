@@ -11,6 +11,8 @@ import { createEmotionCache } from 'src/utils/create-emotion-cache';
 import 'simplebar-react/dist/simplebar.min.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import "../styles/common.css";
+import { NetworkStatusIndicator } from 'src/components/check-status';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -35,6 +37,7 @@ const App = (props) => {
           name="viewport"
           content="initial-scale=1, width=device-width"
         />
+        <NetworkStatusIndicator />
       </Head>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <AuthProvider>

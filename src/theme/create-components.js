@@ -27,7 +27,8 @@ export function createComponents(config) {
       styleOverrides: {
         root: {
           borderRadius: '12px',
-          textTransform: 'none'
+          textTransform: 'none',
+          boxShadow: 'none'
         },
         sizeSmall: {
           padding: '6px 16px'

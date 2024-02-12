@@ -13,27 +13,29 @@ import { OverviewTraffic } from "src/sections/overview/overview-traffic";
 import { OverviewTotalRaised } from "src/sections/overview/overview-total-raised";
 import { OverviewTotalApproved } from "src/sections/overview/overview-total-approved";
 import { useAuth } from "src/hooks/use-auth";
-import { GET_USER_REQUISITIONS } from "src/services/constants";
-import axios from "axios";
 import { useEffect, useState } from "react";
-
-const now = new Date();
+import { getUserRequisitions } from "src/services/api/requisition.api";
 
 const Page = () => {
-  const [total, setTotal] = useState(0);
-  const [latestReqs, setLatestReqs] = useState([]);
+  const { user } = useAuth();
+  const [totalCount, setTotalCount] = useState(0);
+  const [requisitions, setRequisitions] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get(GET_USER_REQUISITIONS("sadiq@ppdc.org"));
-      const { requisitions, totalCount } = response.data;
-      setTotal(totalCount);
-      setLatestReqs(requisitions.slice(0, 6));
-      
+      try {
+        const response = await getUserRequisitions(user.email);
+        const { requisitions, totalCount } = response.data;
+        setTotalCount(totalCount);
+        setRequisitions(requisitions.slice(0, 6));
+      } catch (error) {
+        console.error("Error fetching requisitions:", error.message);
+      }
+    };
+    if (user.email) {
+      fetchData();
     }
-    fetchData();
-  }, []);
-
+  }, [user.email]);
 
   return (
     <>
@@ -49,55 +51,29 @@ const Page = () => {
       >
         <Container maxWidth="xl">
           <Grid container spacing={3}>
-            <Grid xs={12} sm={6} lg={3}>
-              <OverviewTotalRaised
-                negative
-                sx={{ height: "100%" }}
-                value={`${total}`}
-              />
+            <Grid xs={12} sm={6} lg={4}>
+              <OverviewTotalRaised positive sx={{ height: "100%" }} value={`${totalCount}`} />
             </Grid>
-            <Grid xs={12} sm={6} lg={3}>
+            {/* <Grid xs={12} sm={6} lg={3}>
               <OverviewTotalApproved
                 difference={16}
                 positive={false}
                 sx={{ height: "100%" }}
-                value={`${total}`}
+                value={`${totalCount}`}
               />
-            </Grid>
-            <Grid xs={12} sm={6} lg={3}>
-              <OverviewTasksProgress sx={{ height: "100%" }} value={100} />
+            </Grid> */}
+            <Grid xs={12} sm={6} lg={4}>
+              <OverviewTasksProgress sx={{ height: "100%" }} totalValue={totalCount} />
             </Grid>
             <Grid xs={12} md={12} lg={12}>
-              <OverviewLatestRequests latestReqs={latestReqs} sx={{ height: "100%" }} />
+              {/* if user is not user or tech, this will have latest approved instead */}
+              <OverviewLatestRequests latestReqs={requisitions} sx={{ height: "100%" }} />
             </Grid>
           </Grid>
         </Container>
       </Box>
     </>
   );
-};
-
-export const getServerSideProps = async () => {
-  try {
-    console.log('fetching...')
-    const response = await axios.get(GET_USER_REQUISITIONS("sadiq@ppdc.org"));
-    const { requisitions, totalCount } = response.data;
-
-    return {
-      props: {
-        totalCount,
-        requisitions
-      },
-    };
-  } catch (error) {
-    console.error("Error fetching requisitions:", error.message);
-
-    return {
-      props: {
-        requisitions: [],
-      },
-    };
-  }
 };
 
 Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;

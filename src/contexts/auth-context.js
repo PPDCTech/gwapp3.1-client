@@ -1,19 +1,20 @@
-import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
-import PropTypes from 'prop-types';
-import axios from 'axios';
-import { GET_USERS_URL, LOGIN_API_URL } from 'src/services/constants';
+import { createContext, useContext, useEffect, useReducer, useRef } from "react";
+import PropTypes from "prop-types";
+import axios from "axios";
+import { GET_USERS_API, LOGIN_API } from "src/services/constants";
+import jwt from "jsonwebtoken";
 
 const HANDLERS = {
-  INITIALIZE: 'INITIALIZE',
-  SIGN_IN: 'SIGN_IN',
-  SIGN_OUT: 'SIGN_OUT',
-  SET_USER: "SET_USER"
+  INITIALIZE: "INITIALIZE",
+  SIGN_IN: "SIGN_IN",
+  SIGN_OUT: "SIGN_OUT",
+  SET_USER: "SET_USER",
 };
 
 const initialState = {
   isAuthenticated: false,
   isLoading: true,
-  user: null
+  user: null,
 };
 
 const handlers = {
@@ -22,18 +23,16 @@ const handlers = {
 
     return {
       ...state,
-      ...(
-        // if payload (user) is provided, then is authenticated
-        user
-          ? ({
+      ...// if payload (user) is provided, then is authenticated
+      (user
+        ? {
             isAuthenticated: true,
             isLoading: false,
-            user
-          })
-          : ({
-            isLoading: false
-          })
-      )
+            user,
+          }
+        : {
+            isLoading: false,
+          }),
     };
   },
   [HANDLERS.SIGN_IN]: (state, action) => {
@@ -42,14 +41,14 @@ const handlers = {
     return {
       ...state,
       isAuthenticated: true,
-      user
+      user,
     };
   },
   [HANDLERS.SIGN_OUT]: (state) => {
     return {
       ...state,
       isAuthenticated: false,
-      user: null
+      user: null,
     };
   },
   [HANDLERS.SET_USER]: (state, action) => ({
@@ -59,9 +58,8 @@ const handlers = {
   }),
 };
 
-const reducer = (state, action) => (
-  handlers[action.type] ? handlers[action.type](state, action) : state
-);
+const reducer = (state, action) =>
+  handlers[action.type] ? handlers[action.type](state, action) : state;
 
 // The role of this context is to propagate authentication state through the App tree.
 
@@ -76,8 +74,8 @@ export const AuthProvider = (props) => {
     dispatch({
       type: HANDLERS.SET_USER,
       payload: user,
-    })
-  }
+    });
+  };
 
   const initialize = async () => {
     // Prevent from calling twice in development mode with React.StrictMode enabled
@@ -90,24 +88,24 @@ export const AuthProvider = (props) => {
     let isAuthenticated = false;
 
     try {
-      isAuthenticated = window.sessionStorage.getItem('authenticated') === 'true';
+      isAuthenticated = window.localStorage.getItem("authenticated") === "true";
     } catch (err) {
       console.error(err);
     }
 
     if (isAuthenticated) {
-      const userId = window.sessionStorage.getItem('gwapp_userId');
+      const userId = window.localStorage.getItem("gwapp_userId");
 
-      const response = await axios.get(`${GET_USERS_URL}/${userId}`);
+      const response = await axios.get(`${GET_USERS_API}/${userId}`);
       const user = response.data;
 
       dispatch({
         type: HANDLERS.INITIALIZE,
-        payload: user
+        payload: user,
       });
     } else {
       dispatch({
-        type: HANDLERS.INITIALIZE
+        type: HANDLERS.INITIALIZE,
       });
     }
   };
@@ -120,50 +118,71 @@ export const AuthProvider = (props) => {
     []
   );
 
+  useEffect(() => {
+    const token = window.localStorage.getItem("token");
+    if (token) {
+      const decodedToken = jwt.decode(token);
+      const currentTime = Date.now() / 1000;
+      if (decodedToken.exp < currentTime) {
+        signOut();
+      }
+    }
+  }, [state]);
+
   const skip = () => {
     try {
-      window.sessionStorage.setItem('authenticated', 'true');
+      window.localStorage.setItem("authenticated", "true");
     } catch (err) {
       console.error(err);
     }
 
     const user = {
-      id: '5e86809283e28b96d2d38537',
-      avatar: '/assets/avatars/avatar-anika-visser.png',
-      name: 'Sadiq Sambo',
-      email: 'anika.visser@devias.io'
+      id: "5e86809283e28b96d2d38537",
+      avatar: "/assets/avatars/avatar-anika-visser.png",
+      name: "Sadiq Sambo",
+      email: "anika.visser@devias.io",
     };
 
     dispatch({
       type: HANDLERS.SIGN_IN,
-      payload: user
+      payload: user,
     });
   };
 
   const signIn = async (email, password) => {
-    const response = await axios.post(LOGIN_API_URL, {email, password});
+    const response = await axios.post(LOGIN_API, { email, password });
     const { userData } = response.data;
+    const token = userData.token;
+    const status = userData.status;
+
+    if (status !== "active") {
+      // you shall not pass
+      return;
+    }
 
     try {
-      window.sessionStorage.setItem('gwapp_userId', userData._id);
-      window.sessionStorage.setItem('authenticated', 'true');
+      window.localStorage.setItem("gwapp_userId", userData._id);
+      window.localStorage.setItem("authenticated", "true");
+      window.localStorage.setItem("token", token);
     } catch (err) {
       console.error(err);
     }
 
     dispatch({
       type: HANDLERS.SIGN_IN,
-      payload: userData
+      payload: userData,
     });
   };
 
   const signUp = async (email, name, password) => {
-    throw new Error('Sign up is not implemented');
+    throw new Error("Sign up is not implemented");
   };
 
   const signOut = () => {
+    window.localStorage.removeItem("token");
+
     dispatch({
-      type: HANDLERS.SIGN_OUT
+      type: HANDLERS.SIGN_OUT,
     });
   };
 
@@ -175,7 +194,7 @@ export const AuthProvider = (props) => {
         skip,
         signIn,
         signUp,
-        signOut
+        signOut,
       }}
     >
       {children}
@@ -184,7 +203,7 @@ export const AuthProvider = (props) => {
 };
 
 AuthProvider.propTypes = {
-  children: PropTypes.node
+  children: PropTypes.node,
 };
 
 export const AuthConsumer = AuthContext.Consumer;

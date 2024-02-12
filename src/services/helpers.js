@@ -1,26 +1,7 @@
 import axios from "axios";
-import { UPLOAD_FILE_URL } from "./constants";
+import { UPLOAD_FILE_API } from "./constants";
 import dayjs from "dayjs";
-
-// GENERIC POST FUNC
-export const postData = async (endpoint, data) => {
-  try {
-    const response = await axios.post(endpoint, data);
-    return response.data;
-  } catch (error) {
-    console.error("Error during POST request:", error);
-    return null;
-  }
-};
-
-export const fetchData = async (endpoint) => {
-  try {
-    const response = await axios.get(endpoint);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+import { toast } from "react-toastify";
 
 export const uploadImages = async (selectedFiles) => {
   try {
@@ -30,7 +11,7 @@ export const uploadImages = async (selectedFiles) => {
       formData.append(`file-${index}`, file);
     });
 
-    const response = await axios.post(UPLOAD_FILE_URL, formData, {
+    const response = await axios.post(UPLOAD_FILE_API, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -66,6 +47,12 @@ export const getDateMDY = (date) => {
   }
 
   return "Invalid Date";
+};
+
+export const getCurrentDateTimeString = () => {
+  const currentDate = new Date();
+  const dateTimeString = currentDate.toISOString().split(".")[0]; // Remove milliseconds
+  return dateTimeString;
 };
 
 export const tobase64 = (url) => {
@@ -203,3 +190,22 @@ export const amountToWords = (currency, amount) => {
 
   return result;
 };
+
+export const showNetworkToast = (message, type) => {
+  return toast(message, {
+    position: "bottom-left",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "dark",
+    type: type || "default",
+  });
+};
+
+
+// export const allowSendBack = (userStatus, reqStatus) => {
+//   if (reqStatus)
+// }

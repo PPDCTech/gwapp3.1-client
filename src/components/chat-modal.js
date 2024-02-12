@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Modal,
   Typography,
-  Paper,
   List,
   ListItem,
   ListItemText,
@@ -14,12 +13,10 @@ import {
 } from "@mui/material";
 import XCircleIcon from "@heroicons/react/24/outline/XCircleIcon";
 import PaperAirplaneIcon from "@heroicons/react/24/outline/PaperAirplaneIcon";
-import axios from "axios";
-import { MESSAGES_URL, USERS_URL } from "src/services/constants";
 import { toast } from "react-toastify";
-import { fetchData } from "src/services/helpers";
+import { fetchSingleUser } from "src/services/api/users.api";
+import { addMessage, fetchMessages } from "src/services/api/message-chat.api";
 import { useAuth } from "src/hooks/use-auth";
-import { addMessage, fetchMessages } from "src/services/api";
 
 function ChatModal({ open, onClose, reqId }) {
   const [messages, setMessages] = useState([]);
@@ -28,9 +25,7 @@ function ChatModal({ open, onClose, reqId }) {
   const [users, setUsers] = useState({});
   const [loadingMessages, setLoadingMessages] = useState(true);
 
-  const auth = useAuth();
-
-  const user = auth?.user;
+  const { user } = useAuth();
   const userId = user?._id || "";
   const lastMessageRef = useRef(null);
 
@@ -58,8 +53,8 @@ function ChatModal({ open, onClose, reqId }) {
       try {
         if (reqId) {
           setLoadingMessages(true);
-          const messages = await fetchMessages(reqId);
-          setMessages(messages);
+          const response = await fetchMessages(reqId);
+          setMessages(response.data);
         }
       } catch (error) {
         toast.error(error.message);
@@ -75,7 +70,7 @@ function ChatModal({ open, onClose, reqId }) {
       const usersData = {};
       for (const message of messages) {
         if (!usersData[message.user_id]) {
-          const userData = await fetchData(`${USERS_URL}/${message.user_id}`);
+          const userData = await fetchSingleUser(message.user_id);
           usersData[message.user_id] = userData;
         }
       }
@@ -94,17 +89,16 @@ function ChatModal({ open, onClose, reqId }) {
   const sendMessage = async () => {
     try {
       setLoading(true);
-      const addedMessage = await addMessage(reqId, auth?.user._id, message);
-      console.log("Added Message:", addedMessage);
+      await addMessage(reqId, user._id, message);
       const updatedMessages = await fetchMessages(reqId);
-      setMessages(updatedMessages);
+      setMessages(updatedMessages.data);
     } catch (error) {
       toast.error(error.message);
     } finally {
       setLoading(false);
       setMessage("");
     }
-  }
+  };
 
   return (
     <Modal
@@ -141,7 +135,7 @@ function ChatModal({ open, onClose, reqId }) {
           ) : messages.length === 0 ? (
             <Typography variant="subtitle1">No Messages</Typography>
           ) : (
-            messages.map((message, index) => {
+            messages && messages.map((message, index) => {
               const isOwnMessage = message.user_id === userId;
               const user = users[message.user_id] || {};
 

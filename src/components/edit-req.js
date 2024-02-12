@@ -1,4 +1,3 @@
-// EditReqModal.js
 import React, { useState } from "react";
 import {
   Dialog,
@@ -25,7 +24,6 @@ const EditReqModal = ({ open, onClose, requisition, onSave }) => {
   };
 
   const handleSave = () => {
-    // Call an API to save the edited requisition
     onSave(editedRequisition);
     onClose();
   };

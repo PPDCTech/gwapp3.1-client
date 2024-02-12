@@ -66,7 +66,9 @@ export const TopNav = (props) => {
             px: 2,
           }}
         >
-          <Stack alignItems="center" direction="row" spacing={2}>
+          <Stack alignItems="center"
+direction="row"
+spacing={2}>
             {!lgUp && (
               <IconButton onClick={onNavOpen}>
                 <SvgIcon fontSize="small">
@@ -76,13 +78,17 @@ export const TopNav = (props) => {
             )}
             {`${greeting}, ${getFirstName(auth.user?.name)}`}
           </Stack>
-          <Stack alignItems="center" direction="row" spacing={2}>
+          <Stack alignItems="center"
+direction="row"
+spacing={2}>
             <Tooltip title="Notifications">
               <IconButton
                 ref={notificationDropdown.anchorRef}
                 onClick={notificationDropdown.handleOpen}
               >
-                <Badge badgeContent={4} color="success" variant="dot">
+                <Badge badgeContent={4}
+color="success"
+variant="dot">
                   <SvgIcon fontSize="small">
                     <BellIcon />
                   </SvgIcon>

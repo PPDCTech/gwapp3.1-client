@@ -31,20 +31,25 @@ export const AccountProfile = () => {
               width: 80,
             }}
           />
-          <Typography gutterBottom variant="h5">
+          <Typography gutterBottom
+variant="h5">
             {user.name}
           </Typography>
-          <Typography color="text.secondary" variant="body2">
+          <Typography color="text.secondary"
+variant="body2">
             {user.email}
           </Typography>
-          <Typography color="text.secondary" variant="body2">
+          <Typography color="text.secondary"
+variant="body2">
             {user.role}
           </Typography>
         </Box>
       </CardContent>
       <Divider />
       <CardActions>
-        <Button fullWidth variant="text" color="info">
+        <Button fullWidth
+variant="text"
+color="info">
           Upload picture
         </Button>
       </CardActions>

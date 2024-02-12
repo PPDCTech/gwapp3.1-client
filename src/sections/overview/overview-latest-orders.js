@@ -14,20 +14,15 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableRow
+  TableRow,
+  Tooltip
 } from '@mui/material';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SeverityPill } from 'src/components/severity-pill';
 import { shortenString } from 'src/utils/format-strings';
 import { formatAmount, getCurrencySign } from "src/utils/format-currency";
 import { formatDate } from "src/utils/format-date";
-
-const statusMap = {
-  pending: 'secondary',
-  checked: 'info',
-  approved: 'success',
-  rejected: 'error'
-};
+import { STATUS_COLOR_TYPE } from 'src/services/constants';
 
 export const OverviewLatestRequests = (props) => {
   const { latestReqs = [], sx } = props;
@@ -40,31 +35,31 @@ export const OverviewLatestRequests = (props) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>
+                <TableCell sx={{ width: '40%' }}>
                   Title
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ width: '20%' }}>
                   Amount
                 </TableCell>
-                <TableCell sortDirection="desc">
+                <TableCell sortDirection="desc" sx={{ width: '20%' }}>
                   Date
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ width: '20%' }}>
                   Status
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {latestReqs.map((req) => {
-                // const createdAt = format(req.createdAt, 'dd/MM/yyyy');
-
                 return (
                   <TableRow
                     hover
-                    key={latestReqs._id}
+                    key={req._id}
                   >
                     <TableCell>
+                      <Tooltip title={req.title}>
                       {shortenString(req.title, 50)}
+                      </Tooltip>
                     </TableCell>
                     <TableCell>
                       {getCurrencySign(req?.currency)}
@@ -74,7 +69,7 @@ export const OverviewLatestRequests = (props) => {
                       {formatDate(req.date)}
                     </TableCell>
                     <TableCell>
-                      <SeverityPill color={statusMap[req.status]}>
+                      <SeverityPill color={STATUS_COLOR_TYPE[req.status]}>
                         {req.status}
                       </SeverityPill>
                     </TableCell>
