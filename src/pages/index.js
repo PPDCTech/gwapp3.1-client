@@ -32,10 +32,10 @@ const Page = () => {
         console.error("Error fetching requisitions:", error.message);
       }
     };
-    if (user.email) {
+    if (user && user.email) {
       fetchData();
     }
-  }, [user.email]);
+  }, [user, user?.email]);
 
   return (
     <>

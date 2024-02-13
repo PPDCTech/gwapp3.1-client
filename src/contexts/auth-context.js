@@ -124,30 +124,12 @@ export const AuthProvider = (props) => {
       const decodedToken = jwt.decode(token);
       const currentTime = Date.now() / 1000;
       if (decodedToken.exp < currentTime) {
-        signOut();
+        dispatch({
+          type: HANDLERS.SIGN_OUT,
+        });
       }
     }
   }, [state]);
-
-  const skip = () => {
-    try {
-      window.localStorage.setItem("authenticated", "true");
-    } catch (err) {
-      console.error(err);
-    }
-
-    const user = {
-      id: "5e86809283e28b96d2d38537",
-      avatar: "/assets/avatars/avatar-anika-visser.png",
-      name: "Sadiq Sambo",
-      email: "anika.visser@devias.io",
-    };
-
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user,
-    });
-  };
 
   const signIn = async (email, password) => {
     const response = await axios.post(LOGIN_API, { email, password });
@@ -180,6 +162,8 @@ export const AuthProvider = (props) => {
 
   const signOut = () => {
     window.localStorage.removeItem("token");
+    window.localStorage.removeItem("authenticated");
+    window.localStorage.removeItem("gwapp_userId");
 
     dispatch({
       type: HANDLERS.SIGN_OUT,
@@ -191,7 +175,6 @@ export const AuthProvider = (props) => {
       value={{
         ...state,
         setUser,
-        skip,
         signIn,
         signUp,
         signOut,

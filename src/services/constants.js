@@ -1,11 +1,5 @@
 
-let API;
-
-if (process.env.NODE_ENV === "development") {
-  API = "http://localhost:5000";
-} else {
-  API = "https://gwapp3-api.vercel.app";
-}
+const API = process.env.API;
 
 export const STATUS_COLOR_TYPE = {
   pending: "warning", 

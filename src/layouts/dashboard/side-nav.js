@@ -37,15 +37,15 @@ export const SideNav = (props) => {
   ];
 
   const filteredItems = items.filter((item) => {
-    if (user.accessLevel === "tech") {
+    if (user?.accessLevel === "tech") {
       return true; // tech can see all items
-    } else if (user.accessLevel === "superUser") {
+    } else if (user?.accessLevel === "superUser") {
       return item.path !== "/retirements"; // superUser can't see /retirements
-    } else if (user.accessLevel === "budgetHolder") {
+    } else if (user?.accessLevel === "budgetHolder") {
       return item.path !== "/retirements" && item.path !== "/accounts"; // budgetHolder can't see /retirements and /accounts
-    } else if (user.accessLevel === "finance" || user.accessLevel === "financeReviewer") {
+    } else if (user?.accessLevel === "finance" || user?.accessLevel === "financeReviewer") {
       return item.path !== "/retirements"; // finance and financeReviewer can't see /retirements
-    } else if (user.accessLevel === "user") {
+    } else if (user?.accessLevel === "user") {
       return item.path !== "/accounts" && item.path !== "/projects"; // user can't see /accounts and /projects
     } else {
       return false; // Default to not including the item if no specific logic applies

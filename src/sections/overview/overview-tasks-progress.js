@@ -18,16 +18,26 @@ export const OverviewTasksProgress = (props) => {
   const { totalValue, sx } = props;
   const { user } = useAuth();
   const [unretiredPercentage, setUnretiredPercentage] = useState(0);
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
   const [avatarColor, setAvatarColor] = useState("success.ppdc");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoading(true); // Set loading state to true
         const response = await getUserUnretiredRequisitions(user.email);
         const unretiredCount = response.data.totalCount;
         const totalCount = totalValue;
-        const percentage = (unretiredCount / totalCount) * 100;
+
+        if (totalCount === 0) {
+          // Handle zero total count (set appropriate percentage or message)
+          setUnretiredPercentage(0);
+          return;
+        }
+
+        const percentage = Math.round((unretiredCount / totalCount) * 100); // Ensure valid values
         setUnretiredPercentage(percentage);
+
         if (percentage === 0) {
           setAvatarColor("success.ppdc");
         } else if (percentage > 80) {
@@ -41,6 +51,8 @@ export const OverviewTasksProgress = (props) => {
         }
       } catch (error) {
         console.error("Error fetching unretired requisitions:", error.message);
+      } finally {
+        setIsLoading(false); // Set loading state to false
       }
     };
     fetchData();
@@ -54,12 +66,19 @@ export const OverviewTasksProgress = (props) => {
             <Typography color="text.secondary" gutterBottom variant="overline">
               Retirements
             </Typography>
-            <Typography variant="h4">{Number(unretiredPercentage.toFixed(2))}%</Typography>
+            <Typography variant="h4">
+              {isLoading ? (
+                "Loading..." // Display loading placeholder
+              ) : (
+                unretiredPercentage !== 0 && ( // Conditional rendering
+                  Number(unretiredPercentage.toFixed(2)) + "%"
+                )
+              )}
+            </Typography>
           </Stack>
           <Avatar
             sx={{
               backgroundColor: avatarColor,
-              // backgroundColor: 'warning.main',
               height: 56,
               width: 56,
             }}

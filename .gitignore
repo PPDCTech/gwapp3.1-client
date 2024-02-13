@@ -30,3 +30,5 @@ yarn-error.log*
 public/sw.js 
 public/swe-worker-4da67dda9bc18c53.js 
 public/workbox-c06b064f.js
+
+.VSCodeCounter
