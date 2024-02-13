@@ -1,4 +1,10 @@
-# Gwapp3.1 (https://gwapp.ppdc.org/)
+# Gwapp3.1
+
+## Official link
+https://gwapp.ppdc.org
+
+## Host
+https://vercel.com/tech-procurementm/gwapp3-1-client
 
 ## Quick Start
 
