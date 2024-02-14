@@ -151,10 +151,10 @@ function ChatModal({ open, onClose, reqId }) {
                   }}
                 >
                   <ListItemAvatar sx={{ width: 32, height: 32 }}>
-                    <Avatar alt={user.name} src={user.photoUrl} />
+                    <Avatar alt={user?.name} src={user?.photoUrl} />
                   </ListItemAvatar>
                   <ListItemText
-                    primary={isOwnMessage ? "You" : user.name}
+                    primary={isOwnMessage ? "You" : user?.name}
                     secondary={message.message}
                   />
                 </ListItem>
