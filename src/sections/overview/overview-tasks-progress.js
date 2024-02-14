@@ -25,7 +25,7 @@ export const OverviewTasksProgress = (props) => {
     const fetchData = async () => {
       try {
         setIsLoading(true); // Set loading state to true
-        const response = await getUserUnretiredRequisitions(user.email);
+        const response = await getUserUnretiredRequisitions(user?.email);
         const unretiredCount = response.data.totalCount;
         const totalCount = totalValue;
 

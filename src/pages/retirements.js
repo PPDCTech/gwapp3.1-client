@@ -12,7 +12,7 @@ const Page = () => {
 
   const fetchData = async () => {
     try {
-      const response = await getUserUnretiredRequisitions(user.email);
+      const response = await getUserUnretiredRequisitions(user?.email);
       const { requisitions } = response.data;
       setData(requisitions);
     } catch (error) {

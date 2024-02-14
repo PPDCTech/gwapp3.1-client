@@ -1,7 +1,8 @@
 import axios from "axios";
 
-const API = process.env.API;
-console.log("API", API);
+const API = process.env.DEV_API;
+
+console.log("API from .env:", API);
 
 if (typeof window !== "undefined") {
   const token = localStorage.getItem("token");

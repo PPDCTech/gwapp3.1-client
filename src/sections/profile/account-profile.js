@@ -24,7 +24,7 @@ export const AccountProfile = () => {
           }}
         >
           <Avatar
-            src={user.photoUrl}
+            src={user?.photoUrl}
             sx={{
               height: 80,
               mb: 2,
@@ -33,15 +33,15 @@ export const AccountProfile = () => {
           />
           <Typography gutterBottom
 variant="h5">
-            {user.name}
+            {user?.name}
           </Typography>
           <Typography color="text.secondary"
 variant="body2">
-            {user.email}
+            {user?.email}
           </Typography>
           <Typography color="text.secondary"
 variant="body2">
-            {user.role}
+            {user?.role}
           </Typography>
         </Box>
       </CardContent>

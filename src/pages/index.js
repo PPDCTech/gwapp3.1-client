@@ -24,7 +24,7 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getUserRequisitions(user.email);
+        const response = await getUserRequisitions(user?.email);
         const { requisitions, totalCount } = response.data;
         setTotalCount(totalCount);
         setRequisitions(requisitions.slice(0, 6));
@@ -32,7 +32,7 @@ const Page = () => {
         console.error("Error fetching requisitions:", error.message);
       }
     };
-    if (user && user.email) {
+    if (user && user?.email) {
       fetchData();
     }
   }, [user, user?.email]);

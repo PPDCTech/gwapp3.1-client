@@ -38,12 +38,12 @@ const Page = () => {
       let count;
       switch (selectedTab) {
         case "myRequisitions":
-          const myReqs = await getUserRequisitions(user.email);
+          const myReqs = await getUserRequisitions(user?.email);
           fetchedRequisitions = myReqs.data.requisitions;
           count = myReqs.data.totalCount;
           break;
         case "forMyAttention":
-          const myAttentionReqs = await getAttentionedToRequisitions(user.email);
+          const myAttentionReqs = await getAttentionedToRequisitions(user?.email);
           fetchedRequisitions = myAttentionReqs.data.requisitions;
           count = myAttentionReqs.data.totalCount;
           break;
@@ -67,7 +67,7 @@ const Page = () => {
 
   useEffect(() => {
     fetchRequisitions();
-  }, [selectedTab, user.email]);
+  }, [selectedTab, user?.email]);
 
   const handleOpenCreateModal = () => {
     setEditMode(false);

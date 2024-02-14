@@ -94,9 +94,9 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
   };
 
   const checker_info = {
-    name: user.name,
-    email: user.email,
-    signatureUrl: user.signatureUrl,
+    name: user?.name,
+    email: user?.email,
+    signatureUrl: user?.signatureUrl,
   };
 
   const reqIsUpdated = () => toast.info("Requisition Updated");
@@ -369,7 +369,7 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
             )}
           </Grid>
 
-          {!(user.role === "staff" || user.role === "user") && (
+          {!(user?.role === "staff" || user?.role === "user") && (
             <>
               {requisition.projectChargedTo && (
                 <Grid container space={2} padding={2}>
@@ -400,7 +400,7 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
                 {(requisition.status === "pending" && user.accessLevel === "budgetHolder") ||
                 (requisition.status === "pending" &&
                   user.accessLevel === "finance" &&
-                  requisition.attentionTo.includes(user.email)) ? (
+                  requisition.attentionTo.includes(user?.email)) ? (
                   <>
                     <Button
                       variant="contained"
@@ -480,7 +480,7 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
                 ) : requisition.status === "reviewed" ? (
                   <Typography sx={{ color: success.ppdc }}>Request Awaiting Approval</Typography>
                 ) : requisition.status === "approved" &&
-                  (user.accessLevel === "finance" || user.accessLevel === "financeReviewer") ? (
+                  (user?.accessLevel === "finance" || user?.accessLevel === "financeReviewer") ? (
                   <Button size="small" onClick={handleCancelPayment}>
                     Cancel Payment
                   </Button>

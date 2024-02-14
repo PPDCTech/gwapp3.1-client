@@ -229,13 +229,13 @@ export const RequisitionTable = ({
                               )}
 
                             {/* Will add explanation later, I don tire */}
-                            {(user.accessLevel === "budgetHolder" &&
+                            {(user?.accessLevel === "budgetHolder" &&
                               requisition.status === "pending") ||
-                            (user.accessLevel === "finance" &&
+                            (user?.accessLevel === "finance" &&
                               requisition.status === "holderCheck") ||
-                            (user.accessLevel === "financeReviewer" &&
+                            (user?.accessLevel === "financeReviewer" &&
                               requisition.status === "checked") ||
-                            (user.accessLevel === "superUser" &&
+                            (user?.accessLevel === "superUser" &&
                               requisition.status === "reviewed") ? (
                               <Grid item>
                                 <Tooltip title="Print">

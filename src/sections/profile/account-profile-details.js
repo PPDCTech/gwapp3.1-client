@@ -30,7 +30,7 @@ export const AccountProfileDetails = () => {
   const [values, setValues] = useState({
     firstName: user.name.split(" ")[0],
     lastName: user.name.split(" ")[1],
-    email: user.email,
+    email: user?.email,
     password: "",
     repeatPassword: "",
     newPassword: "",
@@ -65,7 +65,7 @@ export const AccountProfileDetails = () => {
 
           if (is_password_correct.status === 200) {
             setError("");
-            const response = await axios.post(CHANGE_PASSWORD_API, { email: user.email });
+            const response = await axios.post(CHANGE_PASSWORD_API, { email: user?.email });
             if (response.status === 200) {
               setIsCodeModalOpen(true);
             }
@@ -77,13 +77,13 @@ export const AccountProfileDetails = () => {
         setLoading(false);
       }
     },
-    [user._id, user.email, values.newPassword, values.password, values.repeatPassword]
+    [user?._id, user?.email, values.newPassword, values.password, values.repeatPassword]
   );
 
   const handleCodeSubmit = async (codeValue) => {
     try {
       const password_change = await axios.post(RESET_PASSWORD_API, {
-        email: user.email,
+        email: user?.email,
         password: values.newPassword,
         resetToken: codeValue,
       });
