@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from "react";
 import PropTypes from "prop-types";
-import axios from "axios";
-import { GET_USERS_API, LOGIN_API } from "src/services/constants";
 import jwt from "jsonwebtoken";
+import { fetchSingleUser } from "src/services/api/users.api";
+import { loginUser } from "src/services/api/auth.api";
 
 const HANDLERS = {
   INITIALIZE: "INITIALIZE",
@@ -96,8 +96,8 @@ export const AuthProvider = (props) => {
     if (isAuthenticated) {
       const userId = window.localStorage.getItem("gwapp_userId");
 
-      const response = await axios.get(`${GET_USERS_API}/${userId}`);
-      const user = response.data;
+      const response = await fetchSingleUser(userId);
+      const user = response?.data;
 
       dispatch({
         type: HANDLERS.INITIALIZE,
@@ -120,6 +120,7 @@ export const AuthProvider = (props) => {
 
   useEffect(() => {
     const token = window.localStorage.getItem("token");
+
     if (token) {
       const decodedToken = jwt.decode(token);
       const currentTime = Date.now() / 1000;
@@ -129,17 +130,15 @@ export const AuthProvider = (props) => {
         });
       }
     }
-  }, [state]);
+  }, []);
 
   const signIn = async (email, password) => {
-    const response = await axios.post(LOGIN_API, { email, password });
+    const response = await loginUser(email, password);
     const { userData } = response.data;
-    const token = userData.token;
-    const status = userData.status;
+    const { status, token } = userData;
 
-    if (status !== "active") {
-      // you shall not pass
-      return;
+    if (status === "inactive") {
+      return; // you shall not pass
     }
 
     try {
@@ -147,7 +146,7 @@ export const AuthProvider = (props) => {
       window.localStorage.setItem("authenticated", "true");
       window.localStorage.setItem("token", token);
     } catch (err) {
-      console.error(err);
+      console.error(err.message);
     }
 
     dispatch({

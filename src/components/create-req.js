@@ -114,8 +114,10 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
 
   const getBudgetHolders = async () => {
     const response = await fetchBudgetHolders();
-    const { budget_holders } = response.data;
-    setBudgetHolders(budget_holders);
+    if (response && response.data) {
+      const { budget_holders } = response.data;
+      setBudgetHolders(budget_holders);
+    }
   };
 
   const getBeneficiaries = async () => {
@@ -181,7 +183,6 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
       }));
 
       const formValues = {
-        
         userId: user._id,
         type,
         title,

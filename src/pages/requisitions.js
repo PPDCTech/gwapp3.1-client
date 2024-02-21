@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
-import { Box, Button, Container, Grid, Typography, Divider, Tabs, Tab } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  Grid,
+  Typography,
+  Divider,
+  Tabs,
+  Tab,
+  Tooltip,
+} from "@mui/material";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import CreateReqModal from "src/components/create-req";
 import ChatModal from "src/components/chat-modal";
@@ -13,19 +23,27 @@ import {
   getAllRequisitions,
   getAttentionedToRequisitions,
   getUserRequisitions,
+  searchFilterRequisitions,
 } from "src/services/api/requisition.api";
+import { FilterRequisitions } from "src/sections/requisitions/filter-requisitions";
+// import DownloadForOfflineOutlinedIcon from "@mui/icons-material/DownloadForOfflineOutlined";
+// import DownloadingOutlinedIcon from "@mui/icons-material/DownloadingOutlined";
+import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const Page = () => {
   const { user } = useAuth();
   const [requisitions, setRequisitions] = useState([]);
+  const [filteredRequisitions, setFilteredRequisitions] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = useState("myRequisitions");
   const [isCreateReqModalOpen, setCreateReqModalOpen] = useState(false);
   const [selectedRequisition, setSelectedRequisition] = useState(null);
   const [editMode, setEditMode] = useState(false);
+
+  // const [downloadingCSV, setDownloadingCSV] = useState(false);
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
@@ -80,6 +98,12 @@ const Page = () => {
     fetchRequisitions();
   };
 
+  const handleSubmitFilter = async (filters) => {
+    const response = await searchFilterRequisitions(filters);
+    console.log(response.data);
+    // setFilteredRequisitions()
+  };
+
   return (
     <>
       <Head>
@@ -99,14 +123,39 @@ const Page = () => {
               <Typography variant="h6" component="div" gutterBottom>
                 Requisitions
               </Typography>
-              <Button
-                size="small"
-                variant="outlined"
-                color="primary"
-                onClick={handleOpenCreateModal}
-              >
-                Create New
-              </Button>
+              <Box>
+                {/* <Tooltip title="Download Approved">
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    color="success"
+                    onClick={handleCSVDownload}
+                    disabled={downloadingCSV}
+                  >
+                    {downloadingCSV ? (
+                      <>
+                        <DownloadingOutlinedIcon />
+                        &nbsp;loading..
+                      </>
+                    ) : (
+                      <>
+                        <DownloadForOfflineOutlinedIcon />
+                        &nbsp;Download
+                      </>
+                    )}
+                  </Button>
+                </Tooltip> */}
+                <Button
+                  size="small"
+                  variant="outlined"
+                  color="primary"
+                  onClick={handleOpenCreateModal}
+                  sx={{ ml: 2 }}
+                >
+                  <CreateNewFolderIcon />
+                  &nbsp; Create New
+                </Button>
+              </Box>
               <CreateReqModal
                 open={isCreateReqModalOpen}
                 onClose={handleCloseCreateModal}
@@ -120,7 +169,7 @@ const Page = () => {
             </Grid>
 
             <Grid item xs={12}>
-              {/* Filter section */}
+              <FilterRequisitions onSubmitFilters={handleSubmitFilter} />
             </Grid>
 
             <Grid item xs={12}>
@@ -136,7 +185,7 @@ const Page = () => {
               </Tabs>
               <Box>
                 <RequisitionTable
-                  requisitions={requisitions}
+                  requisitions={filteredRequisitions.length ? filteredRequisitions : requisitions}
                   loading={loading}
                   totalCount={totalCount}
                   currentTab={selectedTab}

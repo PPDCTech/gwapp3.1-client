@@ -22,7 +22,6 @@ import {
   ArrowUturnLeftIcon,
 } from "@heroicons/react/24/outline";
 import { STATUS_COLOR_TYPE } from "src/services/constants";
-import { formatDate } from "src/utils/format-date";
 import { formatAmount, getCurrencySign } from "src/utils/format-currency";
 import { shortenString } from "src/utils/format-strings";
 import { SeverityPill } from "src/components/severity-pill";
@@ -33,6 +32,8 @@ import RequisitionDetailsModal from "src/components/req-details-modal";
 import ReqModal from "src/components/req-modal";
 import { useAuth } from "src/hooks/use-auth";
 import { deleteRequisition, destroyRequisition } from "src/services/api/requisition.api";
+import { formatDate } from "src/utils/format-date";
+import { getDateMDY } from "src/services/helpers";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -46,7 +47,7 @@ export const RequisitionTable = ({
   const { user } = useAuth();
   const [loadingRows, setLoadingRows] = useState([]);
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [rowsPerpage, setRowsPerpage] = useState(25);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState("");
   const [isReqDetailsOpen, setIsReqDetailsOpen] = useState(false);
@@ -56,7 +57,7 @@ export const RequisitionTable = ({
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 25));
+    setRowsPerpage(parseInt(event.target.value, 25));
     setPage(1);
   };
 
@@ -151,7 +152,7 @@ export const RequisitionTable = ({
                           {getCurrencySign(requisition?.currency)}
                           {formatAmount(Number(requisition?.total))}
                         </TableCell>
-                        <TableCell>{formatDate(requisition.date)}</TableCell>
+                        <TableCell>{getDateMDY(requisition.date)}</TableCell>
                         <TableCell>
                           <SeverityPill color={STATUS_COLOR_TYPE[requisition.status || "pending"]}>
                             {requisition.status}
@@ -186,7 +187,7 @@ export const RequisitionTable = ({
                             </Grid>
 
                             {/* If you are the requester, and it's not yet approved - you can delete */}
-                            {requisition.user.name === user.name &&
+                            {requisition?.user?.name === user?.name &&
                               requisition.status !== "approved" && (
                                 <>
                                   <Grid item>
@@ -290,10 +291,10 @@ export const RequisitionTable = ({
               </TableContainer>
               <Pagination
                 sx={{ mt: 2, display: "flex", justifyContent: "center" }}
-                count={Math.ceil(totalCount / rowsPerPage)}
+                count={Math.ceil(totalCount / rowsPerpage)}
                 page={page}
                 onChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
+                rowsPerPage={rowsPerpage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
               />
               <ChatModal open={isChatModalOpen} onClose={closeChatModal} reqId={selectedId} />

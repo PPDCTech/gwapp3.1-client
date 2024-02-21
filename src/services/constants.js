@@ -12,7 +12,6 @@ export const STATUS_COLOR_TYPE = {
   cancelled: "error",
 };
 
-export const LOGIN_API = `${API}/login`;
 export const VERIFY_PASSWORD_API = `${API}/verify-password`;
 export const CHANGE_PASSWORD_API = `${API}/change-password`;
 export const RESET_PASSWORD_API = `${API}/reset-password`;
@@ -35,7 +34,6 @@ export const GET_REQUISITION_BY_ID_API = (requisitionId) => `${API}/requisitions
 export const FILTER_REQUISITIONS_API = `${API}/filter-requisitions`;
 
 
-export const GET_USERS_API = `${API}/users`;
 export const PROJECTS_API = `${API}/projects`;
 export const BUDGET_CODES_API = `${API}/budget-codes`;
 export const UPLOAD_FILE_API = `${API}/upload-file`;

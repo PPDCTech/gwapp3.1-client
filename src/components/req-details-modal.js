@@ -563,7 +563,7 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
                 </>
 
                 {/* Delete button */}
-                {requisition.status !== "approved" && requisition.user.name === user.name && (
+                {requisition.status !== "approved" && requisition?.user?.name === user?.name && (
                   <Button
                     sx={{ ml: 2 }}
                     variant="outlined"

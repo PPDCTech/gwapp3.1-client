@@ -146,17 +146,18 @@ const Page = () => {
                     onChange={formik.handleChange}
                     type={showPassword ? "text" : "password"}
                     value={formik.values.password}
-                    InputProps={{
-                      endAdornment: (
-                        <IconButton
-                          edge="end"
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                        >
-                          {showPassword ? <Visibility /> : <VisibilityOff />}
-                        </IconButton>
-                      ),
-                    }}
+                    // InputProps={{
+                    //   endAdornment: (
+                    //     <IconButton
+                    //       edge="end"
+                    //       onClick={handleClickShowPassword}
+                    //       onMouseDown={handleMouseDownPassword}
+                    //       aria-label="toggle password visibility"
+                    //     >
+                    //       {showPassword ? <Visibility /> : <VisibilityOff />}
+                    //     </IconButton>
+                    //   ),
+                    // }}
                   />
                 </Stack>
 
@@ -183,14 +184,6 @@ const Page = () => {
                 >
                   {loadingSubmit ? "Logging in..." : "Continue"}
                 </Button>
-                {/* <Button
-                  fullWidth
-                  size="large"
-                  sx={{ mt: 3 }}
-                  onClick={handleSkip}
-                >
-                  Skip authentication
-                </Button> */}
                 <Alert color="primary" severity="info" sx={{ mt: 3 }}>
                   <div>
                     The default password is: <b>ppdc</b>
