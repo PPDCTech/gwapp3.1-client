@@ -40,18 +40,17 @@ import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { getCurrentDateTimeString, uploadImages } from "src/services/helpers";
-import {
-  BUDGET_CODES_API,
-  PROJECTS_API,
-  REQUISITION_API,
-  UPLOAD_FILE_API,
-} from "src/services/constants";
 import { formatAmount } from "src/utils/format-currency";
 import { useFormik } from "formik";
-import CircularProgress from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 import { fetchBudgetHolders } from "src/services/api/users.api";
 import { addAccount, getAllAccounts } from "src/services/api/accounts.api";
 import { createRequisition } from "src/services/api/requisition.api";
+import { getAllProjects } from "src/services/api/projects.api";
+import { getAllBudgetCodes } from "src/services/api/budget-codes.api";
+import { CheckIcon } from "@heroicons/react/24/outline";
+import { CheckCircleOutline } from "@mui/icons-material";
+import { uploadFileAPI } from "src/services/api/uploads.api";
 
 const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
   const { user } = useAuth();
@@ -63,8 +62,9 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
   const [title, setTitle] = useState("");
   const [currency, setCurrency] = useState("NGN");
   // OTHERS
-
   const [loadingFileUpload, setLoadingFileUpload] = useState(false);
+  const [fileUploadSuccess, setFileUploadSuccess] = useState(false);
+
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [loadingSaveEdit, setLoadingSaveEdit] = useState(false);
 
@@ -75,6 +75,7 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
   const [totalItemsAmount, setTotalItemsAmount] = useState(0);
 
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [invoiceArray, setInvoiceArray] = useState([]);
 
   const [budgetHolders, setBudgetHolders] = useState([]);
   const [attentionTo, setAttentionTo] = useState("");
@@ -86,6 +87,22 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
   const [newBankName, setNewBankName] = useState("");
   const [newAccountNumber, setNewAccountNumber] = useState("");
   const [newHolderName, setNewHolderName] = useState("");
+
+  // CODES
+  const [projects, setProjects] = useState([]);
+  const [budgetCodes, setBudgetCodes] = useState([]);
+
+  useEffect(() => {
+    if (requisitionData) {
+      setProjectName(requisitionData.projectName || requisitionData.projectChargedTo.projectName || "");
+      setType(requisitionData.type || "");
+      setTitle(requisitionData.title || "");
+      setCurrency(requisitionData.currency || "");
+      setItemsArray(requisitionData.items);
+      setInvoiceArray(requisitionData.invoices || "");
+      setTotalItemsAmount(Number(requisitionData.total) || 0);
+    }
+  }, [requisitionData]);
 
   const handleAddNewAccount = async () => {
     try {
@@ -108,10 +125,6 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
     }
   };
 
-  // CODES
-  const [projects, setProjects] = useState([]);
-  const [budgetCodes, setBudgetCodes] = useState([]);
-
   const getBudgetHolders = async () => {
     const response = await fetchBudgetHolders();
     if (response && response.data) {
@@ -125,21 +138,29 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
     setBeneficiaryList(response.data);
   };
 
-  const fetchProjects = async () => {
-    const response = await axios.get(PROJECTS_API);
+  const geProjects = async () => {
+    const response = await getAllProjects();
     setProjects(response.data);
   };
 
-  const fetchBudgetCodes = async () => {
-    const response = await axios.get(BUDGET_CODES_API);
+  const getBudgetCodes = async () => {
+    const response = await getAllBudgetCodes();
     setBudgetCodes(response.data);
+  };
+
+  const getRequisitionDataForEdit = async (reqId) => {
+    if (!requisitionData) {
+      return;
+    }
+    console.log(reqId);
   };
 
   useEffect(() => {
     getBudgetHolders();
     getBeneficiaries();
-    fetchProjects();
-    fetchBudgetCodes();
+    geProjects();
+    getBudgetCodes();
+    getRequisitionDataForEdit();
   }, []);
 
   const handleEditRequisition = async () => {
@@ -175,18 +196,12 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
     try {
       const selectedProject = projects.find((project) => project.projectName === projectName);
       const attentionToUser = budgetHolders.find((holder) => holder.name === attentionTo);
-      const imageUrls = await uploadImages(selectedFiles);
-
-      const invoices = imageUrls.map((imageUrl, index) => ({
-        name: selectedFiles[index].name,
-        url: imageUrl,
-      }));
 
       const formValues = {
         userId: user._id,
         type,
         title,
-        receipts: invoices,
+        invoices: invoiceArray,
         items: itemsArray,
         currency,
         amountInWords: "",
@@ -274,25 +289,42 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
     setSelectedFiles([...selectedFiles, ...Array.from(files)]);
   };
 
-  const uploadFiles = async () => {
-    const formData = new FormData();
+  const uploadFiles = async (event) => {
+    event.preventDefault();
 
     try {
       setLoadingFileUpload(true);
+
+      const formData = new FormData();
+      const newInvoices = [];
 
       formData.append("destination", "invoices");
 
       for (let i = 0; i < selectedFiles.length; i++) {
         formData.append("files", selectedFiles[i]);
+        newInvoices.push({ name: selectedFiles[i].name });
       }
 
-      // const response = await axios.post(UPLOAD_FILE_API, formData);
-      // console.log(response.data);
+      const response = await uploadFileAPI(formData);
+      const { imageUrls } = await response.data;
+
+      for (let i = 0; i < imageUrls.length; i++) {
+        newInvoices[i].url = imageUrls[i].imageUrl;
+        newInvoices[i].id = imageUrls[i].public_id;
+      }
+
+      setInvoiceArray([...invoiceArray, ...newInvoices]);
+
+      setFileUploadSuccess(true);
+
+      setTimeout(() => {
+        setFileUploadSuccess(false);
+      }, 3000);
     } catch (error) {
-      console.error("Error uploading files:", error.message);
+      toast.error("Error uploading files");
+      console.log("Error uploading files:", error.message);
     } finally {
-      setLoadingFileUpload(true);
-      console.log(formData);
+      setLoadingFileUpload(false);
     }
   };
 
@@ -310,194 +342,10 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
     // <form onSubmit={formik.handleSubmit}>
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ my: 2 }}>
-        <Typography variant="title">
-          {isEditMode ? "Edit Requisition" : "Create Requisition"}
-        </Typography>
+        {isEditMode ? "Edit Requisition" : "Create Requisition"}
         <Typography variant="subtitle1">{`Step ${part}`}</Typography>
       </DialogTitle>
       <DialogContent>
-        {/* {part === 1 && (
-          <>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Select Project</InputLabel>
-                  <Select
-                    label="Select Project"
-                    {...formik.getFieldProps("projectName")}
-                    onChange={(e) => {
-                      formik.setFieldValue("projectName", e.target.value);
-                    }}
-                  >
-                    {projects.map((project) => (
-                      <MenuItem key={project._id} value={project.projectName}>
-                        {project.projectName}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Request Type</InputLabel>
-
-                  <Select
-                    label="Request Type"
-                    {...formik.getFieldProps("type")}
-                    onChange={(e) => {
-                      formik.setFieldValue("type", e.target.value);
-                    }}
-                  >
-                    <MenuItem value="Fund Req">Fund Request</MenuItem>
-                    <MenuItem value="Petty Cash">Petty Cash</MenuItem>
-                    <MenuItem value="Reimbursement">Reimbursement</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-            </Grid>
-            <TextField
-              multiline
-              rows={4}
-              fullWidth
-              label="Description"
-              variant="outlined"
-              margin="normal"
-              value={formik.values.title}
-              onChange={(e) => {
-                formik.setFieldValue("title", e.target.value);
-              }}
-            />
-
-            <Box sx={{ mt: 4 }}>
-              <Grid container spacing={2} sx={{ mt: 1 }}>
-                <Grid item xs={3}>
-                  <FormControl fullWidth>
-                    <InputLabel>Choose Currency</InputLabel>
-                    <Select
-                      value={formik.values.currency}
-                      onChange={(e) => formik.setFieldValue("currency", e.target.value)}
-                    >
-                      <MenuItem value="NGN">₦</MenuItem>
-                      <MenuItem value="USD">$</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
-
-              <Typography sx={{ mt: 3 }} variant="subtitle2">
-                Add Items
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={4}>
-                  <FormControl fullWidth sx={{ mt: 1 }}>
-                    <TextField
-                      label="Enter desc"
-                      value={newItemTitle}
-                      onChange={(e) => setNewItemTitle(e.target.value)}
-                      variant="outlined"
-                      fullWidth
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                  <FormControl fullWidth sx={{ mt: 1 }}>
-                    <TextField
-                      label="Enter amount"
-                      type="number"
-                      value={newItemAmount}
-                      onChange={(e) => setNewItemAmount(e.target.value)}
-                      variant="outlined"
-                      fullWidth
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                  <FormControl fullWidth sx={{ mt: 1 }}>
-                    <InputLabel id="budget-line">Budget Line</InputLabel>
-                    <Select
-                      labelId="budget-line"
-                      value={newItemCode}
-                      onChange={(e) => setNewItemCode(e.target.value)}
-                      label="Budget Line"
-                      sx={{
-                        minWidth: "220px",
-                        maxWidth: "220px",
-                      }}
-                    >
-                      {budgetCodes &&
-                        budgetCodes.map((budgetCode, index) =>
-                          budgetCode.project.includes(formik.values.projectName) ? (
-                            <MenuItem key={index} value={budgetCode.code}>
-                              {budgetCode.description}
-                            </MenuItem>
-                          ) : null
-                        )}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6} md={4} sx={{ mt: 0 }}>
-                  <Button variant="outlined" color="success" size="medium" onClick={handleAddItem}>
-                    Add
-                  </Button>
-                </Grid>
-              </Grid>
-
-              {itemsArray.length > 0 && (
-                <>
-                  <Typography variant="subtitle1" sx={{ mt: 2 }}>
-                    Items List
-                  </Typography>
-                  <TableContainer component={Paper}>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Title</TableCell>
-                          <TableCell>Amount</TableCell>
-                          <TableCell>Budget Line</TableCell>
-                          <TableCell>Action</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {itemsArray.map((item, index) => (
-                          <TableRow key={index}>
-                            <TableCell>{item.title}</TableCell>
-                            <TableCell>{item.amount}</TableCell>
-                            <TableCell>{item.code}</TableCell>
-                            <TableCell>
-                              <IconButton
-                                onClick={() => handleRemoveItem(index)}
-                                aria-label="Preview"
-                                color="error"
-                                sx={{ fontSize: "1rem" }}
-                              >
-                                <SvgIcon fontSize="small">
-                                  <TrashIcon />
-                                </SvgIcon>
-                              </IconButton>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </>
-              )}
-            </Box>
-
-            <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item xs={12}>
-                <Typography>
-                  <strong>
-                    Total amount:&nbsp;
-                    {formik.values.currency}
-                    &nbsp;
-                    {formatAmount(Number(totalItemsAmount))}
-                  </strong>
-                </Typography>
-              </Grid>
-            </Grid>
-          </>
-        )} */}
         {part === 1 && (
           <>
             <Grid container spacing={2}>
@@ -702,9 +550,24 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
                     color="success"
                     sx={{ mt: 2, ml: 1 }}
                     disabled={loadingFileUpload || selectedFiles.length === 0}
-                    onClick={uploadFiles}
+                    onClick={(e) => uploadFiles(e)}
                   >
-                    {loadingFileUpload ? <CircularProgress size={20} /> : "Upload"}
+                    Upload
+                    {loadingFileUpload && (
+                      <CircularProgress
+                        size={20}
+                        sx={{
+                          color: "green",
+                          position: "absolute",
+                          top: "50%",
+                          left: "50%",
+                          marginTop: "-12px",
+                          marginLeft: "-12px",
+                        }}
+                      />
+                    )}
+                    &nbsp;
+                    {fileUploadSuccess && <CheckCircleOutline />}
                   </Button>
                 </label>
               </Grid>

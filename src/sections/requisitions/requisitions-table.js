@@ -31,9 +31,14 @@ import ChatModal from "src/components/chat-modal";
 import RequisitionDetailsModal from "src/components/req-details-modal";
 import ReqModal from "src/components/req-modal";
 import { useAuth } from "src/hooks/use-auth";
-import { deleteRequisition, destroyRequisition } from "src/services/api/requisition.api";
+import {
+  deleteRequisition,
+  destroyRequisition,
+  getRequisitionById,
+} from "src/services/api/requisition.api";
 import { formatDate } from "src/utils/format-date";
 import { getDateMDY } from "src/services/helpers";
+import CreateReqModal from "src/components/create-req";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -51,6 +56,10 @@ export const RequisitionTable = ({
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState("");
   const [isReqDetailsOpen, setIsReqDetailsOpen] = useState(false);
+
+  const [isEditReqModalOpen, setEditReqModalOpen] = useState(false);
+  const [selectedRequisition, setSelectedRequisition] = useState(null);
+  const [editMode, setEditMode] = useState(false);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -81,17 +90,28 @@ export const RequisitionTable = ({
     if (!isReqDetailsOpen) {
       setRequisitions((prevRequisitions) => [...prevRequisitions]);
     }
-  }, [isReqDetailsOpen])
+  }, [isReqDetailsOpen, setRequisitions]);
 
   const handleOpenReqDetails = (id) => {
     setSelectedId(id);
     openReqDetails();
   };
 
-  const handleOpenEditModal = (id) => {
-    console.log(id);
-    // fetch single requisition using id,
-    // call open create req modal and pass the data
+  const handleOpenEditModal = async (id) => {
+    try {
+      const req = await getRequisitionById(id);
+      setSelectedRequisition(req.data);
+      setEditMode(true);
+      setEditReqModalOpen(true);
+    } catch (error) {
+      console.log("Error getting single requisition:", error.message);
+    }
+  };
+
+  const handleCloseEditModal = () => {
+    setEditMode(false);
+    setEditReqModalOpen(false);
+    // fetchRequisitions();
   };
 
   const handleDeleteRequisition = async (id) => {
@@ -145,7 +165,7 @@ export const RequisitionTable = ({
                           onClick={() => handleOpenReqDetails(requisition._id)}
                         >
                           <Tooltip title={requisition.title}>
-                            {shortenString(requisition.title, 55)}
+                            <>{shortenString(requisition.title, 55)}</>
                           </Tooltip>
                         </TableCell>
                         <TableCell>
@@ -311,6 +331,12 @@ export const RequisitionTable = ({
         isOpen={isReqDetailsOpen}
         requisitionId={selectedId}
         onClose={closeReqDetails}
+      />
+      <CreateReqModal
+        open={isEditReqModalOpen}
+        onClose={handleCloseEditModal}
+        isEditMode={editMode}
+        requisitionData={selectedRequisition ? selectedRequisition : null}
       />
     </>
   );

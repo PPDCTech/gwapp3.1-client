@@ -43,8 +43,6 @@ const Page = () => {
   const [selectedRequisition, setSelectedRequisition] = useState(null);
   const [editMode, setEditMode] = useState(false);
 
-  // const [downloadingCSV, setDownloadingCSV] = useState(false);
-
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
   };
@@ -100,7 +98,7 @@ const Page = () => {
 
   const handleSubmitFilter = async (filters) => {
     const response = await searchFilterRequisitions(filters);
-    console.log(response.data);
+    // console.log(response.data);
     // setFilteredRequisitions()
   };
 

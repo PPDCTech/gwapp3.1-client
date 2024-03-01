@@ -23,7 +23,7 @@ import DownloadingOutlinedIcon from "@mui/icons-material/DownloadingOutlined";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
 import { getAllApprovedRequisitions } from "src/services/api/requisition.api";
-import { currentDate } from "src/services/helpers";
+import { currentDate, getDateYearMonthDay } from "src/services/helpers";
 import { CSVLink } from "react-csv";
 
 export const FilterRequisitions = ({ onSubmitFilters }) => {
@@ -79,7 +79,6 @@ export const FilterRequisitions = ({ onSubmitFilters }) => {
   }, [filters, onSubmitFilters]);
 
   const submitFilterRequisitions = () => {
-    console.log(filters);
     onSubmitFilters(filters);
   };
 
@@ -123,7 +122,7 @@ export const FilterRequisitions = ({ onSubmitFilters }) => {
       const csv_data = approvedReqs.map((requisition, index) => {
         const row = {
           serialNumber: index + 1,
-          date: requisition.approvedDate,
+          date: getDateYearMonthDay(requisition.approvedDate),
           title: requisition.title || "N/A",
           total: requisition.total || "N/A",
           type: requisition.type || "N/A",
@@ -234,7 +233,7 @@ export const FilterRequisitions = ({ onSubmitFilters }) => {
                   data={csvData}
                   headers={csvHeaders}
                   filename={`requisitions_${currentDate}.csv`}
-                  forceDownload={true}
+                  // forceDownload={true}
                 />
               )}
             </Grid>

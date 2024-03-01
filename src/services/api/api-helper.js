@@ -2,18 +2,18 @@ import axios from "axios";
 
 const API = process.env.API;
 
-// if (typeof window !== "undefined") {
-//   const token = localStorage.getItem("token");
-//   if (token) {
-//     axios.defaults.headers.common["Authorization"] = token;
-//   }
-// }
+const setAuthorizationHeader = () => {
+  const token = window.localStorage.getItem("token");
+  if (token) {
+    axios.defaults.headers.common["Authorization"] = token;
+  } else {
+    delete axios.defaults.headers.common["Authorization"];
+  }
+};
 
 export const postData = async (endpoint, data) => {
   try {
-    const token = window.localStorage.getItem("token");
-    axios.defaults.headers.common["Authorization"] = token;
-
+    setAuthorizationHeader();
     const response = await axios.post(`${API}/${endpoint}`, data);
     return response;
   } catch (error) {
@@ -24,10 +24,7 @@ export const postData = async (endpoint, data) => {
 
 export const fetchData = async (endpoint) => {
   try {
-    console.log(`${API}/${endpoint}`);
-    const token = window.localStorage.getItem("token");
-    axios.defaults.headers.common["Authorization"] = token;
-
+    setAuthorizationHeader();
     const response = await axios.get(`${API}/${endpoint}`);
     return response;
   } catch (error) {
@@ -38,9 +35,7 @@ export const fetchData = async (endpoint) => {
 
 export const putData = async (endpoint, data) => {
   try {
-    const token = window.localStorage.getItem("token");
-    axios.defaults.headers.common["Authorization"] = token;
-
+    setAuthorizationHeader();
     const response = await axios.put(`${API}/${endpoint}`, data);
     return response;
   } catch (error) {
@@ -51,9 +46,7 @@ export const putData = async (endpoint, data) => {
 
 export const patchData = async (endpoint, data) => {
   try {
-    const token = window.localStorage.getItem("token");
-    axios.defaults.headers.common["Authorization"] = token;
-
+    setAuthorizationHeader();
     const response = await axios.patch(`${API}/${endpoint}`, data);
     return response;
   } catch (error) {
@@ -64,9 +57,7 @@ export const patchData = async (endpoint, data) => {
 
 export const deleteData = async (endpoint) => {
   try {
-    const token = window.localStorage.getItem("token");
-    axios.defaults.headers.common["Authorization"] = token;
-    
+    setAuthorizationHeader();
     const response = await axios.delete(`${API}/${endpoint}`);
     return response;
   } catch (error) {

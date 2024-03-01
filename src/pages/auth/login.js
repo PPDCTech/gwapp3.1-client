@@ -146,18 +146,6 @@ const Page = () => {
                     onChange={formik.handleChange}
                     type={showPassword ? "text" : "password"}
                     value={formik.values.password}
-                    // InputProps={{
-                    //   endAdornment: (
-                    //     <IconButton
-                    //       edge="end"
-                    //       onClick={handleClickShowPassword}
-                    //       onMouseDown={handleMouseDownPassword}
-                    //       aria-label="toggle password visibility"
-                    //     >
-                    //       {showPassword ? <Visibility /> : <VisibilityOff />}
-                    //     </IconButton>
-                    //   ),
-                    // }}
                   />
                 </Stack>
 
@@ -184,11 +172,6 @@ const Page = () => {
                 >
                   {loadingSubmit ? "Logging in..." : "Continue"}
                 </Button>
-                <Alert color="primary" severity="info" sx={{ mt: 3 }}>
-                  <div>
-                    The default password is: <b>ppdc</b>
-                  </div>
-                </Alert>
               </form>
             )}
             {method === "phoneNumber" && (

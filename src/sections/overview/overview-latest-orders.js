@@ -52,7 +52,9 @@ export const OverviewLatestRequests = (props) => {
                     return (
                       <TableRow hover key={req._id}>
                         <TableCell>
-                          <Tooltip title={`${req.title}`}>{shortenString(req.title, 50)}</Tooltip>
+                          <Tooltip title={`${req.title}`}>
+                            <>{shortenString(req.title, 50)}</>
+                          </Tooltip>
                         </TableCell>
                         <TableCell>
                           {getCurrencySign(req?.currency)}

@@ -1,32 +1,5 @@
-import axios from "axios";
-import { UPLOAD_FILE_API } from "./constants";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
-
-export const uploadImages = async (selectedFiles) => {
-  try {
-    const formData = new FormData();
-
-    selectedFiles.forEach((file, index) => {
-      formData.append(`file-${index}`, file);
-    });
-
-    const response = await axios.post(UPLOAD_FILE_API, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    if (response.status === 200) {
-      const result = response.data;
-      console.log("Upload successful:", result);
-    } else {
-      console.error("Upload failed:", response.statusText);
-    }
-  } catch (error) {
-    console.error("Error uploading images:", error.message);
-  }
-};
 
 export const getDateForPrint = (timestamp) => {
   return dayjs(Math.abs(Number(timestamp))).format("DD/MM/YYYY");
@@ -51,8 +24,32 @@ export const getDateMDY = (date) => {
 
 export const getCurrentDateTimeString = () => {
   const currentDate = new Date();
-  const dateTimeString = currentDate.toISOString().split(".")[0]; // Remove milliseconds
+  const dateTimeString = currentDate.toISOString().split(".")[0];
   return dateTimeString;
+};
+
+export const currentDate = new Date().toLocaleString("en-NG", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+});
+
+export const getDateYearMonthDay = (dateString) => {
+  const date = new Date(dateString);
+
+  if (isNaN(date.getTime())) {
+    return "N/A";
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 };
 
 export const tobase64 = (url) => {
@@ -204,13 +201,3 @@ export const showNetworkToast = (message, type) => {
     type: type || "default",
   });
 };
-
-export const currentDate = new Date().toLocaleString("en-NG", {
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-  hour12: false,
-});

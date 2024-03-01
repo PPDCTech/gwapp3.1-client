@@ -61,8 +61,7 @@ const handlers = {
 const reducer = (state, action) =>
   handlers[action.type] ? handlers[action.type](state, action) : state;
 
-// The role of this context is to propagate authentication state through the App tree.
-
+// This context is to propagate authentication state through the App tree.
 export const AuthContext = createContext({ undefined });
 
 export const AuthProvider = (props) => {
@@ -133,26 +132,26 @@ export const AuthProvider = (props) => {
   }, []);
 
   const signIn = async (email, password) => {
-    const response = await loginUser(email, password);
-    const { userData } = response.data;
-    const { status, token } = userData;
-
-    if (status === "inactive") {
-      return; // you shall not pass
-    }
-
     try {
+      const response = await loginUser(email, password);
+      const { userData } = response.data;
+      const { status, token } = userData;
+
+      if (status === "inactive") {
+        return;
+      }
+
       window.localStorage.setItem("gwapp_userId", userData._id);
       window.localStorage.setItem("authenticated", "true");
       window.localStorage.setItem("token", token);
-    } catch (err) {
-      console.error(err.message);
-    }
 
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: userData,
-    });
+      dispatch({
+        type: HANDLERS.SIGN_IN,
+        payload: userData,
+      });
+    } catch (error) {
+      console.error("Error signing in:", error.message);
+    }
   };
 
   const signUp = async (email, name, password) => {
