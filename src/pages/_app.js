@@ -11,8 +11,9 @@ import { createEmotionCache } from "src/utils/create-emotion-cache";
 import "simplebar-react/dist/simplebar.min.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "../styles/common.css";
 import { NetworkStatusIndicator } from "src/components/check-status";
+import "../styles/common.css";
+import "../styles/gwapploading.css";
 
 const clientSideEmotionCache = createEmotionCache();
 

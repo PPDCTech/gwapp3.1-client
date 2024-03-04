@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import PropTypes from "prop-types";
 import { useAuthContext } from "src/contexts/auth-context";
+import GwappLoading from "src/components/gwappload/GwappLoading";
 
 export const AuthGuard = (props) => {
   const { children } = props;
@@ -40,7 +41,7 @@ export const AuthGuard = (props) => {
   }, [isAuthenticated, router, router.isReady]);
 
   if (!checked) {
-    return <div>Loading...</div>;
+    return <GwappLoading />
   }
 
   // If got here, it means that the redirect did not occur, and that tells us that the user is
