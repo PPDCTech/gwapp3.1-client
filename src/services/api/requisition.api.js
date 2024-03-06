@@ -11,17 +11,17 @@ export const getRequisitionById = (id) => fetchData(`${REQUISITION_API}/${id}`);
 export const getAttentionedToRequisitions = (email) =>
   fetchData(`${REQUISITION_API}/attention/${email}`);
 
-  export const getAllApprovedRequisitions = async (queryParams) => {
-    try {
-      const params = new URLSearchParams(queryParams).toString();
-      return fetchData(`${REQUISITION_API}/approved?${params}`);
-    } catch (error) {
-      console.error("Error fetching approved requisitions:", error);
-      throw error;
-    }
-  };
+export const getAllApprovedRequisitions = async (queryParams) => {
+  try {
+    const params = new URLSearchParams(queryParams).toString();
+    return fetchData(`${REQUISITION_API}/approved?${params}`);
+  } catch (error) {
+    console.error("Error fetching approved requisitions:", error);
+    throw error;
+  }
+};
 
-export const getUserRequisitions = (email) => fetchData(`user-requisitions/${email}`);
+export const getUserRequisitions = (userId) => fetchData(`user-requisitions/${userId}`);
 
 export const getUserUnretiredRequisitions = (email) =>
   fetchData(`user-requisitions/unretired/${email}`);

@@ -24,10 +24,12 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getUserRequisitions(user?.email);
-        const { requisitions, totalCount } = response.data;
-        setTotalCount(totalCount);
-        setRequisitions(requisitions.slice(0, 6));
+        if (user && user.email) {
+          const response = await getUserRequisitions(user?._id);
+          const { requisitions, totalCount } = response.data;
+          setTotalCount(totalCount);
+          setRequisitions(requisitions.slice(0, 6));
+        }
       } catch (error) {
         console.error("Error fetching requisitions:", error.message);
       }
@@ -54,14 +56,14 @@ const Page = () => {
             <Grid xs={12} sm={6} lg={4}>
               <OverviewTotalRaised positive sx={{ height: "100%" }} value={`${totalCount}`} />
             </Grid>
-            {/* <Grid xs={12} sm={6} lg={3}>
+            <Grid xs={12} sm={6} lg={3}>
               <OverviewTotalApproved
                 difference={16}
                 positive={false}
                 sx={{ height: "100%" }}
                 value={`${totalCount}`}
               />
-            </Grid> */}
+            </Grid>
             <Grid xs={12} sm={6} lg={4}>
               <OverviewTasksProgress sx={{ height: "100%" }} totalValue={totalCount} />
             </Grid>

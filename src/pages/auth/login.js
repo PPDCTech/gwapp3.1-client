@@ -120,7 +120,7 @@ const Page = () => {
               value={method}
             >
               <Tab label="Login to your account" value="email" />
-              <Tab label="Reset password" value="phoneNumber" />
+              {/* <Tab label="Reset password" value="phoneNumber" /> */}
             </Tabs>
             {method === "email" && (
               <form noValidate onSubmit={formik.handleSubmit}>

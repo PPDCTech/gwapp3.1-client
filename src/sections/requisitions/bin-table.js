@@ -25,7 +25,7 @@ const BinRequisitions = () => {
 
   useEffect(() => {
     fetchBinRequisitions();
-  }, []); // Fetch all requisitions on initial render
+  }, []);
 
   const fetchBinRequisitions = async () => {
     setIsLoading(true);
@@ -42,7 +42,6 @@ const BinRequisitions = () => {
   const handleDestroy = async (requisitionId) => {
     try {
       await destroyRequisition(requisitionId);
-      // Remove the requisition from the list after deletion
       setRequisitions((prevRequisitions) =>
         prevRequisitions.filter((req) => req._id !== requisitionId)
       );
@@ -66,51 +65,56 @@ const BinRequisitions = () => {
 
   return (
     <Box>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ width: "45%" }}>Title</TableCell>
-              <TableCell sx={{ width: "15%" }}>Amount</TableCell>
-              <TableCell sx={{ width: "15%" }}>Raised By</TableCell>
-              <TableCell sx={{ width: "15%" }}>Date</TableCell>
-              <TableCell sx={{ width: "10%" }}>Action</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {displayedRequisitions.map((req) => (
-              <TableRow key={req._id}>
-                <TableCell>{req.title}</TableCell>
-                <TableCell>
-                  {getCurrencySign(req?.currency)}
-                  {formatAmount(Number(req?.total))}
-                </TableCell>
-                <TableCell>{req.user.name}</TableCell>
-                <TableCell>{formatDate(req.date)}</TableCell>
-                <TableCell>
-                  <Button
-                    size="small"
-                    variant="contained"
-                    color="error"
-                    onClick={() => handleDestroy(req._id)}
-                    disabled={isLoading}
-                  >
-                    Destroy
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Box mt={2} display="flex" justifyContent="center">
-        <Button onClick={handlePrevPage} disabled={currentPage === 0 || isLoading}>
-          Previous
-        </Button>
-        <Button onClick={handleNextPage} disabled={currentPage === pageCount - 1 || isLoading}>
-          Next
-        </Button>
-      </Box>
+      {displayedRequisitions.length === 0 && <p>Bin is Empty!</p>}
+      {displayedRequisitions.length > 0 && (
+        <>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ width: "45%" }}>Title</TableCell>
+                  <TableCell sx={{ width: "15%" }}>Amount</TableCell>
+                  <TableCell sx={{ width: "15%" }}>Raised By</TableCell>
+                  <TableCell sx={{ width: "15%" }}>Date</TableCell>
+                  <TableCell sx={{ width: "10%" }}>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {displayedRequisitions.map((req) => (
+                  <TableRow key={req._id}>
+                    <TableCell>{req.title}</TableCell>
+                    <TableCell>
+                      {getCurrencySign(req?.currency)}
+                      {formatAmount(Number(req?.total))}
+                    </TableCell>
+                    <TableCell>{req.user.name}</TableCell>
+                    <TableCell>{formatDate(req.date)}</TableCell>
+                    <TableCell>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="error"
+                        onClick={() => handleDestroy(req._id)}
+                        disabled={isLoading}
+                      >
+                        Destroy
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Box mt={2} display="flex" justifyContent="center">
+            <Button onClick={handlePrevPage} disabled={currentPage === 0 || isLoading}>
+              Previous
+            </Button>
+            <Button onClick={handleNextPage} disabled={currentPage === pageCount - 1 || isLoading}>
+              Next
+            </Button>
+          </Box>
+        </>
+      )}
     </Box>
   );
 };

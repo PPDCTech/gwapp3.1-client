@@ -21,6 +21,7 @@ import { useAuth } from "src/hooks/use-auth";
 import { getGreeting } from "src/utils/get-greeting";
 import { getFirstName } from "src/utils/get-firstname";
 import NotificationDropdown from "src/components/notifications-dropdown";
+import { Warning } from "@mui/icons-material";
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
@@ -66,9 +67,7 @@ export const TopNav = (props) => {
             px: 2,
           }}
         >
-          <Stack alignItems="center"
-direction="row"
-spacing={2}>
+          <Stack alignItems="center" direction="row" spacing={2}>
             {!lgUp && (
               <IconButton onClick={onNavOpen}>
                 <SvgIcon fontSize="small">
@@ -78,17 +77,13 @@ spacing={2}>
             )}
             {`${greeting}, ${getFirstName(auth.user?.name)}`}
           </Stack>
-          <Stack alignItems="center"
-direction="row"
-spacing={2}>
+          <Stack alignItems="center" direction="row" spacing={2}>
             <Tooltip title="Notifications">
               <IconButton
                 ref={notificationDropdown.anchorRef}
                 onClick={notificationDropdown.handleOpen}
               >
-                <Badge badgeContent={4}
-color="success"
-variant="dot">
+                <Badge badgeContent={4} color="success" variant="dot">
                   <SvgIcon fontSize="small">
                     <BellIcon />
                   </SvgIcon>

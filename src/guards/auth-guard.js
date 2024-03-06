@@ -8,12 +8,9 @@ export const AuthGuard = (props) => {
   const { children } = props;
   const router = useRouter();
   const { isAuthenticated } = useAuthContext();
-  const ignore = useRef(false);
-  const [checked, setChecked] = useState(false);
-
-  // Only do authentication check on component mount.
-  // This flow allows you to manually redirect the user after sign-out, otherwise this will be
-  // triggered and will automatically redirect to sign-in page.
+  
+  // const ignore = useRef(false);
+  // const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     if (!router.isReady) {
@@ -21,11 +18,11 @@ export const AuthGuard = (props) => {
     }
 
     // Prevent from calling twice in development mode with React.StrictMode enabled
-    if (ignore.current) {
-      return;
-    }
+    // if (ignore.current) {
+    //   return;
+    // }
 
-    ignore.current = true;
+    // ignore.current = true;
 
     if (!isAuthenticated) {
       console.log("Not authenticated, redirecting");
@@ -35,19 +32,18 @@ export const AuthGuard = (props) => {
           query: router.asPath !== "/" ? { continueUrl: router.asPath } : undefined,
         })
         .catch(console.error);
-    } else {
-      setChecked(true);
-    }
+    } 
+    // else {
+    //   setChecked(true);
+    // }
   }, [isAuthenticated, router, router.isReady]);
 
-  if (!checked) {
-    return <GwappLoading />
-  }
+  // if (!checked) {
+  //   return <GwappLoading />;
+  // }
 
-  // If got here, it means that the redirect did not occur, and that tells us that the user is
-  // authenticated / authorized.
-
-  return children;
+  // return children;
+  return isAuthenticated ? children : <GwappLoading />
 };
 
 AuthGuard.propTypes = {

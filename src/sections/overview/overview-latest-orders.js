@@ -31,7 +31,7 @@ export const OverviewLatestRequests = (props) => {
   return (
     <Card sx={sx}>
       <CardHeader title="Latest Requisitions" />
-      <Container>{latestReqs.length === 0 && "Loading..."}</Container>
+      <Container>{latestReqs.length === 0 && "No requisition found"}</Container>
       {latestReqs.length > 0 && (
         <>
           <Scrollbar sx={{ flexGrow: 1 }}>

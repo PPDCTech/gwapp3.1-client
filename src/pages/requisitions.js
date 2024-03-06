@@ -29,6 +29,7 @@ import { FilterRequisitions } from "src/sections/requisitions/filter-requisition
 // import DownloadForOfflineOutlinedIcon from "@mui/icons-material/DownloadForOfflineOutlined";
 // import DownloadingOutlinedIcon from "@mui/icons-material/DownloadingOutlined";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
+import { Warning } from "@mui/icons-material";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -54,7 +55,7 @@ const Page = () => {
       let count;
       switch (selectedTab) {
         case "myRequisitions":
-          const myReqs = await getUserRequisitions(user?.email);
+          const myReqs = await getUserRequisitions(user?._id);
           fetchedRequisitions = myReqs.data.requisitions;
           count = myReqs.data.totalCount;
           break;
@@ -143,16 +144,20 @@ const Page = () => {
                     )}
                   </Button>
                 </Tooltip> */}
-                <Button
-                  size="small"
-                  variant="outlined"
-                  color="primary"
-                  onClick={handleOpenCreateModal}
-                  sx={{ ml: 2 }}
-                >
-                  <CreateNewFolderIcon />
-                  &nbsp; Create New
-                </Button>
+                {user?.signatureUrl ? (
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    color="success"
+                    onClick={handleOpenCreateModal}
+                    sx={{ ml: 2 }}
+                  >
+                    <CreateNewFolderIcon />
+                    &nbsp; Create New
+                  </Button>
+                ) : (
+                  <Button href="/profile" startIcon={<Warning />} color="warning">Upload your Signature to raise request</Button>
+                )}
               </Box>
               <CreateReqModal
                 open={isCreateReqModalOpen}

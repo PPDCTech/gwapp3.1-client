@@ -35,45 +35,48 @@ const RetirementsTable = ({ data = [], reloadData }) => {
 
   return (
     <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell sx={{ width: "60%" }}>Title</TableCell>
-            <TableCell sx={{ width: "20%" }}>Amount</TableCell>
-            <TableCell sx={{ width: "20%" }}>Action</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {(rowsPerPage > 0
-            ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            : data
-          ).map((row) => (
-            <TableRow key={row._id}>
-              <TableCell>{row.title}</TableCell>
-              <TableCell>
-                {getCurrencySign(row?.currency)}
-                {formatAmount(Number(row?.total))}
-              </TableCell>
-              <TableCell>
-                <Button
-                  size="small"
-                  color="success"
-                  onClick={() => handleClick(row._id)}
-                  variant="contained"
-                  disabled={loadingIds.includes(row._id)}
-                >
-                  {loadingIds.includes(row._id) ? "Retiring..." : "Mark as retired"}
-                </Button>
-              </TableCell>
+      {data.length === 0 && <p>You have no pending retirements 😃!</p>}
+      {data.length > 0 && (
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ width: "60%" }}>Title</TableCell>
+              <TableCell sx={{ width: "20%" }}>Amount</TableCell>
+              <TableCell sx={{ width: "20%" }}>Action</TableCell>
             </TableRow>
-          ))}
-          {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={3} />
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          </TableHead>
+          <TableBody>
+            {(rowsPerPage > 0
+              ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : data
+            ).map((row) => (
+              <TableRow key={row._id}>
+                <TableCell>{row.title}</TableCell>
+                <TableCell>
+                  {getCurrencySign(row?.currency)}
+                  {formatAmount(Number(row?.total))}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    size="small"
+                    color="success"
+                    onClick={() => handleClick(row._id)}
+                    variant="contained"
+                    disabled={loadingIds.includes(row._id)}
+                  >
+                    {loadingIds.includes(row._id) ? "Retiring..." : "Mark as retired"}
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 53 * emptyRows }}>
+                <TableCell colSpan={3} />
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      )}
     </TableContainer>
   );
 };

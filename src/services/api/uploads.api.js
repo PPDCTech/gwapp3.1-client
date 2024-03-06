@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const API = process.env.API;
 
@@ -21,6 +22,7 @@ export const uploadFileAPI = async (formData) => {
     });
     return response;
   } catch (error) {
+    toast.error("Error uploading files");
     console.error("Error uploading files:", error.message);
     throw error;
   }
@@ -37,6 +39,7 @@ export const removeFileAPI = async (publicId) => {
     });
     return response;
   } catch (error) {
+    toast.error("Error uploading files");
     console.error("Error removing file:", error.message);
     throw error;
   }

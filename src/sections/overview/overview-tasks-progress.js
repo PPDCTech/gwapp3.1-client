@@ -5,6 +5,7 @@ import {
   Box,
   Card,
   CardContent,
+  CircularProgress,
   LinearProgress,
   Stack,
   SvgIcon,
@@ -18,24 +19,23 @@ export const OverviewTasksProgress = (props) => {
   const { totalValue, sx } = props;
   const { user } = useAuth();
   const [unretiredPercentage, setUnretiredPercentage] = useState(0);
-  const [isLoading, setIsLoading] = useState(true); // Add loading state
+  const [isLoading, setIsLoading] = useState(true);
   const [avatarColor, setAvatarColor] = useState("success.ppdc");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(true); // Set loading state to true
+        setIsLoading(true);
         const response = await getUserUnretiredRequisitions(user?.email);
         const unretiredCount = response.data.totalCount;
         const totalCount = totalValue;
 
         if (totalCount === 0) {
-          // Handle zero total count (set appropriate percentage or message)
           setUnretiredPercentage(0);
           return;
         }
 
-        const percentage = Math.round((unretiredCount / totalCount) * 100); // Ensure valid values
+        const percentage = Math.round((unretiredCount / totalCount) * 100);
         setUnretiredPercentage(percentage);
 
         if (percentage === 0) {
@@ -52,11 +52,11 @@ export const OverviewTasksProgress = (props) => {
       } catch (error) {
         console.error("Error fetching unretired requisitions:", error.message);
       } finally {
-        setIsLoading(false); // Set loading state to false
+        setIsLoading(false);
       }
     };
     fetchData();
-  }, []);
+  }, [totalValue, user?.email]);
 
   return (
     <Card sx={sx}>
@@ -64,16 +64,17 @@ export const OverviewTasksProgress = (props) => {
         <Stack alignItems="flex-start" direction="row" justifyContent="space-between" spacing={3}>
           <Stack spacing={1}>
             <Typography color="text.secondary" gutterBottom variant="overline">
-              Retirements
+              Retirements Left
             </Typography>
             <Typography variant="h4">
               {isLoading ? (
-                "Loading..." // Display loading placeholder
+                <CircularProgress color="warning" />
               ) : (
-                unretiredPercentage !== 0 && ( // Conditional rendering
+                unretiredPercentage !== 0 && (
                   Number(unretiredPercentage.toFixed(2)) + "%"
                 )
               )}
+              {Number(totalValue) === 0 && <p style={{ fontSize: "12px"}}>No pending retirements</p>}
             </Typography>
           </Stack>
           <Avatar
