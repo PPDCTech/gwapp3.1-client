@@ -1,8 +1,7 @@
-
 const API = process.env.API;
 
 export const STATUS_COLOR_TYPE = {
-  pending: "warning", 
+  pending: "warning",
   holderChecked: "secondary",
   hoderChecked: "secondary",
   checked: "primary",
@@ -17,22 +16,30 @@ export const CHANGE_PASSWORD_API = `${API}/change-password`;
 export const RESET_PASSWORD_API = `${API}/reset-password`;
 
 export const REQUISITION_API = `${API}/requisitions`;
-export const GET_ATTENTIONED_TO_REQUISITIONS_API = (email) => `${API}/requisitions/attention/${email}`;
+export const GET_ATTENTIONED_TO_REQUISITIONS_API = (email) =>
+  `${API}/requisitions/attention/${email}`;
 export const GET_ALL_APPROVED_REQUISITIONS_API = `${API}/requisitions/approved`;
 export const GET_USER_REQUISITIONS_API = (email) => `${API}/user-requisitions/${email}`;
-export const GET_USER_UNRETIRED_REQUISITIONS_API = (email) => `${API}/user-requisitions/unretired/${email}`;
-export const BUDGET_HOLDER_CHECK_REQUISITION_API = (requisitionId) => `${API}/requisitions/budgetHolderCheck/${requisitionId}`;
-export const FINANCE_CHECK_REQUISITION_API = (requisitionId) => `${API}/requisitions/financeCheck/${requisitionId}`;
-export const FINANCE_REVIEW_REQUISITION_API = (requisitionId) => `${API}/requisitions/financeReview/${requisitionId}`;
-export const APPROVE_REQUISITION_API = (requisitionId) => `${API}/requisitions/approve/${requisitionId}`;
-export const DELETE_REQUISITION_API = (requisitionId) => `${API}/requisitions/delete/${requisitionId}`;
-export const CANCEL_REQUISITION_API = (requisitionId) => `${API}/requisitions/cancel/${requisitionId}`;
+export const GET_USER_UNRETIRED_REQUISITIONS_API = (email) =>
+  `${API}/user-requisitions/unretired/${email}`;
+export const BUDGET_HOLDER_CHECK_REQUISITION_API = (requisitionId) =>
+  `${API}/requisitions/budgetHolderCheck/${requisitionId}`;
+export const FINANCE_CHECK_REQUISITION_API = (requisitionId) =>
+  `${API}/requisitions/financeCheck/${requisitionId}`;
+export const FINANCE_REVIEW_REQUISITION_API = (requisitionId) =>
+  `${API}/requisitions/financeReview/${requisitionId}`;
+export const APPROVE_REQUISITION_API = (requisitionId) =>
+  `${API}/requisitions/approve/${requisitionId}`;
+export const DELETE_REQUISITION_API = (requisitionId) =>
+  `${API}/requisitions/delete/${requisitionId}`;
+export const CANCEL_REQUISITION_API = (requisitionId) =>
+  `${API}/requisitions/cancel/${requisitionId}`;
 export const GET_BIN_REQUISITIONS_API = `${API}/requisitions/bin`;
-export const DESTROY_REQUISITION_API = (requisitionId) => `${API}/requisitions/destroy/${requisitionId}`;
+export const DESTROY_REQUISITION_API = (requisitionId) =>
+  `${API}/requisitions/destroy/${requisitionId}`;
 export const UPDATE_REQUISITION_API = (requisitionId) => `${API}/requisitions/${requisitionId}`;
 export const GET_REQUISITION_BY_ID_API = (requisitionId) => `${API}/requisitions/${requisitionId}`;
 export const FILTER_REQUISITIONS_API = `${API}/filter-requisitions`;
-
 
 export const PROJECTS_API = `${API}/projects`;
 export const BUDGET_CODES_API = `${API}/budget-codes`;
@@ -55,6 +62,21 @@ export const USER_ACCESS_LABELS = {
   financeReviewer: "Reviewer",
   tech: "Tech",
 };
+
+// This is for what users can view depending on what access group they fall into
+export const ZERO_ACCESS_VIEW = ["staff", "user"];
+export const BUDGET_ACCESS_VIEW = ["budgetHolder", "tech"];
+export const FINANCE_ACCESS_VIEW = ["finance", "financeReviewer", "tech"];
+export const USER_ACCESS_VIEW = ["userManager", "tech"];
+export const SUPER_ACCESS_VIEW = ["superUser", "tech"];
+export const ALL_ADMIN_VIEW = [
+  "budgetHolder",
+  "finance",
+  "financeReviewer",
+  "superUser",
+  "userManager",
+  "tech",
+];
 
 export const EMPTY_REQ_VALUES = {
   _id: "",

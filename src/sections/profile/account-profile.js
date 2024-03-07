@@ -23,6 +23,7 @@ export const AccountProfile = () => {
   const [image, setImage] = useState(null);
   const [signature, setSignature] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [savingSig, setSavingSig] = useState(false);
 
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
@@ -62,7 +63,7 @@ export const AccountProfile = () => {
 
   const handleSignatureUpload = async () => {
     try {
-      setSaving(true);
+      setSavingSig(true);
       const formData = new FormData();
       formData.append("files", image);
       formData.append("destination", "signature-photos");
@@ -84,7 +85,7 @@ export const AccountProfile = () => {
     } catch (error) {
       console.error("Error uploading image:", error);
     } finally {
-      setSaving(false);
+      setSavingSig(false);
     }
   };
 
@@ -200,9 +201,9 @@ export const AccountProfile = () => {
               variant="text"
               color="success"
               onClick={handleSignatureUpload}
-              disabled={saving}
+              disabled={savingSig}
             >
-              {saving ? "Saving..." : "Save Signature Image"}
+              {savingSig ? "Saving..." : "Save Signature"}
             </Button>
             <Button color="error" onClick={() => setSignature(null)}>
               <Cancel />

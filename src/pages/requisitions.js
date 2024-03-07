@@ -103,6 +103,23 @@ const Page = () => {
     // setFilteredRequisitions()
   };
 
+  const renderTabs = (userAccessLevel) => {
+    switch (userAccessLevel) {
+      case "staff":
+      case "user":
+        return <Tab value="myRequisitions" label="My Requisitions" />;
+      case "userManager":
+        return <Tab value="forMyAttention" label="Requisitions for my attention" />;
+      default:
+        return (
+          <>
+            <Tab value="forMyAttention" label="Requisitions for my attention" />
+            <Tab value="allRequisitions" label="All Requisitions" />
+          </>
+        );
+    }
+  };
+
   return (
     <>
       <Head>
@@ -156,7 +173,9 @@ const Page = () => {
                     &nbsp; Create New
                   </Button>
                 ) : (
-                  <Button href="/profile" startIcon={<Warning />} color="warning">Upload your Signature to raise request</Button>
+                  <Button href="/profile" startIcon={<Warning />} color="warning">
+                    Upload your Signature to raise request
+                  </Button>
                 )}
               </Box>
               <CreateReqModal
@@ -182,9 +201,10 @@ const Page = () => {
                 variant="scrollable"
                 scrollButtons="auto"
               >
-                <Tab value="myRequisitions" label="My Requisitions" />
+                {renderTabs(user?.accessLevel)}
+                {/* <Tab value="myRequisitions" label="My Requisitions" />
                 <Tab value="forMyAttention" label="Requisitions for my attention" />
-                <Tab value="allRequisitions" label="All Requisitions" />
+                <Tab value="allRequisitions" label="All Requisitions" /> */}
               </Tabs>
               <Box>
                 <RequisitionTable

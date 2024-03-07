@@ -94,7 +94,9 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
 
   useEffect(() => {
     if (requisitionData) {
-      setProjectName(requisitionData.projectName || requisitionData.projectChargedTo.projectName || "");
+      setProjectName(
+        requisitionData.projectName || requisitionData.projectChargedTo.projectName || ""
+      );
       setType(requisitionData.type || "");
       setTitle(requisitionData.title || "");
       setCurrency(requisitionData.currency || "");
@@ -163,37 +165,11 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
     getRequisitionDataForEdit();
   }, []);
 
-  const handleEditRequisition = async () => {
-    try {
-      const updatedRequisitionData = {
-        // Update the requisition data with the modified values
-        project,
-        type: reqType,
-        title: reqDesc,
-        items: itemsArray,
-        // ... other properties
-      };
-
-      // Perform the update operation using the updatedRequisitionData
-      const response = await axios.put(
-        `${REQUISITION_API}/${requisitionData._id}`,
-        updatedRequisitionData
-      );
-
-      // Handle the response, e.g., show a success message
-      console.log("Requisition updated successfully:", response.data);
-    } catch (error) {
-      // Handle errors, e.g., show an error message
-      console.error("Error updating requisition:", error.message);
-    } finally {
-      onClose();
-    }
-  };
-
   const handleSubmitRequisition = async (event) => {
     event.preventDefault();
-    setLoadingSubmit(true);
+
     try {
+      setLoadingSubmit(true);
       const selectedProject = projects.find((project) => project.projectName === projectName);
       const attentionToUser = budgetHolders.find((holder) => holder.name === attentionTo);
 
@@ -209,7 +185,7 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
         accountName: beneficiary?.accountName,
         accountNumber: Number(beneficiary?.accountNumber),
         bankName: beneficiary?.bankName,
-        attentionTo: attentionToUser.email,
+        attentionTo: attentionToUser?.email || "",
         projectChargedTo: {
           account: {
             accountName: selectedProject ? selectedProject.account.accountName : "",
@@ -222,19 +198,38 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
         date: getCurrentDateTimeString(),
       };
 
+      if (
+        !formValues.type ||
+        !formValues.title ||
+        (formValues.itemsArray && formValues.itemsArray.length < 1) ||
+        !formValues.bankName ||
+        !formValues.accountNumber ||
+        !formValues.attentionTo ||
+        !formValues.projectChargedTo
+      ) {
+        console.log(formValues);
+        return toast.warning("Missing parameters");
+      }
+
       const response = await createRequisition(formValues);
-      console.log(response);
+
+      if (response.status === 200) {
+        console.log(response.data);
+        onClose();
+      }
     } catch (error) {
-      toast.error("Error posting request:", error);
-      console.log(error.message);
+      toast.error(`Error creating request\n${error.message}`);
+      console.log("Error creating request", error.message);
     } finally {
       setLoadingSubmit(false);
       setPart(1);
-      onClose();
     }
   };
 
   const handleNext = () => {
+    if (itemsArray.length === 0) {
+      return alert("Please save at least one item");
+    }
     setPart(part + 1);
   };
 
@@ -252,7 +247,7 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
       const newItemData = {
         title: newItemTitle,
         amount: newItemAmount,
-        code: newItemCode,
+        code: newItemCode.code,
       };
 
       let totalAmount = Number(totalItemsAmount) || 0;
@@ -434,31 +429,25 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
                   <FormControl fullWidth sx={{ mt: 1 }}>
-                    <InputLabel id="budget-line">Budget Line</InputLabel>
-                    <Select
-                      labelId="budget-line"
+                    <Autocomplete
+                      fullWidth
+                      options={budgetCodes.filter((budgetCode) =>
+                        budgetCode.project.includes(projectName)
+                      )}
+                      getOptionLabel={(budgetCode) => budgetCode?.description || ""}
                       value={newItemCode}
-                      onChange={(e) => setNewItemCode(e.target.value)}
-                      label="Budget Line"
-                      sx={{
-                        minWidth: "220px",
-                        maxWidth: "220px",
+                      onChange={(event, newValue) => {
+                        setNewItemCode(newValue);
                       }}
-                    >
-                      {budgetCodes &&
-                        budgetCodes.map((budgetCode, index) =>
-                          budgetCode.project.includes(projectName) ? (
-                            <MenuItem key={index} value={budgetCode.code}>
-                              {budgetCode.description}
-                            </MenuItem>
-                          ) : null
-                        )}
-                    </Select>
+                      renderInput={(params) => (
+                        <TextField {...params} label="Budget Line" fullWidth />
+                      )}
+                    />
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4} sx={{ mt: 0 }}>
                   <Button variant="outlined" color="success" size="medium" onClick={handleAddItem}>
-                    Add
+                    Save Item
                   </Button>
                 </Grid>
               </Grid>
@@ -572,9 +561,11 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
                 </label>
               </Grid>
               <Grid item xs={12} md={6}>
-                <Typography variant="subtitle1" sx={{ mt: 2 }}>
-                  Uploads
-                </Typography>
+                {selectedFiles && selectedFiles.length > 0 && (
+                  <Typography variant="subtitle1" sx={{ mt: 2 }}>
+                    Uploads
+                  </Typography>
+                )}
                 <List sx={{ mt: 2 }}>
                   {selectedFiles.map((file, index) => (
                     <ListItem key={index} sx={{ mt: -1 }}>
@@ -636,7 +627,6 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
                     setBeneficiary(
                       beneficiaryList.find((account) => account.accountName === value) || {}
                     );
-                    console.log("b::2", beneficiary);
                   }}
                 />
               </Grid>
