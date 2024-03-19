@@ -26,8 +26,6 @@ import {
   searchFilterRequisitions,
 } from "src/services/api/requisition.api";
 import { FilterRequisitions } from "src/sections/requisitions/filter-requisitions";
-// import DownloadForOfflineOutlinedIcon from "@mui/icons-material/DownloadForOfflineOutlined";
-// import DownloadingOutlinedIcon from "@mui/icons-material/DownloadingOutlined";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import { Warning } from "@mui/icons-material";
 
@@ -51,20 +49,25 @@ const Page = () => {
   const fetchRequisitions = async () => {
     setLoading(true);
     try {
+      setFilteredRequisitions([]);
       let fetchedRequisitions;
       let count;
+
       switch (selectedTab) {
         case "myRequisitions":
+          fetchedRequisitions = [];
           const myReqs = await getUserRequisitions(user?._id);
           fetchedRequisitions = myReqs.data.requisitions;
           count = myReqs.data.totalCount;
           break;
         case "forMyAttention":
+          fetchedRequisitions = [];
           const myAttentionReqs = await getAttentionedToRequisitions(user?.email);
           fetchedRequisitions = myAttentionReqs.data.requisitions;
           count = myAttentionReqs.data.totalCount;
           break;
         case "allRequisitions":
+          fetchedRequisitions = [];
           const allReqs = await getAllRequisitions();
           fetchedRequisitions = allReqs.data.requisitions;
           count = allReqs.data.totalCount;
@@ -98,26 +101,21 @@ const Page = () => {
   };
 
   const handleSubmitFilter = async (filters) => {
-    const response = await searchFilterRequisitions(filters);
-    // console.log(response.data);
-    // setFilteredRequisitions()
+    const { user_email, type, status, startDate, endDate } = filters;
+
+    if (user_email !== "" || type !== "" || status !== "" || startDate !== "" || endDate !== "") {
+      const response = await searchFilterRequisitions(filters);
+      setFilteredRequisitions(response.data.requisitions);
+    } else {
+      setFilteredRequisitions([]);
+    }
   };
 
-  const renderTabs = (userAccessLevel) => {
-    switch (userAccessLevel) {
-      case "staff":
-      case "user":
-        return <Tab value="myRequisitions" label="My Requisitions" />;
-      case "userManager":
-        return <Tab value="forMyAttention" label="Requisitions for my attention" />;
-      default:
-        return (
-          <>
-            <Tab value="forMyAttention" label="Requisitions for my attention" />
-            <Tab value="allRequisitions" label="All Requisitions" />
-          </>
-        );
-    }
+  const handleEditRequisition = (editedRequisition) => {
+    const updatedRequisitions = requisitions.map((req) =>
+      req._id === editedRequisition._id ? editedRequisition : req
+    );
+    setRequisitions(updatedRequisitions);
   };
 
   return (
@@ -140,27 +138,6 @@ const Page = () => {
                 Requisitions
               </Typography>
               <Box>
-                {/* <Tooltip title="Download Approved">
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    color="success"
-                    onClick={handleCSVDownload}
-                    disabled={downloadingCSV}
-                  >
-                    {downloadingCSV ? (
-                      <>
-                        <DownloadingOutlinedIcon />
-                        &nbsp;loading..
-                      </>
-                    ) : (
-                      <>
-                        <DownloadForOfflineOutlinedIcon />
-                        &nbsp;Download
-                      </>
-                    )}
-                  </Button>
-                </Tooltip> */}
                 {user?.signatureUrl ? (
                   <Button
                     size="small"
@@ -201,18 +178,27 @@ const Page = () => {
                 variant="scrollable"
                 scrollButtons="auto"
               >
-                {renderTabs(user?.accessLevel)}
-                {/* <Tab value="myRequisitions" label="My Requisitions" />
-                <Tab value="forMyAttention" label="Requisitions for my attention" />
-                <Tab value="allRequisitions" label="All Requisitions" /> */}
+                {(user.accessLevel === "user" || user.accessLevel === "tech") && (
+                  <Tab value="myRequisitions" label="My Requisitions" />
+                )}
+                {user.accessLevel !== "user" && (
+                  <Tab value="forMyAttention" label="Requisitions for my attention" />
+                )}
+                {user.accessLevel !== "user" && user.accessLevel !== "budgetHolder" && (
+                  <Tab value="allRequisitions" label="All Requisitions" />
+                )}
               </Tabs>
               <Box>
                 <RequisitionTable
-                  requisitions={filteredRequisitions.length ? filteredRequisitions : requisitions}
+                  requisitions={
+                    // requisitions
+                    filteredRequisitions.length > 0 ? filteredRequisitions : requisitions
+                  }
                   loading={loading}
                   totalCount={totalCount}
                   currentTab={selectedTab}
                   setRequisitions={setRequisitions}
+                  onEditRequisition={handleEditRequisition}
                 />
               </Box>
             </Grid>

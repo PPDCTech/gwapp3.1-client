@@ -46,7 +46,7 @@ export const SideNav = (props) => {
     } else if (user?.accessLevel === "finance" || user?.accessLevel === "financeReviewer") {
       return item.path !== "/retirements"; // finance and financeReviewer can't see /retirements
     } else if (user?.accessLevel === "user") {
-      return item.path !== "/accounts" && item.path !== "/projects"; // user can't see /accounts and /projects
+      return item.path !== "/accounts" && item.path !== "/projects" && item.path !== "/bin"; // user can't see /accounts and /projects and /bin
     } else {
       return false; // Default to not including the item if no specific logic applies
     }

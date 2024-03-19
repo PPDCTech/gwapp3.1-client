@@ -9,10 +9,10 @@ import {
   IconButton,
   Typography,
   SvgIcon,
-  Pagination,
   Grid,
   Tooltip,
   CircularProgress,
+  TablePagination,
 } from "@mui/material";
 import {
   TrashIcon,
@@ -29,16 +29,15 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import ChatModal from "src/components/chat-modal";
 import RequisitionDetailsModal from "src/components/req-details-modal";
-import ReqModal from "src/components/req-modal";
 import { useAuth } from "src/hooks/use-auth";
 import {
   deleteRequisition,
-  destroyRequisition,
   getRequisitionById,
+  sendBackRequisition,
 } from "src/services/api/requisition.api";
-import { formatDate } from "src/utils/format-date";
 import { getDateMDY } from "src/services/helpers";
 import CreateReqModal from "src/components/create-req";
+import { printDocument } from "src/utils/print-document";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -46,13 +45,13 @@ export const RequisitionTable = ({
   requisitions,
   loading,
   totalCount,
-  currentTab,
   setRequisitions,
+  onEditRequisition,
 }) => {
   const { user } = useAuth();
   const [loadingRows, setLoadingRows] = useState([]);
-  const [page, setPage] = useState(1);
-  const [rowsPerpage, setRowsPerpage] = useState(25);
+  const [page, setPage] = useState(0);
+  const [rowsPerpage, setRowsPerpage] = useState(10);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState("");
   const [isReqDetailsOpen, setIsReqDetailsOpen] = useState(false);
@@ -61,13 +60,28 @@ export const RequisitionTable = ({
   const [selectedRequisition, setSelectedRequisition] = useState(null);
   const [editMode, setEditMode] = useState(false);
 
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const requisition_id = params.get("id");
+      const action = params.get("action");
+
+      if (action === "openModal" && requisition_id) {
+        setSelectedId(requisition_id);
+        openReqDetails();
+      }
+    } catch (error) {
+      console.log("Error:", error);
+    }
+  }, []);
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerpage(parseInt(event.target.value, 25));
-    setPage(1);
+    setRowsPerpage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   const openChatModal = (reqId) => {
@@ -111,12 +125,37 @@ export const RequisitionTable = ({
   const handleCloseEditModal = () => {
     setEditMode(false);
     setEditReqModalOpen(false);
-    // fetchRequisitions();
+  };
+
+  const updateRequisition = (editedRequisition) => {
+    onEditRequisition(editedRequisition);
   };
 
   const handleDeleteRequisition = async (id) => {
+    console.log("deleting..", id);
     await deleteRequisition(id);
     setRequisitions(requisitions.filter((req) => req._id !== id));
+  };
+
+  const handleSendBackRequisition = async (id) => {
+    await sendBackRequisition(id);
+    closeReqDetails();
+  };
+
+  const [printLoading, setPrintLoading] = useState({});
+
+  const handlePrint = async (id) => {
+    try {
+      setPrintLoading((prevLoading) => ({ ...prevLoading, [id]: true }));
+      const response = await getRequisitionById(id);
+      const requisition = await response.data;
+      const document = await printDocument(requisition);
+      pdfMake.createPdf(document).open();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setPrintLoading((prevLoading) => ({ ...prevLoading, [id]: false }));
+    }
   };
 
   return (
@@ -129,7 +168,7 @@ export const RequisitionTable = ({
             <Typography sx={{ mt: 2 }}>No requisitions found.</Typography>
           )}
 
-          {requisitions && (
+          {requisitions && requisitions.length > 0 && (
             <>
               <TableContainer sx={{ mt: 2 }}>
                 <Table>
@@ -178,6 +217,8 @@ export const RequisitionTable = ({
                             {requisition.status}
                           </SeverityPill>
                         </TableCell>
+
+                        {/* Action column */}
                         <TableCell
                           sx={{
                             "@media (max-width: 600px)": {
@@ -186,7 +227,7 @@ export const RequisitionTable = ({
                           }}
                         >
                           <Grid container spacing={2}>
-                            {/* Chat icon always visible */}
+                            {/* Always show chat icon */}
                             <Grid item>
                               <Tooltip title="Messages">
                                 <IconButton
@@ -206,60 +247,14 @@ export const RequisitionTable = ({
                               </Tooltip>
                             </Grid>
 
-                            {/* If you are the requester, and it's not yet approved - you can delete */}
-                            {requisition?.user?.name === user?.name &&
-                              requisition.status !== "approved" && (
-                                <>
-                                  <Grid item>
-                                    <Tooltip title="Delete">
-                                      <IconButton
-                                        sx={{
-                                          backgroundColor: "error.main",
-                                          color: "#fff",
-                                          "&:hover": {
-                                            backgroundColor: "error.dark",
-                                          },
-                                        }}
-                                        onClick={() => handleDeleteRequisition(requisition._id)}
-                                      >
-                                        <SvgIcon fontSize="small">
-                                          <TrashIcon />
-                                        </SvgIcon>
-                                      </IconButton>
-                                    </Tooltip>
-                                  </Grid>
-                                  <Grid item>
-                                    <Tooltip title="Edit">
-                                      <IconButton
-                                        onClick={() => handleOpenEditModal(requisition._id)}
-                                        sx={{
-                                          backgroundColor: "warning.main",
-                                          color: "#fff",
-                                          "&:hover": {
-                                            backgroundColor: "warning.dark",
-                                          },
-                                        }}
-                                      >
-                                        <SvgIcon fontSize="small">
-                                          <PencilSquareIcon />
-                                        </SvgIcon>
-                                      </IconButton>
-                                    </Tooltip>
-                                  </Grid>
-                                </>
-                              )}
-
-                            {/* Will add explanation later, I don tire */}
-                            {(user?.accessLevel === "budgetHolder" &&
-                              requisition.status === "pending") ||
-                            (user?.accessLevel === "finance" &&
-                              requisition.status === "holderCheck") ||
-                            (user?.accessLevel === "financeReviewer" &&
-                              requisition.status === "checked") ||
-                            (user?.accessLevel === "superUser" &&
-                              requisition.status === "reviewed") ? (
+                            {/* Send back icon conditions */}
+                            {requisition.status !== "reviewed" &&
+                            requisition.status !== "approved" &&
+                            user.accessLevel !== "user" &&
+                            user.accessLevel !== "userManager" &&
+                            requisition.attentionTo.includes(user.email) ? (
                               <Grid item>
-                                <Tooltip title="Print">
+                                <Tooltip title="Send Back">
                                   <IconButton
                                     sx={{
                                       backgroundColor: "warning.main",
@@ -268,6 +263,7 @@ export const RequisitionTable = ({
                                         backgroundColor: "warning.dark",
                                       },
                                     }}
+                                    onClick={(e) => handleSendBackRequisition(e, requisition._id)}
                                   >
                                     <SvgIcon fontSize="small">
                                       <ArrowUturnLeftIcon />
@@ -277,8 +273,36 @@ export const RequisitionTable = ({
                               </Grid>
                             ) : null}
 
-                            {/* If approved, you (owner) and all accessLevels above 'user' can print */}
-                            {requisition.status === "approved" && (
+                            {/* Edit condition */}
+                            {requisition.status !== "reviewed" &&
+                            requisition.status !== "approved" &&
+                            (requisition.user.name === user.name ||
+                              requisition.user.email === user.email) ? (
+                              <Grid item>
+                                <Tooltip title="Edit">
+                                  <IconButton
+                                    onClick={() => handleOpenEditModal(requisition._id)}
+                                    sx={{
+                                      backgroundColor: "primary.main",
+                                      color: "#fff",
+                                      "&:hover": {
+                                        backgroundColor: "primary.dark",
+                                      },
+                                    }}
+                                  >
+                                    <SvgIcon fontSize="small">
+                                      <PencilSquareIcon />
+                                    </SvgIcon>
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                            ) : null}
+
+                            {/* Conditions for Printing */}
+                            {requisition.status === "approved" &&
+                            (requisition.user.name === user.name ||
+                              requisition.user.email === user.email ||
+                              ["tech", "finance", "financeReviewer"].includes(user.accessLevel)) ? (
                               <Grid item>
                                 <Tooltip title="Print">
                                   <IconButton
@@ -289,10 +313,10 @@ export const RequisitionTable = ({
                                         backgroundColor: "success.dark",
                                       },
                                     }}
-                                    onClick={(e) => handlePrint(e, requisition._id)}
+                                    onClick={() => handlePrint(requisition._id)}
                                   >
-                                    {loadingRows.includes(requisition._id) ? (
-                                      <CircularProgress size={20} color="inherit" />
+                                    {printLoading[requisition._id] ? (
+                                      <CircularProgress size={20} />
                                     ) : (
                                       <SvgIcon fontSize="small">
                                         <PrinterIcon />
@@ -301,7 +325,32 @@ export const RequisitionTable = ({
                                   </IconButton>
                                 </Tooltip>
                               </Grid>
-                            )}
+                            ) : null}
+
+                            {/* Delete condition */}
+                            {requisition.status !== "approved" &&
+                            requisition.status !== "reviewed" &&
+                            (requisition.user.name === user.name ||
+                              requisition.user.email === user.email) ? (
+                              <Grid item>
+                                <Tooltip title="Delete">
+                                  <IconButton
+                                    sx={{
+                                      backgroundColor: "error.main",
+                                      color: "#fff",
+                                      "&:hover": {
+                                        backgroundColor: "error.dark",
+                                      },
+                                    }}
+                                    onClick={() => handleDeleteRequisition(requisition._id)}
+                                  >
+                                    <SvgIcon fontSize="small">
+                                      <TrashIcon />
+                                    </SvgIcon>
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                            ) : null}
                           </Grid>
                         </TableCell>
                       </TableRow>
@@ -309,24 +358,22 @@ export const RequisitionTable = ({
                   </TableBody>
                 </Table>
               </TableContainer>
-              <Pagination
-                sx={{ mt: 2, display: "flex", justifyContent: "center" }}
-                count={Math.ceil(totalCount / rowsPerpage)}
-                page={page}
-                onChange={handleChangePage}
+
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={Number(totalCount)}
                 rowsPerPage={rowsPerpage}
+                page={page}
+                onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
-              />
-              <ChatModal open={isChatModalOpen} onClose={closeChatModal} reqId={selectedId} />
-              <RequisitionDetailsModal
-                isOpen={isReqDetailsOpen}
-                onClose={closeReqDetails}
-                requisitionId={selectedId}
               />
             </>
           )}
         </>
       )}
+      <ChatModal open={isChatModalOpen} onClose={closeChatModal} reqId={selectedId} />
+
       <RequisitionDetailsModal
         isOpen={isReqDetailsOpen}
         requisitionId={selectedId}
@@ -335,6 +382,7 @@ export const RequisitionTable = ({
       <CreateReqModal
         open={isEditReqModalOpen}
         onClose={handleCloseEditModal}
+        triggerUpdateRequisition={updateRequisition}
         isEditMode={editMode}
         requisitionData={selectedRequisition ? selectedRequisition : null}
       />

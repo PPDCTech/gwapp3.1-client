@@ -54,8 +54,8 @@ export const AddAccount = ({ updateAccounts }) => {
 
   return (
     <>
-      <Button color="info" size="small" variant="contained" onClick={handleOpen}>
-        Add New
+      <Button color="info" size="small" variant="outlined" onClick={handleOpen}>
+        Add New Bank Account
       </Button>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add New Account</DialogTitle>

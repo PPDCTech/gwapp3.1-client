@@ -25,7 +25,7 @@ export const postData = async (endpoint, data) => {
 export const fetchData = async (endpoint) => {
   try {
     setAuthorizationHeader();
-    const response = await axios.get(`${API}/${endpoint}`);
+    const response = axios ? await axios.get(`${API}/${endpoint}`) : null;
     return response;
   } catch (error) {
     console.error("Error during GET request:", error);

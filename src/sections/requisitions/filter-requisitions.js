@@ -25,6 +25,7 @@ import SearchOffIcon from "@mui/icons-material/SearchOff";
 import { getAllApprovedRequisitions } from "src/services/api/requisition.api";
 import { currentDate, getDateYearMonthDay } from "src/services/helpers";
 import { CSVLink } from "react-csv";
+import { useAuth } from "src/hooks/use-auth";
 
 export const FilterRequisitions = ({ onSubmitFilters }) => {
   const [users, setUsers] = useState([]);
@@ -32,6 +33,7 @@ export const FilterRequisitions = ({ onSubmitFilters }) => {
   const [csvData, setCsvData] = useState([]);
   const [csvHeaders, setCsvHeaders] = useState([]);
   const csvLinkRef = useRef(null);
+  const { user } = useAuth();
 
   const [filters, setFilters] = useState({
     user_email: "",
@@ -277,24 +279,28 @@ export const FilterRequisitions = ({ onSubmitFilters }) => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={6} md={4}>
-              <Autocomplete
-                options={users.map((user) => user.name)}
-                getOptionSelected={(option, value) => option === value}
-                renderInput={(params) => (
-                  <TextField {...params} label="User" fullWidth sx={{ marginBottom: "1rem" }} />
-                )}
-                onChange={(event, value) => {
-                  const selectedUser = users.find((user) => user.name === value);
-                  if (selectedUser) {
-                    setFilters((prevFilters) => ({
-                      ...prevFilters,
-                      user_email: selectedUser.email,
-                    }));
-                  }
-                }}
-              />
-            </Grid>
+
+            {user.accessLevel !== "user" && user.accessLevel !== "userManager" && (
+              <Grid item xs={6} md={4}>
+                <Autocomplete
+                  options={users.map((user) => user.name)}
+                  getOptionSelected={(option, value) => option === value}
+                  renderInput={(params) => (
+                    <TextField {...params} label="User" fullWidth sx={{ marginBottom: "1rem" }} />
+                  )}
+                  onChange={(event, value) => {
+                    const selectedUser = users.find((user) => user.name === value);
+                    if (selectedUser) {
+                      setFilters((prevFilters) => ({
+                        ...prevFilters,
+                        user_email: selectedUser.email,
+                      }));
+                    }
+                  }}
+                />
+              </Grid>
+            )}
+
             <Grid item xs={6} md={4}>
               <TextField
                 fullWidth

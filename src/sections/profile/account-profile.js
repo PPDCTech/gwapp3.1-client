@@ -65,7 +65,7 @@ export const AccountProfile = () => {
     try {
       setSavingSig(true);
       const formData = new FormData();
-      formData.append("files", image);
+      formData.append("files", signature);
       formData.append("destination", "signature-photos");
 
       const response = await uploadFileAPI(formData);

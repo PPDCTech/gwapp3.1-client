@@ -53,10 +53,10 @@ const Page = () => {
       >
         <Container maxWidth="xl">
           <Grid container spacing={3}>
-            <Grid xs={12} sm={6} lg={4}>
+            <Grid xs={12} sm={6} lg={3}>
               <OverviewTotalRaised positive sx={{ height: "100%" }} value={`${totalCount}`} />
             </Grid>
-            <Grid xs={12} sm={6} lg={3}>
+            <Grid xs={12} sm={6} lg={4}>
               <OverviewTotalApproved
                 difference={16}
                 positive={false}

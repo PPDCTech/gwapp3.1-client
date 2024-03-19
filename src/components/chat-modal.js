@@ -135,9 +135,10 @@ function ChatModal({ open, onClose, reqId }) {
           ) : messages.length === 0 ? (
             <Typography variant="subtitle1">No Messages</Typography>
           ) : (
-            messages && messages.map((message, index) => {
+            messages &&
+            messages.map((message, index) => {
               const isOwnMessage = message.user_id === userId;
-              const user = users[message.user_id] || {};
+              const sender = !isOwnMessage ? users[message.user_id] : {};
 
               const isLastMessage = index === messages.length - 1 ? lastMessageRef : null;
 
@@ -151,10 +152,13 @@ function ChatModal({ open, onClose, reqId }) {
                   }}
                 >
                   <ListItemAvatar sx={{ width: 32, height: 32 }}>
-                    <Avatar alt={user?.name} src={user?.photoUrl} />
+                    <Avatar
+                      alt={isOwnMessage ? user?.name : sender?.data.name || ""}
+                      src={isOwnMessage ? user?.photoUrl : sender?.data.photoUrl || ""}
+                    />
                   </ListItemAvatar>
                   <ListItemText
-                    primary={isOwnMessage ? "You" : user?.name}
+                    primary={isOwnMessage ? "You" : sender?.data.name || "..."}
                     secondary={message.message}
                   />
                 </ListItem>

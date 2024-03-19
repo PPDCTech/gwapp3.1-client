@@ -16,7 +16,7 @@ import {
 import { Delete as DeleteIcon, Edit as EditIcon, Save } from "@mui/icons-material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
-export const BankAccountsTable = ({ accounts, onDelete, onEdit }) => {
+export const BankAccountsTable = ({ accounts, onDelete, onEdit, isVendor }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [editId, setEditId] = useState(null);
   const [newAccountName, setNewAccountName] = useState("");
@@ -37,10 +37,10 @@ export const BankAccountsTable = ({ accounts, onDelete, onEdit }) => {
   const handleSaveClick = (id) => {
     const editedAccount = accounts.find((account) => account._id === id);
     if (newAccountName) {
-        editedAccount["accountName"] = newAccountName;
+      editedAccount["accountName"] = newAccountName;
     }
     if (newAccountNumber) {
-        editedAccount["accountNumber"] = newAccountNumber;
+      editedAccount["accountNumber"] = newAccountNumber;
     }
     onEdit(editedAccount);
     setEditId(null);
@@ -56,7 +56,7 @@ export const BankAccountsTable = ({ accounts, onDelete, onEdit }) => {
                 <TableCell>Bank Name</TableCell>
                 <TableCell>Holder</TableCell>
                 <TableCell>Account Number</TableCell>
-                <TableCell>Action</TableCell>
+                {!isVendor && <TableCell>Action</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -86,34 +86,33 @@ export const BankAccountsTable = ({ accounts, onDelete, onEdit }) => {
                       account.accountNumber
                     )}
                   </TableCell>
-                  <TableCell>
-                    {editId === account._id ? (
-                      <IconButton onClick={() => handleSaveClick(account._id)}
-aria-label="save">
-                        <SvgIcon color="success"
-fontSize="small">
-                          <Save />
-                        </SvgIcon>
-                      </IconButton>
-                    ) : (
-                      <>
-                        <IconButton onClick={() => onDelete(account._id)}
-aria-label="delete">
-                          <SvgIcon color="error"
-fontSize="small">
-                            <DeleteIcon />
+                  {!isVendor && (
+                    <TableCell>
+                      {editId === account._id ? (
+                        <IconButton onClick={() => handleSaveClick(account._id)} aria-label="save">
+                          <SvgIcon color="success" fontSize="small">
+                            <Save />
                           </SvgIcon>
                         </IconButton>
-                        <IconButton onClick={() => handleEditClick(account._id)}
-aria-label="edit">
-                          <SvgIcon color="info"
-fontSize="small">
-                            <EditIcon />
-                          </SvgIcon>
-                        </IconButton>
-                      </>
-                    )}
-                  </TableCell>
+                      ) : (
+                        <>
+                          <IconButton onClick={() => onDelete(account._id)} aria-label="delete">
+                            <SvgIcon color="error" fontSize="small">
+                              <DeleteIcon />
+                            </SvgIcon>
+                          </IconButton>
+                          <IconButton
+                            onClick={() => handleEditClick(account._id)}
+                            aria-label="edit"
+                          >
+                            <SvgIcon color="info" fontSize="small">
+                              <EditIcon />
+                            </SvgIcon>
+                          </IconButton>
+                        </>
+                      )}
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

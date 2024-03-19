@@ -45,14 +45,21 @@ import { useFormik } from "formik";
 import CircularProgress from "@mui/material/CircularProgress";
 import { fetchBudgetHolders } from "src/services/api/users.api";
 import { addAccount, getAllAccounts } from "src/services/api/accounts.api";
-import { createRequisition } from "src/services/api/requisition.api";
+import { createRequisition, updateRequisition } from "src/services/api/requisition.api";
 import { getAllProjects } from "src/services/api/projects.api";
 import { getAllBudgetCodes } from "src/services/api/budget-codes.api";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { CheckCircleOutline } from "@mui/icons-material";
 import { uploadFileAPI } from "src/services/api/uploads.api";
+import { addVendor, getAllVendors } from "src/services/api/vendors.api";
 
-const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
+const CreateReqModal = ({
+  open,
+  onClose,
+  isEditMode,
+  requisitionData,
+  triggerUpdateRequisition,
+}) => {
   const { user } = useAuth();
   const [part, setPart] = useState(1);
 
@@ -86,16 +93,22 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
 
   const [newBankName, setNewBankName] = useState("");
   const [newAccountNumber, setNewAccountNumber] = useState("");
-  const [newHolderName, setNewHolderName] = useState("");
+  const [newAccountName, setNewAccountName] = useState("");
 
-  // CODES
   const [projects, setProjects] = useState([]);
   const [budgetCodes, setBudgetCodes] = useState([]);
+
+  const [addingNewBeneficiary, setAddingNewBeneficiary] = useState(false);
+  const [savingNewBeneficiary, setSavingNewBeneficiary] = useState(false);
 
   useEffect(() => {
     if (requisitionData) {
       setProjectName(
-        requisitionData.projectName || requisitionData.projectChargedTo.projectName || ""
+        requisitionData.projectName
+          ? requisitionData.projectName
+          : requisitionData.projectChargedTo
+          ? requisitionData.projectChargedTo.projectName
+          : ""
       );
       setType(requisitionData.type || "");
       setTitle(requisitionData.title || "");
@@ -108,22 +121,26 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
 
   const handleAddNewAccount = async () => {
     try {
+      setSavingNewBeneficiary(true);
       const new_account = {
         bankName: newBankName,
-        accountName: newHolderName,
+        accountName: newAccountName,
         accountNumber: newAccountNumber,
+        userId: user._id,
       };
-      const response = await addAccount(new_account);
+      const response = await addVendor(new_account);
       if (response.status === 201) {
-        toast.success("Account added successfully");
+        toast.success("Saved account");
         setBeneficiary({
           bankName: response.data.bankName,
           accountNumber: response.data.accountNumber,
-          holderName: response.data.holderName,
+          accountName: response.data.accountName,
         });
       }
     } catch (error) {
       console.error("Error adding new account:", error.message);
+    } finally {
+      setSavingNewBeneficiary(false);
     }
   };
 
@@ -136,7 +153,7 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
   };
 
   const getBeneficiaries = async () => {
-    const response = await getAllAccounts();
+    const response = await getAllVendors();
     setBeneficiaryList(response.data);
   };
 
@@ -154,7 +171,6 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
     if (!requisitionData) {
       return;
     }
-    console.log(reqId);
   };
 
   useEffect(() => {
@@ -207,14 +223,12 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
         !formValues.attentionTo ||
         !formValues.projectChargedTo
       ) {
-        console.log(formValues);
         return toast.warning("Missing parameters");
       }
 
       const response = await createRequisition(formValues);
 
       if (response.status === 200) {
-        console.log(response.data);
         onClose();
       }
     } catch (error) {
@@ -223,6 +237,83 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
     } finally {
       setLoadingSubmit(false);
       setPart(1);
+    }
+  };
+
+  const handleSaveEditRequisition = async (event) => {
+    event.preventDefault();
+    try {
+      setLoadingSaveEdit(true);
+      const selectedProject = projects.find((project) => project.projectName === projectName);
+      const attentionToUser = budgetHolders.find((holder) => holder.name === attentionTo);
+
+      const formValues = {
+        userId: user._id,
+        type: type ? type : requisitionData.type,
+        title: title ? title : requisitionData.title,
+        invoices: invoiceArray ? invoiceArray : requisitionData.invoiceArray,
+        items: itemsArray ? itemsArray : requisitionData.itemsArray,
+        currency: currency ? currency : requisitionData.currency,
+        amountInWords: "",
+        total: totalItemsAmount
+          ? Number(totalItemsAmount)
+          : Number(requisitionData.totalItemsAmount) || Number(requisitionData.total),
+        accountName: beneficiary?.accountName
+          ? beneficiary.accountName
+          : requisitionData.accountName,
+        accountNumber: beneficiary?.accountNumber
+          ? Number(beneficiary.accountNumber)
+          : Number(requisitionData.accountNumber),
+        bankName: beneficiary?.bankName ? beneficiary.bankName : requisitionData.bankName,
+        attentionTo: attentionToUser?.email ? attentionToUser.email : requisitionData.attentionTo,
+        projectChargedTo: {
+          account: {
+            accountName: selectedProject
+              ? selectedProject?.account?.accountName || ""
+              : requisitionData?.selectedProject
+              ? requisitionData?.selectedProject?.accountName
+              : "",
+            accountNumber: selectedProject
+              ? selectedProject?.account?.accountNumber || ""
+              : requisitionData?.selectedProject
+              ? requisitionData?.selectedProject?.accountNumber
+              : "",
+            bankName: selectedProject
+              ? selectedProject?.account?.bankName || ""
+              : requisitionData?.selectedProject
+              ? requisitionData?.selectedProject?.bankName
+              : "",
+          },
+          funder: selectedProject ? selectedProject.funder : requisitionData?.selectedProject?.funder || "",
+          projectName: projectName ? projectName : requisitionData?.projectName || "",
+        },
+        date: getCurrentDateTimeString(),
+      };
+
+      if (
+        !formValues.type ||
+        !formValues.title ||
+        (formValues.itemsArray && formValues.itemsArray.length < 1) ||
+        !formValues.bankName ||
+        !formValues.accountNumber ||
+        !formValues.attentionTo ||
+        !formValues.projectChargedTo
+      ) {
+        console.log(formValues);
+        return toast.warning("Missing parameters");
+      }
+
+      const update_response = await updateRequisition(requisitionData._id, formValues);
+
+      if (update_response.status === 200) {
+        triggerUpdateRequisition(update_response.data);
+        setPart(1);
+        onClose();
+      }
+    } catch (error) {
+      console.log("Failed to save changes", error.message);
+    } finally {
+      setLoadingSaveEdit(false);
     }
   };
 
@@ -639,13 +730,12 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
                       name="attentionTo"
                       label="Attention To"
                       value={attentionTo}
-                      onSelect={(e) => setAttentionTo(e.target.value)}
                       fullWidth
                       required
                       sx={{ marginBottom: "1rem" }}
                     />
                   )}
-                  onInputChange={(e) => setAttentionTo(e.target.value)}
+                  onInputChange={(e, newValue) => setAttentionTo(newValue)}
                 />
               </Grid>
             </Grid>
@@ -672,59 +762,75 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
                 )}
               {attentionTo && (
                 <>
-                  <hr />
-                  <Typography variant="subtitle1" sx={{ mt: 2 }}>
+                  {/* <hr /> */}
+                  {/* <Typography variant="subtitle1" sx={{ mt: 2 }}>
                     Attention To: <strong>{attentionTo}</strong>
-                  </Typography>
-                  <hr />
+                  </Typography> */}
+                  {/* <hr /> */}
                 </>
               )}
             </>
 
+            <Divider />
+            {/* Adding new beneficiary account */}
             <>
-              <Typography variant="subtitle2" sx={{ mt: 4 }}>
-                Dont find the beneficiary? add new
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={4}>
-                  <TextField
-                    value={newBankName}
-                    onChange={(e) => setNewBankName(e.target.value)}
-                    fullWidth
-                    label="Bank Name"
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Typography variant="subtitle2">Dont find the beneficiary?</Typography>
+
+                <Button
+                  variant="text"
+                  color={addingNewBeneficiary ? "error" : "success"}
+                  onClick={() => setAddingNewBeneficiary(!addingNewBeneficiary)}
+                >
+                  {addingNewBeneficiary ? "Close" : "Add new"}
+                </Button>
+              </Box>
+
+              {addingNewBeneficiary && (
+                <>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6} md={4}>
+                      <TextField
+                        value={newBankName}
+                        onChange={(e) => setNewBankName(e.target.value)}
+                        fullWidth
+                        label="Bank Name"
+                        variant="outlined"
+                        margin="normal"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={4}>
+                      <TextField
+                        value={newAccountNumber}
+                        onChange={(e) => setNewAccountNumber(e.target.value)}
+                        fullWidth
+                        label="Account Number"
+                        variant="outlined"
+                        margin="normal"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={4}>
+                      <TextField
+                        value={newAccountName}
+                        onChange={(e) => setNewAccountName(e.target.value)}
+                        fullWidth
+                        label="Holder Name"
+                        variant="outlined"
+                        margin="normal"
+                      />
+                    </Grid>
+                  </Grid>
+                  <Button
+                    onClick={handleAddNewAccount}
                     variant="outlined"
-                    margin="normal"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                  <TextField
-                    value={newAccountNumber}
-                    onChange={(e) => setNewAccountNumber(e.target.value)}
-                    fullWidth
-                    label="Account Number"
-                    variant="outlined"
-                    margin="normal"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                  <TextField
-                    value={newHolderName}
-                    onChange={(e) => setNewHolderName(e.target.value)}
-                    fullWidth
-                    label="Holder Name"
-                    variant="outlined"
-                    margin="normal"
-                  />
-                </Grid>
-              </Grid>
-              <Button
-                onClick={handleAddNewAccount}
-                variant="outlined"
-                color="success"
-                size="medium"
-              >
-                Add
-              </Button>
+                    color="success"
+                    size="medium"
+                    disabled={savingNewBeneficiary}
+                  >
+                    {savingNewBeneficiary ? "Saving..." : "Save"}
+                  </Button>
+                </>
+              )}
             </>
           </>
         )}
@@ -749,8 +855,13 @@ const CreateReqModal = ({ open, onClose, isEditMode, requisitionData }) => {
               Back
             </Button>
             {isEditMode ? (
-              <Button disabled={loadingSaveEdit} color="info" variant="contained">
-                {loadingSaveEdit ? "Saving.." : "Save Changes"}
+              <Button
+                disabled={loadingSaveEdit}
+                color="info"
+                variant="contained"
+                onClick={(e) => handleSaveEditRequisition(e)}
+              >
+                {loadingSaveEdit ? "Saving.." : "Submit Changes"}
               </Button>
             ) : (
               <Button

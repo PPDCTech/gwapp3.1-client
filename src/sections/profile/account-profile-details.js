@@ -109,7 +109,7 @@ export const AccountProfileDetails = () => {
 noValidate
 onSubmit={handleSubmit}>
         <Card>
-          <CardHeader subheader="You can only change your password"
+          <CardHeader subheader="You can change your password, photo and signature"
 title="Profile" />
           <CardContent sx={{ pt: 0 }}>
             <Box sx={{ m: -1.5 }}>
