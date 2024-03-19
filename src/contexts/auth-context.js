@@ -95,13 +95,15 @@ export const AuthProvider = (props) => {
     if (isAuthenticated) {
       const userId = window.localStorage.getItem("gwapp_userId");
 
-      const response = await fetchSingleUser(userId);
-      const user = response?.data;
+      if (userId) {
+        const response = await fetchSingleUser(userId);
+        const user = response?.data;
 
-      dispatch({
-        type: HANDLERS.INITIALIZE,
-        payload: user,
-      });
+        dispatch({
+          type: HANDLERS.INITIALIZE,
+          payload: user,
+        });
+      }
     } else {
       dispatch({
         type: HANDLERS.INITIALIZE,

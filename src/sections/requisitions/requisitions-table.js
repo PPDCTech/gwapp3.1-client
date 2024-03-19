@@ -49,7 +49,6 @@ export const RequisitionTable = ({
   onEditRequisition,
 }) => {
   const { user } = useAuth();
-  const [loadingRows, setLoadingRows] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerpage, setRowsPerpage] = useState(10);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
