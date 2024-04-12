@@ -10,8 +10,10 @@ import {
 import axios from "axios";
 import { ACCOUNT_CODES_API } from "src/services/constants";
 import { indigo } from "src/theme/colors";
+import { useAuth } from "src/hooks/use-auth";
 
 export const AddAccountCodeModal = ({ onAddNew }) => {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [codeValue, setCodeValue] = useState("");
   const [description, setDescription] = useState("");
@@ -28,22 +30,21 @@ export const AddAccountCodeModal = ({ onAddNew }) => {
 
   const handleAddCode = async () => {
     const new_code = {
-        value: codeValue,
-        description
-    }
+      value: codeValue,
+      description,
+    };
     onAddNew(new_code);
     handleClose();
   };
 
   return (
     <>
-      <Button variant="outlined"
-sx={{ color: indigo.main }}
-onClick={handleOpen}>
-        Add New Code
-      </Button>
-      <Dialog open={isOpen}
-onClose={handleClose}>
+      {["finance", "financeReviewer", "tech"].includes(user.accessLevel) && (
+        <Button variant="outlined" sx={{ color: indigo.main }} onClick={handleOpen}>
+          Add New Code
+        </Button>
+      )}
+      <Dialog open={isOpen} onClose={handleClose}>
         <DialogTitle>Add New Account Code</DialogTitle>
         <DialogContent>
           <TextField
@@ -64,13 +65,10 @@ onClose={handleClose}>
           />
         </DialogContent>
         <DialogActions>
-          <Button color="error"
-onClick={handleClose}>
+          <Button color="error" onClick={handleClose}>
             Cancel
           </Button>
-          <Button color="success"
-onClick={handleAddCode}
-variant="contained">
+          <Button color="success" onClick={handleAddCode} variant="contained">
             Add Code
           </Button>
         </DialogActions>

@@ -18,20 +18,28 @@ import { getUserRequisitions } from "src/services/api/requisition.api";
 
 const Page = () => {
   const { user } = useAuth();
-  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [requisitions, setRequisitions] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [amounts, setAmounts] = useState();
+  const [totalApproved, setTotalApproved] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (user && user.email) {
           const response = await getUserRequisitions(user?._id);
-          const { requisitions, totalCount } = response.data;
+          const { requisitions, totalCount, totalAmount, totalApproved } = response.data;
+          
           setTotalCount(totalCount);
           setRequisitions(requisitions.slice(0, 6));
+          setAmounts(totalAmount);
+          setTotalApproved(totalApproved)
         }
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching requisitions:", error.message);
+        setLoading(false);
       }
     };
     if (user && user?.email) {
@@ -62,14 +70,17 @@ const Page = () => {
                 positive={false}
                 sx={{ height: "100%" }}
                 value={`${totalCount}`}
+                amounts={amounts}
+                totalApproved={totalApproved}
               />
             </Grid>
             <Grid xs={12} sm={6} lg={4}>
               <OverviewTasksProgress sx={{ height: "100%" }} totalValue={totalCount} />
             </Grid>
             <Grid xs={12} md={12} lg={12}>
+              
               {/* if user is not user or tech, this will have latest approved instead */}
-              <OverviewLatestRequests latestReqs={requisitions} sx={{ height: "100%" }} />
+              <OverviewLatestRequests latestReqs={requisitions} sx={{ height: "100%" }} loading={loading} />
             </Grid>
           </Grid>
         </Container>

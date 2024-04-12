@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import BellIcon from "@heroicons/react/24/solid/BellIcon";
-import UsersIcon from "@heroicons/react/24/solid/UsersIcon";
 import Bars3Icon from "@heroicons/react/24/solid/Bars3Icon";
-import MagnifyingGlassIcon from "@heroicons/react/24/solid/MagnifyingGlassIcon";
 import {
   Avatar,
   Badge,
@@ -21,20 +19,44 @@ import { useAuth } from "src/hooks/use-auth";
 import { getGreeting } from "src/utils/get-greeting";
 import { getFirstName } from "src/utils/get-firstname";
 import NotificationDropdown from "src/components/notifications-dropdown";
-import { Warning } from "@mui/icons-material";
+import { fetchUserMessages } from "src/services/api/message-chat.api";
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
 
 export const TopNav = (props) => {
+  const { user } = useAuth();
   const { onNavOpen } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const accountPopover = usePopover();
   const auth = useAuth();
   const [greeting, setGreeting] = useState(getGreeting());
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const getUnreadNotifications = async () => {
+    try {
+      const response = await fetchUserMessages(user?._id);
+      const { data } = response;
+      let count = 0;
+
+      data.forEach((n) => {
+        const messages = n?.messages || [];
+        messages.forEach((message) => {
+          if (!message.read) {
+            count++;
+          }
+        });
+      });
+
+      setUnreadCount(count);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     setGreeting(getGreeting());
+    getUnreadNotifications();
   }, []);
 
   const notificationDropdown = usePopover();
@@ -83,7 +105,7 @@ export const TopNav = (props) => {
                 ref={notificationDropdown.anchorRef}
                 onClick={notificationDropdown.handleOpen}
               >
-                <Badge badgeContent={4} color="success" variant="dot">
+                <Badge badgeContent={unreadCount} color="success" variant="dot">
                   <SvgIcon fontSize="small">
                     <BellIcon />
                   </SvgIcon>

@@ -275,6 +275,7 @@ export const RequisitionTable = ({
                             {/* Edit condition */}
                             {requisition.status !== "reviewed" &&
                             requisition.status !== "approved" &&
+                            requisition.status !== "deleted" &&
                             (requisition.user.name === user.name ||
                               requisition.user.email === user.email) ? (
                               <Grid item>
@@ -329,6 +330,7 @@ export const RequisitionTable = ({
                             {/* Delete condition */}
                             {requisition.status !== "approved" &&
                             requisition.status !== "reviewed" &&
+                            requisition.status !== "deleted" &&
                             (requisition.user.name === user.name ||
                               requisition.user.email === user.email) ? (
                               <Grid item>

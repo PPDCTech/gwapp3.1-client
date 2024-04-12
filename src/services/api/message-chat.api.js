@@ -1,10 +1,26 @@
-import { fetchData, postData } from "./api-helper";
+import { fetchData, patchData, postData } from "./api-helper";
 
 const MESSAGES_API = "messages";
 
 export const fetchMessages = async (requisitionId) => {
   try {
     return await fetchData(`${MESSAGES_API}/${requisitionId}`);
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchUserMessages = async (userId) => {
+  try {
+    return await fetchData(`${MESSAGES_API}/user/${userId}`);
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const markMessageAsRead = async (userId, messageId) => {
+  try {
+    return await patchData(`${MESSAGES_API}/mark-read/${userId}/${messageId}`);
   } catch (error) {
     throw error;
   }

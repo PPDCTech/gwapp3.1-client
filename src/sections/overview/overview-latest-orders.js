@@ -7,6 +7,7 @@ import {
   Card,
   CardActions,
   CardHeader,
+  CircularProgress,
   Container,
   Divider,
   Link,
@@ -26,11 +27,15 @@ import { formatDate } from "src/utils/format-date";
 import { STATUS_COLOR_TYPE } from "src/services/constants";
 
 export const OverviewLatestRequests = (props) => {
-  const { latestReqs = [], sx } = props;
+  const { latestReqs = [], sx, loading } = props;
+
+  if (loading) {
+    return <CircularProgress color="success" />
+  }
 
   return (
     <Card sx={sx}>
-      <CardHeader title="Latest Requisitions" />
+      <CardHeader title="Recent highlight" />
       <Container>{latestReqs.length === 0 && "No requisition found"}</Container>
       {latestReqs.length > 0 && (
         <>

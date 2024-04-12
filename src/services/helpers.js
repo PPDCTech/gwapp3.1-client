@@ -117,6 +117,18 @@ export const formatAmount = (amount) => {
   }
 };
 
+export const shortenAmount = (amount) => {
+  const suffixes = ["", "K", "M", "B", "T"];
+  let index = 0;
+
+  while (amount >= 1000 && index < suffixes.length - 1) {
+    amount /= 1000;
+    index++;
+  }
+
+  return amount.toFixed(2) + suffixes[index];
+};
+
 export const amountToWords = (currency, amount) => {
   if (!currencyCodes[currency]) {
     throw new Error("Invalid currency code");

@@ -4,9 +4,10 @@ import ArrowUpIcon from "@heroicons/react/24/solid/ArrowUpIcon";
 import BanknotesIcon from "@heroicons/react/24/solid/BanknotesIcon";
 import { Avatar, Box, Card, CardContent, Stack, SvgIcon, Typography } from "@mui/material";
 import { success } from "src/theme/colors";
+import { shortenAmount } from "src/services/helpers";
 
 export const OverviewTotalApproved = (props) => {
-  const { difference, positive = false, sx, value } = props;
+  const { difference, positive = false, sx, value, amounts, totalApproved } = props;
 
   return (
     <Card sx={sx}>
@@ -17,15 +18,15 @@ export const OverviewTotalApproved = (props) => {
               Total Approved
             </Typography>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography variant="h4">{value}</Typography>
-              {/* <div>
+              <Typography variant="h4">{totalApproved}</Typography>
+              <div>
                 <Typography variant="subtitle2" sx={{ color: success.light }}>
-                  N123M
+                  ₦{shortenAmount(amounts ? amounts.naira : 0)}
                 </Typography>
                 <Typography variant="subtitle2" sx={{ color: success.light }}>
-                  $12M
+                  ${shortenAmount(amounts ? amounts.dollars : 0)}
                 </Typography>
-              </div> */}
+              </div>
             </Box>
           </Stack>
           <Avatar

@@ -37,7 +37,7 @@ const Page = () => {
   const [filteredRequisitions, setFilteredRequisitions] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [selectedTab, setSelectedTab] = useState("myRequisitions");
+  const [selectedTab, setSelectedTab] = useState("");
   const [isCreateReqModalOpen, setCreateReqModalOpen] = useState(false);
   const [selectedRequisition, setSelectedRequisition] = useState(null);
   const [editMode, setEditMode] = useState(false);
@@ -49,6 +49,10 @@ const Page = () => {
   const fetchRequisitions = async () => {
     setLoading(true);
     try {
+      ["user", "staff", "tech"].includes(user.accessLevel)
+        ? setSelectedTab("myRequisitions")
+        : setSelectedTab("forMyAttention");
+
       setFilteredRequisitions([]);
       let fetchedRequisitions;
       let count;
@@ -138,21 +142,25 @@ const Page = () => {
                 Requisitions
               </Typography>
               <Box>
-                {user?.signatureUrl ? (
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    color="success"
-                    onClick={handleOpenCreateModal}
-                    sx={{ ml: 2 }}
-                  >
-                    <CreateNewFolderIcon />
-                    &nbsp; Create New
-                  </Button>
-                ) : (
-                  <Button href="/profile" startIcon={<Warning />} color="warning">
-                    Upload your Signature to raise request
-                  </Button>
+                {["user", "staff", "tech"].includes(user.accessLevel) && (
+                  <>
+                    {user?.signatureUrl ? (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color="success"
+                        onClick={handleOpenCreateModal}
+                        sx={{ ml: 2 }}
+                      >
+                        <CreateNewFolderIcon />
+                        &nbsp; Create New
+                      </Button>
+                    ) : (
+                      <Button href="/profile" startIcon={<Warning />} color="warning">
+                        Upload your Signature to raise request
+                      </Button>
+                    )}
+                  </>
                 )}
               </Box>
               <CreateReqModal
@@ -178,7 +186,7 @@ const Page = () => {
                 variant="scrollable"
                 scrollButtons="auto"
               >
-                {(user.accessLevel === "user" || user.accessLevel === "tech") && (
+                {["user", "staff", "tech"].includes(user.accessLevel) && (
                   <Tab value="myRequisitions" label="My Requisitions" />
                 )}
                 {user.accessLevel !== "user" && (

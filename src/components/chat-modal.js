@@ -67,18 +67,20 @@ function ChatModal({ open, onClose, reqId }) {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const usersData = {};
-      for (const message of messages) {
-        if (!usersData[message.user_id]) {
-          const userData = await fetchSingleUser(message.user_id);
-          usersData[message.user_id] = userData;
+      if (userId) {
+        const usersData = {};
+        for (const message of messages) {
+          if (!usersData[message.user_id]) {
+            const userData = await fetchSingleUser(message.user_id);
+            usersData[message.user_id] = userData;
+          }
         }
+        setUsers(usersData);
       }
-      setUsers(usersData);
     };
 
     fetchUsers();
-  }, [messages]);
+  }, [messages, userId]);
 
   useEffect(() => {
     if (open && lastMessageRef.current && !loading) {
