@@ -9,6 +9,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Box
 } from "@mui/material";
 import { getCurrencySign } from "src/utils/format-currency";
 import { formatAmount } from "src/services/helpers";
@@ -35,7 +36,19 @@ const RetirementsTable = ({ data = [], reloadData }) => {
 
   return (
     <TableContainer component={Paper}>
-      {data.length === 0 && <p>You have no pending retirements 😃!</p>}
+      {data.length === 0 && (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <Box sx={{ mt: 2 }}>You have no pending retirements 😃!</Box>
+        </Box>
+      )}
       {data.length > 0 && (
         <Table>
           <TableHead>

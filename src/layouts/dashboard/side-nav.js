@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import PropTypes from "prop-types";
@@ -18,7 +19,6 @@ import { Scrollbar } from "src/components/scrollbar";
 import { items } from "./config";
 import { SideNavItem } from "./side-nav-item";
 import { useAuth } from "src/hooks/use-auth";
-import { useEffect } from "react";
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
@@ -36,21 +36,29 @@ export const SideNav = (props) => {
     "tech",
   ];
 
-  const filteredItems = items.filter((item) => {
-    if (user?.accessLevel === "tech") {
-      return true; // tech can see all items
-    } else if (user?.accessLevel === "superUser") {
-      return item.path !== "/retirements"; // superUser can't see /retirements
-    } else if (user?.accessLevel === "budgetHolder") {
-      return item.path !== "/retirements" && item.path !== "/accounts"; // budgetHolder can't see /retirements and /accounts
-    } else if (user?.accessLevel === "finance" || user?.accessLevel === "financeReviewer") {
-      return item.path !== "/retirements"; // finance and financeReviewer can't see /retirements
-    } else if (user?.accessLevel === "user") {
-      return item.path !== "/accounts" && item.path !== "/projects" && item.path !== "/bin"; // user can't see /accounts and /projects and /bin
-    } else {
-      return false; // Default to not including the item if no specific logic applies
-    }
-  });
+ const [sidebarItems, setSidebarItems] = useState([]);
+
+ useEffect(() => {
+   const filteredItems = items.filter((item) => { 
+     switch (user?.accessLevel) {
+       case "tech":
+         return true; // tech can see all items
+       case "superUser":
+         return item.path !== "/retirements"; // superUser can't see /retirements
+       case "budgetHolder":
+         return item.path !== "/retirements" && item.path !== "/accounts"; // budgetHolder can't see /retirements and /accounts
+       case "finance":
+       case "financeReviewer":
+         return item.path !== "/retirements"; // finance and financeReviewer can't see /retirements
+       case "user":
+         return item.path !== "/accounts" && item.path !== "/projects" && item.path !== "/bin"; // user can't see /accounts and /projects and /bin
+       default:
+         return false; // Default to not including the item if no specific logic applies
+     }
+   });
+   setSidebarItems(filteredItems);
+ }, [user]);
+
 
   const content = (
     <Scrollbar
@@ -122,7 +130,7 @@ export const SideNav = (props) => {
               m: 0,
             }}
           >
-            {filteredItems.map((item) => {
+            {sidebarItems.map((item) => {
               const active = item.path ? pathname === item.path : false;
 
               return (

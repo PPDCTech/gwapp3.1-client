@@ -38,9 +38,15 @@ const Page = () => {
     }),
     onSubmit: async (values, helpers) => {
       setLoadingSubmit(true);
-      try {
-        await auth.signIn(values.email, values.password);
-        router.push("/");
+      try{
+        const res = await auth.signIn(values.email, values.password);
+        if (res && res.status === 200) {
+          router.push("/");
+        } else {
+          helpers.setStatus({ success: false });
+          helpers.setErrors({ submit: "Sorry, something went wrong. Please try again." });
+          helpers.setSubmitting(false);
+        }
       } catch (err) {
         helpers.setStatus({ success: false });
         helpers.setErrors({ submit: err.message });

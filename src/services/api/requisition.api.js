@@ -17,7 +17,11 @@ export const getAllApprovedRequisitions = async (queryParams) => {
     return fetchData(`${REQUISITION_API}/approved?${params}`);
   } catch (error) {
     console.error("Error fetching approved requisitions:", error);
-    throw error;
+    let errorMessage = "An error occurred.";
+    if (error.response && error.response.data) {
+      errorMessage = error.response.data.message || error.response.data.error;
+    }
+    throw new Error(errorMessage);
   }
 };
 

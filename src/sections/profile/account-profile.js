@@ -55,6 +55,7 @@ export const AccountProfile = () => {
         setImage(null);
       }
     } catch (error) {
+      toast.error("Error uploading image");
       console.error("Error uploading image:", error);
     } finally {
       setSaving(false);
@@ -84,6 +85,7 @@ export const AccountProfile = () => {
       }
     } catch (error) {
       console.error("Error uploading image:", error);
+      toast.error("Error uploading image");
     } finally {
       setSavingSig(false);
     }

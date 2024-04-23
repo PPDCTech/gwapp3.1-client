@@ -30,13 +30,40 @@ export const OverviewLatestRequests = (props) => {
   const { latestReqs = [], sx, loading } = props;
 
   if (loading) {
-    return <CircularProgress color="success" />
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
+        <CircularProgress color="success" />
+        <Box sx={{ mt: 2 }}>Relax while we load your data...</Box>
+      </Box>
+    );
   }
 
   return (
     <Card sx={sx}>
       <CardHeader title="Recent highlight" />
-      <Container>{latestReqs.length === 0 && "No requisition found"}</Container>
+      <Container>
+        {latestReqs.length === 0 && (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <Box sx={{ mt: 2 }}>No requisitions found</Box>
+          </Box>
+        )}
+      </Container>
       {latestReqs.length > 0 && (
         <>
           <Scrollbar sx={{ flexGrow: 1 }}>

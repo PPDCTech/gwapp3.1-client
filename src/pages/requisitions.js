@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Head from "next/head";
 import {
   Box,
@@ -7,8 +7,6 @@ import {
   Grid,
   Typography,
   Divider,
-  Tabs,
-  Tab,
   Tooltip,
 } from "@mui/material";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
@@ -28,6 +26,7 @@ import {
 import { FilterRequisitions } from "src/sections/requisitions/filter-requisitions";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import { Warning } from "@mui/icons-material";
+import { CustomTab } from "src/components/CustomTab";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -42,17 +41,22 @@ const Page = () => {
   const [selectedRequisition, setSelectedRequisition] = useState(null);
   const [editMode, setEditMode] = useState(false);
 
-  const handleTabChange = (event, newValue) => {
+  const handleTabChange = (newValue) => {
     setSelectedTab(newValue);
   };
 
-  const fetchRequisitions = async () => {
+  useEffect(() => {
+    if (["user", "staff", "tech"].includes(user.accessLevel)) {
+      setSelectedTab("myRequisitions");
+    } else {
+      setSelectedTab("forMyAttention");
+    }
+  }, [user]);
+
+
+  const fetchRequisitions = useCallback(async () => {
     setLoading(true);
     try {
-      ["user", "staff", "tech"].includes(user.accessLevel)
-        ? setSelectedTab("myRequisitions")
-        : setSelectedTab("forMyAttention");
-
       setFilteredRequisitions([]);
       let fetchedRequisitions;
       let count;
@@ -87,11 +91,11 @@ const Page = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedTab, user]);
 
   useEffect(() => {
     fetchRequisitions();
-  }, [selectedTab, user?.email]);
+  }, [selectedTab, user, fetchRequisitions]);
 
   const handleOpenCreateModal = () => {
     setEditMode(false);
@@ -180,35 +184,43 @@ const Page = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <Tabs
-                value={selectedTab}
-                onChange={handleTabChange}
-                variant="scrollable"
-                scrollButtons="auto"
-              >
+              <div style={{ display: "flex" }}>
                 {["user", "staff", "tech"].includes(user.accessLevel) && (
-                  <Tab value="myRequisitions" label="My Requisitions" />
+                  <CustomTab
+                    isActive={selectedTab === "myRequisitions"}
+                    value="myRequisitions"
+                    onClick={() => handleTabChange("myRequisitions")}
+                    label="My Requisitions"
+                  />
                 )}
                 {user.accessLevel !== "user" && (
-                  <Tab value="forMyAttention" label="Requisitions for my attention" />
+                  <CustomTab
+                    isActive={selectedTab === "forMyAttention"}
+                    value="forMyAttention"
+                    onClick={() => handleTabChange("forMyAttention")}
+                    label="Requisitions for my attention"
+                  />
                 )}
                 {user.accessLevel !== "user" && user.accessLevel !== "budgetHolder" && (
-                  <Tab value="allRequisitions" label="All Requisitions" />
+                  <CustomTab
+                    isActive={selectedTab === "allRequisitions"}
+                    value="allRequisitions"
+                    onClick={() => handleTabChange("allRequisitions")}
+                    label="All Requisitions"
+                  />
                 )}
-              </Tabs>
-              <Box>
-                <RequisitionTable
-                  requisitions={
-                    // requisitions
-                    filteredRequisitions.length > 0 ? filteredRequisitions : requisitions
-                  }
-                  loading={loading}
-                  totalCount={totalCount}
-                  currentTab={selectedTab}
-                  setRequisitions={setRequisitions}
-                  onEditRequisition={handleEditRequisition}
-                />
-              </Box>
+              </div>
+              <RequisitionTable
+                requisitions={
+                  // requisitions
+                  filteredRequisitions.length > 0 ? filteredRequisitions : requisitions
+                }
+                loading={loading}
+                totalCount={totalCount}
+                currentTab={selectedTab}
+                setRequisitions={setRequisitions}
+                onEditRequisition={handleEditRequisition}
+              />
             </Grid>
           </Grid>
         </Container>

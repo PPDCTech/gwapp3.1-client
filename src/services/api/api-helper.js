@@ -18,7 +18,11 @@ export const postData = async (endpoint, data) => {
     return response;
   } catch (error) {
     console.error("Error during POST request:", error);
-    return null;
+    let errorMessage = "An error occurred.";
+    if (error.response && error.response.data) {
+      errorMessage = error.response.data.message || error.response.data.error;
+    }
+    throw new Error(errorMessage);
   }
 };
 
@@ -29,7 +33,11 @@ export const fetchData = async (endpoint) => {
     return response;
   } catch (error) {
     console.error("Error during GET request:", error);
-    throw error;
+    let errorMessage = "An error occurred.";
+    if (error.response && error.response.data) {
+      errorMessage = error.response.data.message || error.response.data.error;
+    }
+    throw new Error(errorMessage);
   }
 };
 
@@ -40,7 +48,11 @@ export const putData = async (endpoint, data) => {
     return response;
   } catch (error) {
     console.error("Error during PUT request:", error);
-    return null;
+    let errorMessage = "An error occurred.";
+    if (error.response && error.response.data) {
+      errorMessage = error.response.data.message || error.response.data.error;
+    }
+    throw new Error(errorMessage);
   }
 };
 
@@ -51,7 +63,11 @@ export const patchData = async (endpoint, data) => {
     return response;
   } catch (error) {
     console.error("Error during PATCH request:", error);
-    return null;
+    let errorMessage = "An error occurred.";
+    if (error.response && error.response.data) {
+      errorMessage = error.response.data.message || error.response.data.error;
+    }
+    throw new Error(errorMessage);
   }
 };
 
@@ -62,6 +78,10 @@ export const deleteData = async (endpoint) => {
     return response;
   } catch (error) {
     console.error("Error during DELETE request:", error);
-    return null;
+    let errorMessage = "An error occurred.";
+    if (error.response && error.response.data) {
+      errorMessage = error.response.data.message || error.response.data.error;
+    }
+    throw new Error(errorMessage);
   }
 };

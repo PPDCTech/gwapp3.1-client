@@ -12,7 +12,7 @@ export const fetchAllUsers = async () => {
     const response = await fetchData(ALL_USERS);
     return response;
   } catch (error) {
-    console.error(error?.response?.data?.message || error.message);
+    throw new Error(error.message);
   }
 };
 
@@ -21,7 +21,7 @@ export const fetchUsers = async (page = 0, rowsPerPage = 25) => {
     const response = await fetchData(`${USERS_API}?page=${page}&rowsPerPage=${rowsPerPage}`);
     return response;
   } catch (error) {
-    console.error(error?.response?.data?.message || error.message);
+    throw new Error(error.message);
   }
 };
 
@@ -30,7 +30,7 @@ export const fetchSingleUser = async (userId) => {
     const response = await fetchData(`${USERS_API}/${userId}`);
     return response;
   } catch (error) {
-    console.error(error?.response?.data?.message || error.message);
+    throw new Error(error.message);
   }
 };
 
@@ -39,7 +39,7 @@ export const fetchAlumni = async (page = 0, rowsPerPage = 25) => {
     const response = await fetchData(`${USERS_API}/alumni?page=${page}&rowsPerPage=${rowsPerPage}`);
     return response;
   } catch (error) {
-    console.error(error?.response?.data?.message || error.message);
+    throw new Error(error.message);
   }
 };
 
@@ -48,7 +48,7 @@ export const deactivateUser = async (userId) => {
     const response = await patchData(DEACTIVATE_USER_API, { userId });
     return response;
   } catch (error) {
-    console.error(error?.response?.data?.message || error.message);
+    throw new Error(error.message);
   }
 };
 
@@ -57,7 +57,7 @@ export const changeUserAccess = async (userId, accessLevel) => {
     const response = await patchData(CHANGE_ACCESS_API, { userId, accessLevel });
     return response;
   } catch (error) {
-    console.error(error?.response?.data?.message || error.message);
+   throw new Error(error.message);
   }
 };
 
@@ -66,7 +66,7 @@ export const updateProfilePic = async (id, imageUrl) => {
     const response = await patchData(`${CHANGE_PROFILE_PIC}/${id}`, { imageUrl });
     return response;
   } catch (error) {
-    console.error(error?.response?.data?.message || error.message);
+   throw new Error(error.message);
   }
 };
 
@@ -75,7 +75,7 @@ export const updateSignaturePic = async (id, imageUrl) => {
     const response = await patchData(`${CHANGE_SIGNATURE}/${id}`, { imageUrl });
     return response;
   } catch (error) {
-    console.error(error?.response?.data?.message || error.message);
+   throw new Error(error.message);
   }
 };
 
@@ -84,6 +84,6 @@ export const fetchBudgetHolders = async () => {
     const response = await fetchData("budget-holders");
     return response;
   } catch (error) {
-    console.error(error?.response?.data?.message || error.message);
+   throw new Error(error.message);
   }
 };

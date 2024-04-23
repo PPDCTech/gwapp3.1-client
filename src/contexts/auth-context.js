@@ -136,6 +136,7 @@ export const AuthProvider = (props) => {
   const signIn = async (email, password) => {
     try {
       const response = await loginUser(email, password);
+
       const { userData } = response.data;
       const { status, token } = userData;
 
@@ -151,8 +152,9 @@ export const AuthProvider = (props) => {
         type: HANDLERS.SIGN_IN,
         payload: userData,
       });
+      return response;
     } catch (error) {
-      console.error("Error signing in:", error.message);
+      throw new Error(error.message);
     }
   };
 

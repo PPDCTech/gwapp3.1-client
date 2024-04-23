@@ -7,6 +7,6 @@ export const loginUser = async (email, password) => {
     const response = await postData(LOGIN_API, { email, password });
     return response;
   } catch (error) {
-    console.error(error?.response?.data?.message || error.message);
+    throw new Error(error.message);
   }
 };

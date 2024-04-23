@@ -13,6 +13,7 @@ import {
   Tooltip,
   CircularProgress,
   TablePagination,
+  Box
 } from "@mui/material";
 import {
   TrashIcon,
@@ -48,7 +49,7 @@ export const RequisitionTable = ({
   setRequisitions,
   onEditRequisition,
 }) => {
-  const { user } = useAuth();
+  const { user } = useAuth()
   const [page, setPage] = useState(0);
   const [rowsPerpage, setRowsPerpage] = useState(10);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
@@ -160,7 +161,18 @@ export const RequisitionTable = ({
   return (
     <>
       {loading ? (
-        <CircularProgress sx={{ mt: 2 }} />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <CircularProgress color="success" />
+          <Box sx={{ mt: 2 }}>Relax while we load your data...</Box>
+        </Box>
       ) : (
         <>
           {(!requisitions || requisitions.length === 0) && (
