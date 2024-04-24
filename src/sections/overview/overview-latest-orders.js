@@ -72,11 +72,12 @@ export const OverviewLatestRequests = (props) => {
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ width: "40%" }}>Title</TableCell>
-                    <TableCell sx={{ width: "20%" }}>Amount</TableCell>
-                    <TableCell sortDirection="desc" sx={{ width: "20%" }}>
+                    <TableCell sx={{ width: "20%" }}>Type</TableCell>
+                    <TableCell sx={{ width: "15%" }}>Amount</TableCell>
+                    <TableCell sortDirection="desc" sx={{ width: "15%" }}>
                       Date
                     </TableCell>
-                    <TableCell sx={{ width: "20%" }}>Status</TableCell>
+                    <TableCell sx={{ width: "10%" }}>Status</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -87,6 +88,9 @@ export const OverviewLatestRequests = (props) => {
                           <Tooltip title={`${req.title}`}>
                             <>{shortenString(req.title, 50)}</>
                           </Tooltip>
+                        </TableCell>
+                        <TableCell>
+                          {req.type}
                         </TableCell>
                         <TableCell>
                           {getCurrencySign(req?.currency)}

@@ -29,8 +29,7 @@ const Page = () => {
       try {
         if (user && user.email) {
           const response = await getUserRequisitions(user?._id);
-          const { requisitions, totalCount, totalAmount, totalApproved } = response.data;
-          
+          const { requisitions, totalCount, totalAmount, totalApproved } = response.data;          
           setTotalCount(totalCount);
           setRequisitions(requisitions.slice(0, 6));
           setAmounts(totalAmount);

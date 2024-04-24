@@ -30,6 +30,7 @@ export const fetchSingleUser = async (userId) => {
     const response = await fetchData(`${USERS_API}/${userId}`);
     return response;
   } catch (error) {
+    console.log("Error fetching user:", error);
     throw new Error(error.message);
   }
 };

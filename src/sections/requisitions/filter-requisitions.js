@@ -253,6 +253,7 @@ export const FilterRequisitions = ({ onSubmitFilters }) => {
                   label="Type"
                 >
                   <MenuItem value="Fund Req">Fund Requisition</MenuItem>
+                  <MenuItem value="Advance Payment">Advance Payment</MenuItem>
                   <MenuItem value="Petty Cash">Petty Cash</MenuItem>
                   <MenuItem value="reimbursement">Reimbursement</MenuItem>
                 </Select>
@@ -284,7 +285,7 @@ export const FilterRequisitions = ({ onSubmitFilters }) => {
               <Grid item xs={6} md={4}>
                 <Autocomplete
                   options={users.map((user) => user.name)}
-                  getOptionSelected={(option, value) => option === value}
+                  // getOptionSelected={(option, value) => option === value}
                   renderInput={(params) => (
                     <TextField {...params} label="User" fullWidth sx={{ marginBottom: "1rem" }} />
                   )}

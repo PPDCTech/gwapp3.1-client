@@ -13,7 +13,7 @@ import {
   Tooltip,
   CircularProgress,
   TablePagination,
-  Box
+  Box,
 } from "@mui/material";
 import {
   TrashIcon,
@@ -49,7 +49,7 @@ export const RequisitionTable = ({
   setRequisitions,
   onEditRequisition,
 }) => {
-  const { user } = useAuth()
+  const { user } = useAuth();
   const [page, setPage] = useState(0);
   const [rowsPerpage, setRowsPerpage] = useState(10);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
@@ -185,13 +185,14 @@ export const RequisitionTable = ({
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ width: "40%" }}>Title</TableCell>
-                      <TableCell sx={{ width: "15%" }}>Amount</TableCell>
+                      <TableCell sx={{ width: "35%" }}>Title</TableCell>
+                      <TableCell sx={{ width: "15%" }}>Type</TableCell>
+                      <TableCell sx={{ width: "10%" }}>Amount</TableCell>
                       <TableCell sx={{ width: "15%" }}>Date</TableCell>
                       <TableCell sx={{ width: "10%" }}>Status</TableCell>
                       <TableCell
                         sx={{
-                          width: "20%",
+                          width: "15%",
                           "@media (max-width: 600px)": {
                             display: "none",
                           },
@@ -215,9 +216,10 @@ export const RequisitionTable = ({
                           onClick={() => handleOpenReqDetails(requisition._id)}
                         >
                           <Tooltip title={requisition.title}>
-                            <>{shortenString(requisition.title, 55)}</>
+                            <>{shortenString(requisition.title, 40)}</>
                           </Tooltip>
                         </TableCell>
+                        <TableCell>{requisition.type}</TableCell>
                         <TableCell>
                           {getCurrencySign(requisition?.currency)}
                           {formatAmount(Number(requisition?.total))}
