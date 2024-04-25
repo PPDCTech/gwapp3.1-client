@@ -1,19 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import PropTypes from "prop-types";
-import ArrowTopRightOnSquareIcon from "@heroicons/react/24/solid/ArrowTopRightOnSquareIcon";
-import ChevronUpDownIcon from "@heroicons/react/24/solid/ChevronUpDownIcon";
-import {
-  Box,
-  Button,
-  Divider,
-  Drawer,
-  Stack,
-  SvgIcon,
-  Typography,
-  useMediaQuery,
-} from "@mui/material";
+import { Box, Drawer, Stack, Divider, useMediaQuery, Typography } from "@mui/material";
 import { Logo } from "src/components/logo";
 import { Scrollbar } from "src/components/scrollbar";
 import { items } from "./config";
@@ -21,57 +10,38 @@ import { SideNavItem } from "./side-nav-item";
 import { useAuth } from "src/hooks/use-auth";
 
 export const SideNav = (props) => {
-  const { open, onClose } = props;
+  const { open, onClose, key } = props;
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const { user } = useAuth();
 
-  const admin_accessLevels = [
-    "user",
-    "superUser",
-    "userManager",
-    "budgetHolder",
-    "finance",
-    "financeReviewer",
-    "tech",
-  ];
+  const [sidebarItems, setSidebarItems] = useState([]);
 
- const [sidebarItems, setSidebarItems] = useState([]);
-
- useEffect(() => {
-   const filteredItems = items.filter((item) => { 
-     switch (user?.accessLevel) {
-       case "tech":
-         return true; // tech can see all items
-       case "superUser":
-         return item.path !== "/retirements"; // superUser can't see /retirements
-       case "budgetHolder":
-         return item.path !== "/retirements" && item.path !== "/accounts"; // budgetHolder can't see /retirements and /accounts
-       case "finance":
-       case "financeReviewer":
-         return item.path !== "/retirements"; // finance and financeReviewer can't see /retirements
-       case "user":
-         return item.path !== "/accounts" && item.path !== "/projects" && item.path !== "/bin"; // user can't see /accounts and /projects and /bin
-       default:
-         return false; // Default to not including the item if no specific logic applies
-     }
-   });
-   setSidebarItems(filteredItems);
- }, [user]);
-
+  useEffect(() => {
+    if (pathname) {
+      const filteredItems = items.filter((item) => {
+        switch (user?.accessLevel) {
+          case "tech":
+            return true;
+          case "superUser":
+            return item.path !== "/retirements";
+          case "budgetHolder":
+            return item.path !== "/retirements" && item.path !== "/accounts";
+          case "finance":
+          case "financeReviewer":
+            return item.path !== "/retirements";
+          case "user":
+            return item.path !== "/accounts" && item.path !== "/projects" && item.path !== "/bin";
+          default:
+            return false;
+        }
+      });
+      setSidebarItems(filteredItems);
+    }
+  }, [user, pathname]); 
 
   const content = (
-    <Scrollbar
-      sx={{
-        height: "100%",
-        "& .simplebar-content": {
-          height: "100%",
-        },
-        "& .simplebar-scrollbar:before": {
-          background: "neutral.400",
-        },
-      }}
-    >
+    <Scrollbar>
       <Box
         sx={{
           display: "flex",
@@ -81,21 +51,21 @@ export const SideNav = (props) => {
         }}
       >
         <Box sx={{ p: 3 }}>
-          <Box
-            component={NextLink}
-            href="/"
-            sx={{
-              display: "inline-flex",
-              height: 32,
-              width: 32,
-            }}
-          >
-            <Logo />
-          </Box>
+          <NextLink href="/" passHref>
+            <Box
+              component="a"
+              sx={{
+                display: "inline-flex",
+                height: 32,
+                width: 32,
+              }}
+            >
+              <Logo />
+            </Box>
+          </NextLink>
           <Box
             sx={{
               alignItems: "center",
-              // backgroundColor: 'rgba(255, 255, 255, 0.08)',
               border: "1px solid rgba(255, 255, 255, 0.08)",
               borderRadius: 1,
               cursor: "pointer",
@@ -106,7 +76,7 @@ export const SideNav = (props) => {
             }}
           >
             <div>
-              <Typography color="inherit" variant="subtitle1">
+              <Typography color="inherit" variant="Logo">
                 GWAPP
               </Typography>
             </div>
@@ -130,21 +100,17 @@ export const SideNav = (props) => {
               m: 0,
             }}
           >
-            {sidebarItems.map((item) => {
-              const active = item.path ? pathname === item.path : false;
-
-              return (
-                <SideNavItem
-                  active={active}
-                  disabled={item.disabled}
-                  external={item.external}
-                  icon={item.icon}
-                  key={item.title}
-                  path={item.path}
-                  title={item.title}
-                />
-              );
-            })}
+            {sidebarItems.map((item) => (
+              <SideNavItem
+                active={pathname === item.path}
+                disabled={item.disabled}
+                external={item.external}
+                icon={item.icon}
+                key={item.title}
+                path={item.path}
+                title={item.title}
+              />
+            ))}
           </Stack>
         </Box>
         <Divider sx={{ borderColor: "neutral.700" }} />
