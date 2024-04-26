@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -17,8 +17,8 @@ import {
 import { Delete as DeleteIcon, Edit as EditIcon, Save } from "@mui/icons-material";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { BUDGET_CODES_API } from "src/services/constants";
-import { AddBudgetCodeModal } from "src/components/modals/add-budgetcode-modal";
+import { BUDGET_CODES_API } from "../../services/constants";
+import { AddBudgetCodeModal } from "../../components/modals/add-budgetcode-modal";
 
 export const BudgetCodesTable = () => {
   const [budgetCodes, setBudgetCodes] = useState([]);
@@ -27,6 +27,8 @@ export const BudgetCodesTable = () => {
   const [newCode, setNewCode] = useState("");
   const [newProject, setNewProject] = useState("");
   const [newDesc, setNewDesc] = useState("");
+  const [accountCodes, setAccountCodes] = useState([]);
+  console.log(accountCodes)
 
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
@@ -65,7 +67,7 @@ export const BudgetCodesTable = () => {
       if (newDesc) {
         editedCode.description = newDesc;
       }
-      return console.log(editedCOde);
+      return console.log(editedCode);
       // await axios.put(`${BUDGET_CODES_API}/${id}`, editedCode);
     } catch (error) {
       console.error("Error updating account code:", error);
@@ -151,7 +153,7 @@ sx={{ display: "flex", alignItems: "center" }}>
                     code.description.toLowerCase().includes(searchQuery.toLowerCase())
                   )
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((code, index) => (
+                  .map((code) => (
                     <TableRow
                       key={code._id}
                       sx={

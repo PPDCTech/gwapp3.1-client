@@ -1,6 +1,6 @@
 import axios from "axios";
+import { API } from "../base-url";
 
-const API = process.env.API;
 
 const setAuthorizationHeader = () => {
   const token = window.localStorage.getItem("token");

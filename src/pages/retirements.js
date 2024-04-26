@@ -1,16 +1,17 @@
-import Head from "next/head";
-import { Box, Container, Stack, Typography, Unstable_Grid2 as Grid } from "@mui/material";
-import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import { getUserUnretiredRequisitions } from "src/services/api/requisition.api";
-import { useEffect, useState } from "react";
-import RetirementsTable from "src/sections/requisitions/retirements-table";
-import { useAuth } from "src/hooks/use-auth";
+import { Box, Container, Stack, Typography } from "@mui/material";
+import { getUserUnretiredRequisitions } from "../services/api/requisition.api";
+import { useEffect, useState, useCallback } from "react";
+import RetirementsTable from "../sections/requisitions/retirements-table";
+import { useAuth } from "../hooks/use-auth";
+import { useNProgress } from "../hooks/use-nprogress";
 
-const Page = () => {
+const Retirements = () => {
+      useNProgress();
+
   const [data, setData] = useState([]);
   const { user } = useAuth();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const response = await getUserUnretiredRequisitions(user?.email);
       const { requisitions } = response.data;
@@ -18,17 +19,14 @@ const Page = () => {
     } catch (error) {
       console.error("Error fetching unretired requisitions:", error.message);
     }
-  };
+  }, [user])
 
   useEffect(() => {
-    fetchData();
-  }, []);
+			fetchData();
+		}, [fetchData]);
 
   return (
     <>
-      <Head>
-        <title>Retirements | Gwapp</title>
-      </Head>
       <Box
         component="main"
         sx={{
@@ -48,6 +46,4 @@ const Page = () => {
   );
 };
 
-Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
-
-export default Page;
+export default Retirements;

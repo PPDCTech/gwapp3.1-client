@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -9,26 +9,24 @@ import {
   IconButton,
   Typography,
   SvgIcon,
-  Menu,
-  MenuItem,
   TextField,
 } from "@mui/material";
 import { Delete as DeleteIcon, Edit as EditIcon, Save } from "@mui/icons-material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 export const BankAccountsTable = ({ accounts, onDelete, onEdit, isVendor }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
+  // const [anchorEl, setAnchorEl] = useState(null);
+ 
   const [editId, setEditId] = useState(null);
   const [newAccountName, setNewAccountName] = useState("");
   const [newAccountNumber, setNewAccountNumber] = useState("");
 
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  // const handleMenuOpen = (event) => {
+  //   setAnchorEl(event.currentTarget);
+  // };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+  // const handleMenuClose = () => {
+  //   setAnchorEl(null);
+  // };
 
   const handleEditClick = (id) => {
     setEditId(id);

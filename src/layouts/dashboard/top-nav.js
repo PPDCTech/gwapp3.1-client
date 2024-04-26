@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import BellIcon from "@heroicons/react/24/solid/BellIcon";
 import Bars3Icon from "@heroicons/react/24/solid/Bars3Icon";
@@ -13,13 +13,13 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import { usePopover } from "src/hooks/use-popover";
+import { usePopover } from "../../hooks/use-popover";
+import { useAuth } from "../../hooks/use-auth";
+import { getGreeting } from "../../utils/get-greeting";
+import { getFirstName } from "../../utils/get-firstname";
+import NotificationDropdown from "../../components/notifications-dropdown";
+import { fetchUserMessages } from "../../services/api/message-chat.api";
 import { AccountPopover } from "./account-popover";
-import { useAuth } from "src/hooks/use-auth";
-import { getGreeting } from "src/utils/get-greeting";
-import { getFirstName } from "src/utils/get-firstname";
-import NotificationDropdown from "src/components/notifications-dropdown";
-import { fetchUserMessages } from "src/services/api/message-chat.api";
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;

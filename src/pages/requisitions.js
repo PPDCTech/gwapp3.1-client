@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
-import Head from "next/head";
+/* eslint-disable no-case-declarations */
+import { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Button,
@@ -7,30 +7,30 @@ import {
   Grid,
   Typography,
   Divider,
-  Tooltip,
 } from "@mui/material";
-import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import CreateReqModal from "src/components/create-req";
-import ChatModal from "src/components/chat-modal";
+import CreateReqModal from "../components/create-req";
+// import ChatModal from "../components/chat-modal";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import RequisitionDetailsModal from "src/components/req-details-modal";
-import { RequisitionTable } from "src/sections/requisitions/requisitions-table";
-import { useAuth } from "src/hooks/use-auth";
+// import RequisitionDetailsModal from "../components/req-details-modal";
+import { RequisitionTable } from "../sections/requisitions/requisitions-table";
+import { useAuth } from "../hooks/use-auth";
 import {
   getAllRequisitions,
   getAttentionedToRequisitions,
   getUserRequisitions,
   searchFilterRequisitions,
-} from "src/services/api/requisition.api";
-import { FilterRequisitions } from "src/sections/requisitions/filter-requisitions";
+} from "../services/api/requisition.api";
+import { FilterRequisitions } from "../sections/requisitions/filter-requisitions";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import { Warning } from "@mui/icons-material";
-import { CustomTab } from "src/components/CustomTab";
+import { CustomTab } from "../components/CustomTab";
+import { useNProgress } from "../hooks/use-nprogress";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-const Page = () => {
+const Requisitions = () => {
+      useNProgress();
   const { user } = useAuth();
   const [requisitions, setRequisitions] = useState([]);
   const [filteredRequisitions, setFilteredRequisitions] = useState([]);
@@ -38,7 +38,7 @@ const Page = () => {
   const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = useState("");
   const [isCreateReqModalOpen, setCreateReqModalOpen] = useState(false);
-  const [selectedRequisition, setSelectedRequisition] = useState(null);
+  const [selectedRequisition] = useState(null);
   const [editMode, setEditMode] = useState(false);
 
   const handleTabChange = (newValue) => {
@@ -128,10 +128,6 @@ const Page = () => {
 
   return (
     <>
-      <Head>
-        <title>Requisitions | Gwapp</title>
-      </Head>
-
       <Box
         component="main"
         sx={{
@@ -229,6 +225,4 @@ const Page = () => {
   );
 };
 
-Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
-
-export default Page;
+export default Requisitions;

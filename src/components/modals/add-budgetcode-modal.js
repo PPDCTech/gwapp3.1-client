@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Button,
   Dialog,
@@ -7,7 +7,7 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import { indigo } from "src/theme/colors";
+import { indigo } from "../../theme/colors";
 
 export const AddBudgetCodeModal = ({ onAddNew }) => {
   const [isOpen, setIsOpen] = useState(false);

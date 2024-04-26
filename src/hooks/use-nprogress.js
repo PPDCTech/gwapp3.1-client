@@ -1,17 +1,15 @@
-import { useEffect } from 'react';
-import Router from 'next/router';
-import nProgress from 'nprogress';
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import nProgress from "nprogress";
 
 export function useNProgress() {
-  useEffect(() => {
-    Router.events.on('routeChangeStart', nProgress.start);
-    Router.events.on('routeChangeError', nProgress.done);
-    Router.events.on('routeChangeComplete', nProgress.done);
+	const location = useLocation();
 
-    return () => {
-      Router.events.off('routeChangeStart', nProgress.start);
-      Router.events.off('routeChangeError', nProgress.done);
-      Router.events.off('routeChangeComplete', nProgress.done);
-    };
-  }, []);
+	useEffect(() => {
+		nProgress.start();
+
+		return () => {
+			nProgress.done();
+		};
+	}, [location]); // This will run whenever the location changes
 }

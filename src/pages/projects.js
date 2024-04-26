@@ -1,12 +1,13 @@
-import Head from "next/head";
 import { Box, Container, Stack, Typography, Tab, Tabs } from "@mui/material";
-import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { useState } from "react";
-import { AccountCodesTable } from "src/sections/projects/account-codes-table";
-import { BudgetCodesTable } from "src/sections/projects/budget-codes-table";
-import { ProjectCodesTable } from "src/sections/projects/project-codes-table";
+import { AccountCodesTable } from "../sections/projects/account-codes-table";
+import { BudgetCodesTable } from "../sections/projects/budget-codes-table";
+import { ProjectCodesTable } from "../sections/projects/project-codes-table";
+import { useNProgress } from "../hooks/use-nprogress";
 
-const Page = () => {
+const Projects = () => {
+      useNProgress();
+
   const [tabIndex, setTabIndex] = useState(0);
 
   const handleTabChange = (event, newValue) => {
@@ -15,9 +16,6 @@ const Page = () => {
 
   return (
     <>
-      <Head>
-        <title>Projects | Gwapp</title>
-      </Head>
       <Box
         component="main"
         sx={{
@@ -59,6 +57,4 @@ const Page = () => {
   );
 };
 
-Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
-
-export default Page;
+export default Projects;

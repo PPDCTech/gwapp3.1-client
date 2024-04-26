@@ -1,9 +1,6 @@
 import PropTypes from "prop-types";
-import ArrowDownIcon from "@heroicons/react/24/solid/ArrowDownIcon";
-import ArrowUpIcon from "@heroicons/react/24/solid/ArrowUpIcon";
 import DocumentTextIcon from "@heroicons/react/24/solid/DocumentTextIcon";
-import { Avatar, Box, Card, CardContent, Stack, SvgIcon, Typography } from "@mui/material";
-import { success } from "src/theme/colors";
+import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from "@mui/material";
 
 export const OverviewTotalRaised = (props) => {
   const { positive = false, sx, value } = props;

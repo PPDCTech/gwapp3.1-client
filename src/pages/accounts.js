@@ -1,14 +1,15 @@
-import Head from "next/head";
 import { useState, useEffect } from "react";
 import { Box, Container, Stack, Typography, Tab, Tabs, Divider } from "@mui/material";
-import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import { AddAccount } from "src/sections/accounts/add-account";
-import { BankAccountsTable } from "src/sections/accounts/accounts-table";
-import { getAllAccounts, deleteAccount, updateAccount } from "src/services/api/accounts.api";
+import { AddAccount } from "../sections/accounts/add-account";
+import { BankAccountsTable } from "../sections/accounts/accounts-table";
+import { getAllAccounts, deleteAccount, updateAccount } from "./../services/api/accounts.api";
 import { toast } from "react-toastify";
-import { getAllVendors } from "src/services/api/vendors.api";
+import { getAllVendors } from "../services/api/vendors.api";
+import { useNProgress } from "../hooks/use-nprogress";
 
-const Page = () => {
+const Account = () => {
+      useNProgress();
+
   const [accounts, setAccounts] = useState([]);
   const [vendors, setVendors] = useState([]);
   const [tabValue, setTabValue] = useState(0);
@@ -68,9 +69,6 @@ const Page = () => {
 
   return (
     <>
-      <Head>
-        <title>Accounts | Gwapp</title>
-      </Head>
       <Box component="main" sx={{ flexGrow: 1, py: 8 }}>
         <Container maxWidth="lg">
           <Stack spacing={3}>
@@ -117,6 +115,5 @@ const Page = () => {
   );
 };
 
-Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 
-export default Page;
+export default Account;

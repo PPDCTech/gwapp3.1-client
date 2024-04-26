@@ -1,14 +1,12 @@
-import Head from "next/head";
 import { Box, Container, Stack, Typography } from "@mui/material";
-import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import BinRequisitions from "src/sections/requisitions/bin-table";
+import BinRequisitions from "../sections/requisitions/bin-table";
+import { useNProgress } from "../hooks/use-nprogress";
 
-const Page = () => {
+const Bin = () => {
+      useNProgress();
+
   return (
     <>
-      <Head>
-        <title>Bin | Gwapp</title>
-      </Head>
       <Box
         component="main"
         sx={{
@@ -33,6 +31,5 @@ const Page = () => {
   );
 };
 
-Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 
-export default Page;
+export default Bin;

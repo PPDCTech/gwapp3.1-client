@@ -1,5 +1,5 @@
 import * as React from "react";
-import { showNetworkToast } from "src/services/helpers";
+import { showNetworkToast } from "../services/helpers";
 
 const getOnLineStatus = () =>
   typeof navigator !== "undefined" && typeof navigator.onLine === "boolean"

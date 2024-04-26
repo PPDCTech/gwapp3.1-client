@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -16,8 +16,8 @@ import {
 } from "@mui/material";
 import { Delete as DeleteIcon, Edit as EditIcon, Save } from "@mui/icons-material";
 import axios from "axios";
-import { ACCOUNT_CODES_API } from "src/services/constants";
-import { AddAccountCodeModal } from "src/components/add-accountcode-modal";
+import { ACCOUNT_CODES_API } from "../../services/constants";
+import { AddAccountCodeModal } from "../../components/add-accountcode-modal";
 import { toast } from "react-toastify";
 
 export const AccountCodesTable = () => {
@@ -144,7 +144,7 @@ sx={{ display: "flex", alignItems: "center" }}>
                     code.description.toLowerCase().includes(searchQuery.toLowerCase())
                   )
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((code, index) => (
+                  .map((code) => (
                     <TableRow
                       key={code._id}
                       sx={editId === code._id ? { border: "1px solid #0B815A" } : { '&:hover': {backgroundColor: "#F5F7FF"} }}

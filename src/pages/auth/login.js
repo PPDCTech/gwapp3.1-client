@@ -1,28 +1,23 @@
 import { useCallback, useState } from "react";
-import Head from "next/head";
-import NextLink from "next/link";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import {
-  Alert,
   Box,
   Button,
-  FormHelperText,
-  IconButton,
-  Link,
   Stack,
   Tab,
   Tabs,
   TextField,
   Typography,
 } from "@mui/material";
-import { useAuth } from "src/hooks/use-auth";
-import { Layout as AuthLayout } from "src/layouts/auth/layout";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useAuth } from "../../hooks/use-auth";
+import { useNProgress } from "../../hooks/use-nprogress";
+// import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-const Page = () => {
-  const router = useRouter();
+const Login = () => {
+    useNProgress();
+  const navigate = useNavigate();
   const auth = useAuth();
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [method, setMethod] = useState("email");
@@ -41,7 +36,7 @@ const Page = () => {
       try{
         const res = await auth.signIn(values.email, values.password);
         if (res && res.status === 200) {
-          router.push("/");
+          navigate("/");
         } else {
           helpers.setStatus({ success: false });
           helpers.setErrors({ submit: "Sorry, something went wrong. Please try again." });
@@ -73,9 +68,6 @@ const Page = () => {
 
   return (
     <>
-      <Head>
-        <title>Login | Gwapp</title>
-      </Head>
       <Box
         sx={{
           backgroundColor: "background.paper",
@@ -192,6 +184,6 @@ const Page = () => {
   );
 };
 
-Page.getLayout = (page) => <AuthLayout>{page}</AuthLayout>;
 
-export default Page;
+
+export default Login;
