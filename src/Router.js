@@ -74,7 +74,7 @@ const Router = () => {
 					}
 				/>
 				<Route
-					path="/account"
+					path="/accounts"
 					element={
 						<DashboardLayout>
 							<Account />
