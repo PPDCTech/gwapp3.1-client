@@ -97,45 +97,47 @@ export const MembersTable = (props) => {
 										<>
 											<TableCell>{member.phone || "N/A"}</TableCell>
 											<TableCell>{USER_ACCESS_LABELS[member.accessLevel]}</TableCell>
-											{user && user?.accessLevel === "userManagaer" && (
-												<TableCell>
-													<Stack direction="row" spacing={1}>
-														<Tooltip title="Deactivate">
-															<IconButton
-																onClick={() => handleDeactivate(member._id)}
-																aria-label="Preview"
-																color="error"
-																sx={{ fontSize: "1rem" }}
-																disabled={deactivateLoading[member._id]}
-															>
-																{deactivateLoading[member._id] ? (
-																	<CircularProgress size={14} />
-																) : (
-																	<SvgIcon fontSize="small">
-																		<BlockIcon />
-																	</SvgIcon>
-																)}
-															</IconButton>
-														</Tooltip>
-														<Tooltip title="Change Access">
-															<Select
-																size="small"
-																value={selectedRole}
-																onChange={(event) =>
-																	handleChangeRole(member._id, event.target.value)
-																}
-															>
-																<MenuItem value="superUser">Super User</MenuItem>
-																<MenuItem value="userManager">User Manager</MenuItem>
-																<MenuItem value="budgetHolder">Budget Holder</MenuItem>
-																<MenuItem value="finance">Finance</MenuItem>
-																<MenuItem value="financeReviewer">Finance Reviewer</MenuItem>
-																<MenuItem value="tech">Tech</MenuItem>
-															</Select>
-														</Tooltip>
-													</Stack>
-												</TableCell>
-											)}
+											{user &&
+												(user?.accessLevel === "userManagaer" ||
+													user?.accessLevel === "tech") && (
+													<TableCell>
+														<Stack direction="row" spacing={1}>
+															<Tooltip title="Deactivate">
+																<IconButton
+																	onClick={() => handleDeactivate(member._id)}
+																	aria-label="Preview"
+																	color="error"
+																	sx={{ fontSize: "1rem" }}
+																	disabled={deactivateLoading[member._id]}
+																>
+																	{deactivateLoading[member._id] ? (
+																		<CircularProgress size={14} />
+																	) : (
+																		<SvgIcon fontSize="small">
+																			<BlockIcon />
+																		</SvgIcon>
+																	)}
+																</IconButton>
+															</Tooltip>
+															<Tooltip title="Change Access">
+																<Select
+																	size="small"
+																	value={selectedRole}
+																	onChange={(event) =>
+																		handleChangeRole(member._id, event.target.value)
+																	}
+																>
+																	<MenuItem value="superUser">Super User</MenuItem>
+																	<MenuItem value="userManager">User Manager</MenuItem>
+																	<MenuItem value="budgetHolder">Budget Holder</MenuItem>
+																	<MenuItem value="finance">Finance</MenuItem>
+																	<MenuItem value="financeReviewer">Finance Reviewer</MenuItem>
+																	<MenuItem value="tech">Tech</MenuItem>
+																</Select>
+															</Tooltip>
+														</Stack>
+													</TableCell>
+												)}
 										</>
 									)}
 								</TableRow>

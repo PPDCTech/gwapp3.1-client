@@ -14,6 +14,8 @@ import {
 	CircularProgress,
 	TablePagination,
 	Box,
+	MenuItem,
+	Select,
 } from "@mui/material";
 import {
 	TrashIcon,
@@ -234,17 +236,10 @@ export const RequisitionTable = ({
 												</TableCell>
 
 												{/* Action column */}
-												<TableCell
-													sx={{
-														"@media (max-width: 600px)": {
-															display: "none",
-														},
-													}}
-												>
-													<Grid container spacing={2}>
-														{/* Always show chat icon */}
-														<Grid item>
-															<Tooltip title="Messages">
+												<TableCell>
+													<Select>
+														<Tooltip title="Messages">
+															<MenuItem onClick={() => openChatModal(requisition._id)}>
 																<IconButton
 																	sx={{
 																		backgroundColor: "info.main",
@@ -259,17 +254,18 @@ export const RequisitionTable = ({
 																		<ChatBubbleOvalLeftEllipsisIcon />
 																	</SvgIcon>
 																</IconButton>
-															</Tooltip>
-														</Grid>
-
+															</MenuItem>
+														</Tooltip>
 														{/* Send back icon conditions */}
 														{requisition.status !== "reviewed" &&
 														requisition.status !== "approved" &&
 														user.accessLevel !== "user" &&
 														user.accessLevel !== "userManager" &&
 														requisition.attentionTo.includes(user.email) ? (
-															<Grid item>
-																<Tooltip title="Send Back">
+															<Tooltip title="Send Back">
+																<MenuItem
+																	onClick={(e) => handleSendBackRequisition(e, requisition._id)}
+																>
 																	<IconButton
 																		sx={{
 																			backgroundColor: "warning.main",
@@ -284,8 +280,8 @@ export const RequisitionTable = ({
 																			<ArrowUturnLeftIcon />
 																		</SvgIcon>
 																	</IconButton>
-																</Tooltip>
-															</Grid>
+																</MenuItem>
+															</Tooltip>
 														) : null}
 
 														{/* Edit condition */}
@@ -294,8 +290,11 @@ export const RequisitionTable = ({
 														requisition.status !== "deleted" &&
 														(requisition.user.name === user.name ||
 															requisition.user.email === user.email) ? (
-															<Grid item>
-																<Tooltip title="Edit">
+															<Tooltip title="Edit">
+																<MenuItem
+																	value="edit"
+																	onClick={() => handleOpenEditModal(requisition._id)}
+																>
 																	<IconButton
 																		onClick={() => handleOpenEditModal(requisition._id)}
 																		sx={{
@@ -310,8 +309,8 @@ export const RequisitionTable = ({
 																			<PencilSquareIcon />
 																		</SvgIcon>
 																	</IconButton>
-																</Tooltip>
-															</Grid>
+																</MenuItem>
+															</Tooltip>
 														) : null}
 
 														{/* Conditions for Printing */}
@@ -321,8 +320,11 @@ export const RequisitionTable = ({
 															["tech", "finance", "financeReviewer"].includes(
 																user.accessLevel,
 															)) ? (
-															<Grid item>
-																<Tooltip title="Print">
+															<Tooltip title="Print">
+																<MenuItem
+																	value="print"
+																	onClick={() => handlePrint(requisition._id)}
+																>
 																	<IconButton
 																		sx={{
 																			backgroundColor: "success.main",
@@ -341,8 +343,8 @@ export const RequisitionTable = ({
 																			</SvgIcon>
 																		)}
 																	</IconButton>
-																</Tooltip>
-															</Grid>
+																</MenuItem>
+															</Tooltip>
 														) : null}
 
 														{/* Delete condition */}
@@ -351,8 +353,11 @@ export const RequisitionTable = ({
 														requisition.status !== "deleted" &&
 														(requisition.user.name === user.name ||
 															requisition.user.email === user.email) ? (
-															<Grid item>
-																<Tooltip title="Delete">
+															<Tooltip title="Delete">
+																<MenuItem
+																	value="delete"
+																	onClick={() => handleDeleteRequisition(requisition._id)}
+																>
 																	<IconButton
 																		sx={{
 																			backgroundColor: "error.main",
@@ -367,10 +372,10 @@ export const RequisitionTable = ({
 																			<TrashIcon />
 																		</SvgIcon>
 																	</IconButton>
-																</Tooltip>
-															</Grid>
+																</MenuItem>
+															</Tooltip>
 														) : null}
-													</Grid>
+													</Select>
 												</TableCell>
 											</TableRow>
 										))}

@@ -133,10 +133,11 @@ const Members = () => {
 	const handleDeactivate = async (id) => {
 		try {
 			await deactivateUser(id);
-			toast.info("User has been deactivated");
 			setActiveMembers((prevMembers) =>
 				prevMembers.filter((member) => member._id !== id),
 			);
+			toast.info("User has been deactivated");
+
 		} catch (error) {
 			console.error(error);
 			toast.error("Failed to deactivate user");
