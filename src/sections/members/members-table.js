@@ -23,9 +23,7 @@ import { Scrollbar } from "../../components/scrollbar";
 import { getInitials } from "../../utils/get-initials";
 import BlockIcon from "@mui/icons-material/Block";
 import { toast } from "react-toastify";
-import {
-	USER_ACCESS_LABELS,
-} from "../../services/constants";
+import { USER_ACCESS_LABELS } from "../../services/constants";
 import { useAuth } from "../../hooks/use-auth";
 
 export const MembersTable = (props) => {
@@ -39,6 +37,7 @@ export const MembersTable = (props) => {
 		isAlumni = false,
 		onDeactivate,
 		onChangeRole,
+		setActiveMembers,
 	} = props;
 
 	const { user } = useAuth();
@@ -50,6 +49,9 @@ export const MembersTable = (props) => {
 		try {
 			setDeactivateLoading((prevLoading) => ({ ...prevLoading, [id]: true }));
 			onDeactivate(id);
+			setActiveMembers((prevMembers) =>
+				prevMembers.filter((member) => member._id !== id),
+			);
 		} catch (error) {
 			toast.error(error.message);
 		} finally {
@@ -97,47 +99,68 @@ export const MembersTable = (props) => {
 										<>
 											<TableCell>{member.phone || "N/A"}</TableCell>
 											<TableCell>{USER_ACCESS_LABELS[member.accessLevel]}</TableCell>
-											{user &&
-												(user?.accessLevel === "userManagaer" ||
-													user?.accessLevel === "tech") && (
-													<TableCell>
-														<Stack direction="row" spacing={1}>
-															<Tooltip title="Deactivate">
-																<IconButton
-																	onClick={() => handleDeactivate(member._id)}
-																	aria-label="Preview"
-																	color="error"
-																	sx={{ fontSize: "1rem" }}
-																	disabled={deactivateLoading[member._id]}
-																>
-																	{deactivateLoading[member._id] ? (
-																		<CircularProgress size={14} />
-																	) : (
-																		<SvgIcon fontSize="small">
-																			<BlockIcon />
-																		</SvgIcon>
-																	)}
-																</IconButton>
-															</Tooltip>
-															<Tooltip title="Change Access">
-																<Select
-																	size="small"
-																	value={selectedRole}
-																	onChange={(event) =>
-																		handleChangeRole(member._id, event.target.value)
-																	}
-																>
-																	<MenuItem value="superUser">Super User</MenuItem>
-																	<MenuItem value="userManager">User Manager</MenuItem>
-																	<MenuItem value="budgetHolder">Budget Holder</MenuItem>
-																	<MenuItem value="finance">Finance</MenuItem>
-																	<MenuItem value="financeReviewer">Finance Reviewer</MenuItem>
-																	<MenuItem value="tech">Tech</MenuItem>
-																</Select>
-															</Tooltip>
-														</Stack>
-													</TableCell>
-												)}
+											{user && ["tech", "userManagaer"].includes(user.accessLevel) && (
+												<TableCell>
+													<Stack direction="row" spacing={1}>
+														<Tooltip title="Deactivate">
+															<IconButton
+																onClick={() => handleDeactivate(member._id)}
+																aria-label="Preview"
+																color="error"
+																sx={{ fontSize: "1rem" }}
+																disabled={deactivateLoading[member._id]}
+															>
+																{deactivateLoading[member._id] ? (
+																	<CircularProgress size={14} />
+																) : (
+																	<SvgIcon fontSize="small">
+																		<BlockIcon />
+																	</SvgIcon>
+																)}
+															</IconButton>
+														</Tooltip>
+														<Tooltip title="Change Access">
+															<Select
+																size="small"
+																sx={{
+																	"& .MuiOutlinedInput-notchedOutline": {
+																		border: "none",
+																	},
+																	"&:hover .MuiOutlinedInput-notchedOutline": {
+																		border: "none",
+																	},
+																	"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+																		border: "none",
+																	},
+																	"& .MuiFilledInput-underline:after": {
+																		border: "none",
+																	},
+																	"& .MuiFilledInput-underline:before": {
+																		border: "none",
+																	},
+																	"&:hover .MuiFilledInput-underline:before": {
+																		border: "none",
+																	},
+																	"& .MuiFilledInput-underline.Mui-focused:before": {
+																		border: "none",
+																	},
+																}}
+																value={selectedRole}
+																onChange={(event) =>
+																	handleChangeRole(member._id, event.target.value)
+																}
+															>
+																<MenuItem value="superUser">Super User</MenuItem>
+																<MenuItem value="userManager">User Manager</MenuItem>
+																<MenuItem value="budgetHolder">Budget Holder</MenuItem>
+																<MenuItem value="finance">Finance</MenuItem>
+																<MenuItem value="financeReviewer">Finance Reviewer</MenuItem>
+																<MenuItem value="tech">Tech</MenuItem>
+															</Select>
+														</Tooltip>
+													</Stack>
+												</TableCell>
+											)}
 										</>
 									)}
 								</TableRow>

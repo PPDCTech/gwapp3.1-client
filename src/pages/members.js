@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 import { useNProgress } from "../hooks/use-nprogress";
 
 const Members = () => {
-	    useNProgress();
+	useNProgress();
 
 	const [activeMembers, setActiveMembers] = useState([]);
 	const [totalActive, setTotalActive] = useState(0);
@@ -30,7 +30,7 @@ const Members = () => {
 	const [alumniPage, setAlumniPage] = useState(0);
 	const [rowsPerPage, setRowsPerPage] = useState(10);
 	const [searchQuery, setSearchQuery] = useState("");
-	console.log(searchQuery)
+	console.log(searchQuery);
 	const [tabValue, setTabValue] = useState(0);
 
 	useEffect(() => {
@@ -133,11 +133,9 @@ const Members = () => {
 	const handleDeactivate = async (id) => {
 		try {
 			await deactivateUser(id);
-			setActiveMembers((prevMembers) =>
-				prevMembers.filter((member) => member._id !== id),
-			);
+			fetchActiveMembers(activePage, rowsPerPage);
+			fetchAlumniMembers(alumniPage, rowsPerPage);
 			toast.info("User has been deactivated");
-
 		} catch (error) {
 			console.error(error);
 			toast.error("Failed to deactivate user");
@@ -191,6 +189,7 @@ const Members = () => {
 								activeTab={true}
 								count={totalActive}
 								onDeactivate={handleDeactivate}
+								setActiveMembers={setActiveMembers}
 								onChangeRole={handleChangeRole}
 							/>
 						)}

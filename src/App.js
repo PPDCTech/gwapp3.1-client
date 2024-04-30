@@ -4,7 +4,6 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { AuthConsumer, AuthProvider } from "./contexts/auth-context";
-// import { NProgressRoute } from "./hooks/use-nprogress";
 import { createTheme } from "./theme";
 import { createEmotionCache } from "./utils/create-emotion-cache";
 import "simplebar-react/dist/simplebar.min.css";
@@ -20,9 +19,7 @@ const clientSideEmotionCache = createEmotionCache();
 const SplashScreen = () => null;
 
 const App = (props) => {
-	// const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
 	const { emotionCache = clientSideEmotionCache } = props;
-	// const getLayout = Component.getLayout ?? ((page) => page);
 
 	const theme = createTheme();
 
