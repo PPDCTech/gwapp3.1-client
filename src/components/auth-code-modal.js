@@ -1,63 +1,92 @@
 import { useState } from "react";
-import Modal from "@mui/material/Modal";
+import { useNavigate } from "react-router-dom";
+import { Modal, Grid } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import { toast } from "react-toastify";
+
 import AuthCodeInput from "./auth-code-input";
+import { useAuth } from "../hooks/use-auth";
 
-const AuthCodeInputModal = ({ open, onClose, onSubmit }) => {
-  const [value, setValue] = useState("");
-  const [loading, setLoading] = useState(false);
+const AuthCodeInputModal = ({ openModal, setOpenModal, regToken }) => {
+	const [value, setValue] = useState("");
+	const [loading, setLoading] = useState(false);
+	const navigate = useNavigate();
+	const auth = useAuth();
 
-  const handleSubmit = () => {
-    setLoading(true);
-    if (value) {
-      onSubmit(value);
-    }
-    setLoading(false);
-  };
+	const handleSubmit = async () => {
+		setLoading(true);
+		try {
+			const res = await auth.signIn(value);
+			if (res && res.status === 200) {
+				setLoading(false);
+				closeAndNavigate();
+			}
+		} catch (error) {
+			setLoading(false);
+			return toast.warning(error.message);
+		}
+	};
 
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      aria-labelledby="auth-code-input-modal"
-      aria-describedby="auth-code-input-modal-description"
-    >
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 400,
-          bgcolor: "background.paper",
-          boxShadow: 24,
-          p: 4,
-          borderRadius: 2,
-        }}
-      >
-        <Typography sx={{ mb: 2 }}
-variant="h6"
-gutterBottom>
-          Enter the code sent to your email
-        </Typography>
+	const closeAndNavigate = () => {
+		setOpenModal(!openModal);
+		navigate("/");
+	};
 
-        <AuthCodeInput length={6}
-onChange={setValue} />
+	return (
+		<Modal
+			// this makes the modal stay open when user clicks outside
+			disableEnforceFocus={true}
+			open={openModal}
+			aria-labelledby="auth-code-input-modal"
+			aria-describedby="auth-code-input-modal-description"
+		>
+			<Box
+				sx={{
+					position: "absolute",
+					top: "50%",
+					left: "50%",
+					transform: "translate(-50%, -50%)",
+					width: 400,
+					bgcolor: "background.paper",
+					boxShadow: 24,
+					p: 4,
+					borderRadius: 2,
+				}}
+			>
+				<Typography sx={{ mb: 2 }} variant="h6" gutterBottom>
+					Enter the OTP sent to your email
+				</Typography>
 
-        <Button
-          sx={{ mt: 2 }}
-          onClick={handleSubmit}
-          disabled={loading}
-          color="info"
-          variant="contained"
-        >
-          {loading ? "Please wait..." : "Submit"}
-        </Button>
-      </Box>
-    </Modal>
-  );
+				<AuthCodeInput length={6} onChange={setValue} />
+
+				<Grid container spacing={2}>
+					<Grid item xs={6}>
+						<Button
+							sx={{ mt: 2 }}
+							variant="contained"
+							color="primary"
+							onClick={() => setOpenModal(false)}
+						>
+							Cancel
+						</Button>
+					</Grid>
+					<Grid item xs={6} sx={{ display: "flex", justifyContent: "flex-end" }}>
+						<Button
+							sx={{ mt: 2 }}
+							onClick={handleSubmit}
+							disabled={loading}
+							color="info"
+							variant="contained"
+						>
+							{loading ? "Please wait..." : "Verify"}
+						</Button>
+					</Grid>
+				</Grid>
+			</Box>
+		</Modal>
+	);
 };
 
 export default AuthCodeInputModal;

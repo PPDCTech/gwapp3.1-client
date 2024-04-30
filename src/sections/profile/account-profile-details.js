@@ -11,21 +11,21 @@ import {
 	Unstable_Grid2 as Grid,
 } from "@mui/material";
 import { useAuth } from "../../hooks/use-auth";
-import { toast } from "react-toastify";
-import AuthCodeInputModal from "../../components/auth-code-modal";
-import axios from "axios";
-import {
-	CHANGE_PASSWORD_API,
-	RESET_PASSWORD_API,
-	VERIFY_PASSWORD_API,
-} from "../../services/constants";
+// import { toast } from "react-toastify";
+// import AuthCodeInputModal from "../../components/auth-code-modal";
+// import axios from "axios";
+// import {
+// 	CHANGE_PASSWORD_API,
+// 	RESET_PASSWORD_API,
+// 	VERIFY_PASSWORD_API,
+// } from "../../services/constants";
 
 export const AccountProfileDetails = () => {
 	const { user } = useAuth();
-	const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
+	// const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
 	// const [code, setCode] = useState("");
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState("");
+	// const [loading, setLoading] = useState(false);
+	// const [error, setError] = useState("");
 
 	const [values, setValues] = useState({
 		firstName: user.name.split(" ")[0],
@@ -43,77 +43,77 @@ export const AccountProfileDetails = () => {
 		}));
 	}, []);
 
-	const handleSubmit = useCallback(
-		async (event) => {
-			event.preventDefault();
+	// const handleSubmit = useCallback(
+	// 	async (event) => {
+	// 		event.preventDefault();
 
-			if (!values.newPassword) return;
+	// 		if (!values.newPassword) return;
 
-			if (String(values.password) !== String(values.repeatPassword)) {
-				setError("Passwords don't match");
-				return;
-			}
+	// 		if (String(values.password) !== String(values.repeatPassword)) {
+	// 			setError("Passwords don't match");
+	// 			return;
+	// 		}
 
-			try {
-				setLoading(true);
+	// 		try {
+	// 			setLoading(true);
 
-				if (values.password) {
-					const is_password_correct = await axios.post(VERIFY_PASSWORD_API, {
-						userId: user._id,
-						oldPassword: values.password,
-					});
+	// 			if (values.password) {
+	// 				const is_password_correct = await axios.post(VERIFY_PASSWORD_API, {
+	// 					userId: user._id,
+	// 					oldPassword: values.password,
+	// 				});
 
-					if (is_password_correct.status === 200) {
-						setError("");
-						const response = await axios.post(CHANGE_PASSWORD_API, {
-							email: user?.email,
-						});
-						if (response.status === 200) {
-							setIsCodeModalOpen(true);
-						}
-					}
-				}
-			} catch (error) {
-				setError("Old password is wrong");
-			} finally {
-				setLoading(false);
-			}
-		},
-		[
-			user?._id,
-			user?.email,
-			values.newPassword,
-			values.password,
-			values.repeatPassword,
-		],
-	);
+	// 				if (is_password_correct.status === 200) {
+	// 					setError("");
+	// 					const response = await axios.post(CHANGE_PASSWORD_API, {
+	// 						email: user?.email,
+	// 					});
+	// 					if (response.status === 200) {
+	// 						setIsCodeModalOpen(true);
+	// 					}
+	// 				}
+	// 			}
+	// 		} catch (error) {
+	// 			setError("Old password is wrong");
+	// 		} finally {
+	// 			setLoading(false);
+	// 		}
+	// 	},
+	// 	[
+	// 		user?._id,
+	// 		user?.email,
+	// 		values.newPassword,
+	// 		values.password,
+	// 		values.repeatPassword,
+	// 	],
+	// );
 
-	const handleCodeSubmit = async (codeValue) => {
-		try {
-			const password_change = await axios.post(RESET_PASSWORD_API, {
-				email: user?.email,
-				password: values.newPassword,
-				resetToken: codeValue,
-			});
+	// const handleCodeSubmit = async (codeValue) => {
+	// 	try {
+	// 		const password_change = await axios.post(RESET_PASSWORD_API, {
+	// 			email: user?.email,
+	// 			password: values.newPassword,
+	// 			resetToken: codeValue,
+	// 		});
 
-			if (password_change.status === 200) {
-				setIsCodeModalOpen(false);
-				toast.success("Password changed successfully");
-			}
-		} catch (error) {
-			toast.error(error);
-		}
-	};
+	// 		if (password_change.status === 200) {
+	// 			setIsCodeModalOpen(false);
+	// 			toast.success("Password changed successfully");
+	// 		}
+	// 	} catch (error) {
+	// 		toast.error(error);
+	// 	}
+	// };
 
 	return (
 		<>
-			<AuthCodeInputModal
+			{/* <AuthCodeInputModal
 				open={isCodeModalOpen}
 				onClose={() => setIsCodeModalOpen(false)}
 				onSubmit={handleCodeSubmit}
-			/>
+			/> */}
 
-			<form autoComplete="off" noValidate onSubmit={handleSubmit}>
+			<form autoComplete="off" noValidate>
 				<Card>
 					<CardHeader
 						subheader="You can change your password, photo and signature"
@@ -156,7 +156,7 @@ export const AccountProfileDetails = () => {
 								<Grid xs={12} md={12}>
 									<Divider />
 								</Grid>
-								<Grid xs={12} md={6}>
+								{/* <Grid xs={12} md={6}>
 									<TextField
 										fullWidth
 										label="Old Password"
@@ -167,8 +167,8 @@ export const AccountProfileDetails = () => {
 										error={Boolean(error)}
 										helperText={error}
 									/>
-								</Grid>
-								<Grid xs={12} md={6}>
+								</Grid> */}
+								{/* <Grid xs={12} md={6}>
 									<TextField
 										fullWidth
 										label="Repeat Password"
@@ -177,8 +177,8 @@ export const AccountProfileDetails = () => {
 										type="password"
 										value={values.repeatPassword}
 									/>
-								</Grid>
-								<Grid xs={12} md={12}>
+								</Grid> */}
+								{/* <Grid xs={12} md={12}>
 									<TextField
 										fullWidth
 										label="Enter New Password"
@@ -188,16 +188,16 @@ export const AccountProfileDetails = () => {
 										value={values.newPassword}
 										required
 									/>
-								</Grid>
+								</Grid> */}
 							</Grid>
 						</Box>
 					</CardContent>
-					<Divider />
+					{/* <Divider />
 					<CardActions sx={{ justifyContent: "flex-end" }}>
 						<Button type="submit" variant="contained" color="info" disabled={loading}>
 							{loading ? "Please wait.." : "Reset Password"}
 						</Button>
-					</CardActions>
+					</CardActions> */}
 				</Card>
 			</form>
 		</>

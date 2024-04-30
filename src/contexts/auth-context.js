@@ -9,7 +9,7 @@ import PropTypes from "prop-types";
 import { jwtDecode } from "jwt-decode";
 
 import { fetchSingleUser } from "../services/api/users.api";
-import { loginUser } from "../services/api/auth.api";
+import { verifyLogin } from "../services/api/auth.api";
 
 const HANDLERS = {
 	INITIALIZE: "INITIALIZE",
@@ -30,8 +30,7 @@ const handlers = {
 
 		return {
 			...state,
-			...// if payload (user) is provided, then is authenticated
-			(user
+			...(user // if payload (user) is provided, then is authenticated
 				? {
 						isAuthenticated: true,
 						isLoading: false,
@@ -141,9 +140,9 @@ export const AuthProvider = (props) => {
 		}
 	}, []);
 
-	const signIn = async (email, password) => {
+	const signIn = async (password) => {
 		try {
-			const response = await loginUser(email, password);
+			const response = await verifyLogin(password);
 
 			const { userData } = response.data;
 			const { status, token } = userData;
@@ -166,10 +165,6 @@ export const AuthProvider = (props) => {
 		}
 	};
 
-	// const signUp = async (email, name, password) => {
-	//   throw new Error("Sign up is not implemented");
-	// };
-
 	const signOut = () => {
 		window.localStorage.removeItem("token");
 		window.localStorage.removeItem("authenticated");
@@ -186,7 +181,6 @@ export const AuthProvider = (props) => {
 				...state,
 				setUser,
 				signIn,
-				// signUp,
 				signOut,
 			}}
 		>

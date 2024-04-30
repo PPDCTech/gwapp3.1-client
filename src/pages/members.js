@@ -1,5 +1,6 @@
 import { useCallback, useState, useEffect } from "react";
-import { Box, Container, Stack, Typography, Tabs, Tab } from "@mui/material";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import { Box,Button, Container, Grid, Stack, Typography, Tabs, Tab } from "@mui/material";
 import { MembersTable } from "../sections/members/members-table";
 import { MembersSearch } from "../sections/members/members-search";
 import {
@@ -11,10 +12,12 @@ import {
 } from "../services/api/users.api";
 import { toast } from "react-toastify";
 import { useNProgress } from "../hooks/use-nprogress";
+import AddMemberModal from "../components/add-member ";
+import { useAuth } from "../hooks/use-auth";
 
 const Members = () => {
 	useNProgress();
-
+	const { user } = useAuth();
 	const [activeMembers, setActiveMembers] = useState([]);
 	const [totalActive, setTotalActive] = useState(0);
 	const [alumniMembers] = useState([]);
@@ -32,6 +35,7 @@ const Members = () => {
 	const [searchQuery, setSearchQuery] = useState("");
 	console.log(searchQuery);
 	const [tabValue, setTabValue] = useState(0);
+	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
 	useEffect(() => {
 		setIsLoadingActive(true);
@@ -46,9 +50,9 @@ const Members = () => {
 	const fetchActiveMembers = async (page, rowsPerPage) => {
 		try {
 			const result = await fetchUsers(page, rowsPerPage);
-			const { users, totalCount } = result.data;
+			const { totalCount } = result.data;
 
-			setFilteredActiveMembers(users);
+			setFilteredActiveMembers(result.data.users);
 			setTotalActive(totalCount);
 		} catch (error) {
 			setErrorActive(error.message);
@@ -171,7 +175,37 @@ const Members = () => {
 			>
 				<Container maxWidth="xl">
 					<Stack spacing={3}>
-						<Typography variant="h6">Staff Members</Typography>
+						<Grid
+							item
+							xs={12}
+							sx={{ display: "flex", justifyContent: "space-between" }}
+						>
+							<Typography variant="h6">Staff Members</Typography>
+							<Box>
+								{["tech"].includes(user.accessLevel) && (
+									<>
+										<Button
+											size="small"
+											variant="outlined"
+											color="success"
+											onClick={() => setIsAddModalOpen(!isAddModalOpen)}
+											sx={{ ml: 2 }}
+										>
+											<PersonAddIcon />
+											&nbsp; New Member
+										</Button>
+									</>
+								)}
+								<AddMemberModal
+									fetchActiveMembers={fetchActiveMembers}
+									activePage={activePage}
+									rowsPerPage={rowsPerPage}
+									open={isAddModalOpen}
+									onClose={() => setIsAddModalOpen(!isAddModalOpen)}
+								/>
+							</Box>
+						</Grid>
+
 						<MembersSearch onSearchInputChange={handleSearchInputChange} />
 						<Tabs value={tabValue} onChange={handleTabChange}>
 							<Tab label="Active Members" />

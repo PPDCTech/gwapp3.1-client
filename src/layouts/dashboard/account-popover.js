@@ -9,18 +9,14 @@ import {
 	Typography,
 } from "@mui/material";
 import { useAuth } from "../../hooks/use-auth";
-import { useNavigate } from "react-router-dom";
 
 export const AccountPopover = (props) => {
 	const { anchorEl, onClose, open } = props;
-	const navigate = useNavigate
 	const auth = useAuth();
 
 	const handleSignOut = useCallback(() => {
-		onClose?.();
 		auth.signOut();
-		navigate("/user/login");
-	}, [onClose, auth, navigate]);
+	}, [auth]);
 
 	return (
 		<Popover

@@ -13,14 +13,13 @@ import { NetworkStatusIndicator } from "./components/check-status";
 import "./styles/common.css";
 import "./styles/gwapploading.css";
 import Router from "./Router";
+import GwappLoading from "./components/gwappload/GwappLoading";
 
 const clientSideEmotionCache = createEmotionCache();
 
-const SplashScreen = () => null;
-
 const App = (props) => {
 	const { emotionCache = clientSideEmotionCache } = props;
-
+	
 	const theme = createTheme();
 
 	return (
@@ -34,7 +33,7 @@ const App = (props) => {
 						<CssBaseline />
 						<ToastContainer theme="colored" />
 						<AuthConsumer>
-							{(auth) => (auth.isLoading ? <SplashScreen /> : <Router />)}
+							{(auth) => (auth.isLoading ? <GwappLoading /> : <Router />)}
 						</AuthConsumer>
 					</ThemeProvider>
 				</AuthProvider>

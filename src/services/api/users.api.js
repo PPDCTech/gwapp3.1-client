@@ -1,11 +1,21 @@
-import { fetchData, patchData } from "./api-helper";
+import { fetchData, patchData, postData } from "./api-helper";
 
 const USERS_API = "users";
 const DEACTIVATE_USER_API = "deactivate-user";
 const CHANGE_ACCESS_API = "change-user-access";
 const ALL_USERS = "all-users";
+const ADD_USER = "users/create";
 const CHANGE_PROFILE_PIC = "update-user-photo";
 const CHANGE_SIGNATURE = "update-user-signature";
+
+export const addNewUser = async (formData) => {
+  try {
+    const response = await postData(ADD_USER, formData);
+    return response;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
 
 export const fetchAllUsers = async () => {
   try {
