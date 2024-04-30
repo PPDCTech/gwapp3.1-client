@@ -237,7 +237,31 @@ export const RequisitionTable = ({
 
 												{/* Action column */}
 												<TableCell>
-													<Select>
+													<Select
+														sx={{
+															"& .MuiOutlinedInput-notchedOutline": {
+																border: "none",
+															},
+															"&:hover .MuiOutlinedInput-notchedOutline": {
+																border: "none",
+															},
+															"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+																border: "none",
+															},
+															"& .MuiFilledInput-underline:after": {
+																border: "none",
+															},
+															"& .MuiFilledInput-underline:before": {
+																border: "none",
+															},
+															"&:hover .MuiFilledInput-underline:before": {
+																border: "none",
+															},
+															"& .MuiFilledInput-underline.Mui-focused:before": {
+																border: "none",
+															},
+														}}
+													>
 														<Tooltip title="Messages">
 															<MenuItem onClick={() => openChatModal(requisition._id)}>
 																<IconButton
