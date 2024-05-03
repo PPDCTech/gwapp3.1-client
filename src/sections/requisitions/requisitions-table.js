@@ -370,6 +370,7 @@ export const RequisitionTable = ({
 															{requisition.status !== "reviewed" &&
 															requisition.status !== "approved" &&
 															requisition.status !== "deleted" &&
+															requisition.retiredStatus !== "retired" &&
 															(requisition.user.name === user.name ||
 																requisition.user.email === user.email) ? (
 																<Tooltip placement="left-start" title="Edit">
