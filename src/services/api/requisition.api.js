@@ -64,8 +64,11 @@ export const binRequisitions = () => fetchData(`requisitions/bin`);
 export const destroyRequisition = (requisitionId) =>
   deleteData(`requisitions/destroy/${requisitionId}`);
 
+export const sendForRetire = (id, data) =>
+	putData(`user-requisitions/retire/${id}`, data);
+
 export const markAsRetired = (requisitionId) =>
-  putData(`user-requisitions/retire/${requisitionId}`);
+	patchData(`finance-requisitions/retire/${requisitionId}`);
 
 export const sendBackRequisition = (requisitionId) =>
   putData(`send-requisition-back/${requisitionId}`);

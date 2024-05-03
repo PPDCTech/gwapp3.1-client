@@ -290,13 +290,64 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
 								</Grid>
 
 								<Grid item xs={4}>
-									<Typography variant="subtitle2">Status</Typography>
-									<Typography
-										sx={{ color: STATUS_COLOR_TYPE[requisition.status] }}
-										variant="body1"
-									>
-										{capitalizeFirstLetter(requisition.status)}
-									</Typography>
+									<TableContainer>
+										<Table>
+											<TableBody>
+												<TableRow>
+													<TableCell component="th" scope="row">
+														Status:
+													</TableCell>
+													<TableCell>
+														<Typography
+															variant="body2"
+															sx={{
+																color: (theme) =>
+																	STATUS_COLOR_TYPE[requisition.status] &&
+																	theme.palette.text.primary,
+																backgroundColor: (theme) =>
+																	STATUS_COLOR_TYPE[requisition.status] &&
+																	theme.palette[STATUS_COLOR_TYPE[requisition.status]].light,
+																display: "inline",
+																marginRight: "8px",
+																padding: "4px 8px",
+																borderRadius: "4px",
+															}}
+														>
+															{capitalizeFirstLetter(requisition.status)}
+														</Typography>
+													</TableCell>
+												</TableRow>
+												<TableRow>
+													<TableCell component="th" scope="row">
+														Retirement:
+													</TableCell>
+													<TableCell>
+														<Typography
+															variant="body2"
+															sx={{
+																color: (theme) =>
+																	STATUS_COLOR_TYPE[requisition.retiredStatus || "cancelled"] &&
+																	theme.palette.text.primary,
+																backgroundColor: (theme) =>
+																	STATUS_COLOR_TYPE[requisition.retiredStatus || "cancelled"] &&
+																	theme.palette[
+																		STATUS_COLOR_TYPE[requisition.retiredStatus || "cancelled"]
+																	].light,
+																display: "inline",
+																marginRight: "8px",
+																padding: "4px 8px",
+																borderRadius: "4px",
+															}}
+														>
+															{capitalizeFirstLetter(
+																requisition.retiredStatus || "controlled",
+															)}
+														</Typography>
+													</TableCell>
+												</TableRow>
+											</TableBody>
+										</Table>
+									</TableContainer>
 								</Grid>
 
 								{/* Check history */}
@@ -542,7 +593,8 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
 												Request Awaiting Budget Holder Check
 											</Typography>
 										) : (requisition.status === "holderCheck" ||
-												requisition.status === "holderChecked") && user.accessLevel === "finance" ? (
+												requisition.status === "holderChecked") &&
+										  user.accessLevel === "finance" ? (
 											<>
 												<Button
 													variant="contained"
@@ -557,11 +609,13 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
 													Send Back
 												</Button>
 											</>
-										) : requisition.status === "holderCheck" || requisition.status === "holderChecked" ? (
+										) : requisition.status === "holderCheck" ||
+										  requisition.status === "holderChecked" ? (
 											<Typography sx={{ color: indigo.main }}>
 												Request Awaiting Finance Check
 											</Typography>
-										) : requisition.status === "checked" && user.accessLevel === "financeReviewer" ? (
+										) : requisition.status === "checked" &&
+										  user.accessLevel === "financeReviewer" ? (
 											<>
 												<Button
 													onClick={handleFinanceReviewed}
@@ -580,7 +634,8 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
 											<Typography sx={{ color: success.main }}>
 												Request Awaiting Finance Review
 											</Typography>
-										) : requisition.status === "reviewed" && user.accessLevel === "superUser" ? (
+										) : requisition.status === "reviewed" &&
+										  user.accessLevel === "superUser" ? (
 											<Button
 												size="small"
 												onClick={handleApprove}
@@ -594,7 +649,8 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
 											<Typography sx={{ color: success.ppdc }}>
 												Request Awaiting Approval
 											</Typography>
-										) : requisition.status === "approved" && (user?.accessLevel === "finance" ||
+										) : requisition.status === "approved" &&
+										  (user?.accessLevel === "finance" ||
 												user?.accessLevel === "financeReviewer") ? (
 											<Button size="small" onClick={handleCancelPayment}>
 												Cancel Payment

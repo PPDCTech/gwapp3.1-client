@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 import ArrowRightIcon from "@heroicons/react/24/solid/ArrowRightIcon";
 import {
 	Box,
@@ -9,7 +10,6 @@ import {
 	CircularProgress,
 	Container,
 	Divider,
-	Link,
 	SvgIcon,
 	Table,
 	TableBody,
@@ -108,7 +108,7 @@ export const OverviewLatestRequests = (props) => {
 					</Scrollbar>
 					<Divider />
 					<CardActions sx={{ justifyContent: "flex-end" }}>
-						<Link href="/requisitions">
+						<Link to="/requisitions">
 							<Button
 								sx={{ color: "success.dark" }}
 								endIcon={

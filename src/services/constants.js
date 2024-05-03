@@ -3,12 +3,14 @@ import { API } from "./base-url";
 export const STATUS_COLOR_TYPE = {
 	pending: "warning",
 	holderChecked: "secondary",
-	hoderChecked: "secondary",
+	requested: "secondary",
 	checked: "primary",
 	reviewed: "info",
 	approved: "success",
+	retired: "success",
 	sentBack: "error",
 	cancelled: "error",
+	controlled: "error",
 };
 
 export const VERIFY_PASSWORD_API = `${API}/verify-password`;

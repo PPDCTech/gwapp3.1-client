@@ -41,6 +41,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { fetchBudgetHolders } from "../services/api/users.api";
 import {
 	createRequisition,
+	sendForRetire,
 	updateRequisition,
 } from "../services/api/requisition.api";
 import { getAllProjects } from "../services/api/projects.api";
@@ -53,6 +54,7 @@ const CreateReqModal = ({
 	open,
 	onClose,
 	isEditMode,
+	retireMode,
 	requisitionData,
 	triggerUpdateRequisition,
 }) => {
@@ -219,7 +221,7 @@ const CreateReqModal = ({
 			if (
 				!formValues.type ||
 				!formValues.title ||
-				(formValues.itemsArray && formValues.itemsArray.length < 1) ||
+				(formValues.items && formValues.items.length < 1) ||
 				!formValues.bankName ||
 				!formValues.accountNumber ||
 				!formValues.attentionTo ||
@@ -257,13 +259,17 @@ const CreateReqModal = ({
 				userId: user._id,
 				type: type ? type : requisitionData.type,
 				title: title ? title : requisitionData.title,
-				invoices: invoiceArray ? invoiceArray : requisitionData.invoiceArray,
+				invoices:
+					invoiceArray.length > 0
+						? [...requisitionData.invoices, ...invoiceArray]
+						: requisitionData.invoices,
 				items: itemsArray ? itemsArray : requisitionData.itemsArray,
 				currency: currency ? currency : requisitionData.currency,
 				amountInWords: "",
 				total: totalItemsAmount
 					? Number(totalItemsAmount)
-					: Number(requisitionData.totalItemsAmount) || Number(requisitionData.total),
+					: Number(requisitionData.totalItemsAmount) ||
+					  Number(requisitionData.total),
 				accountName: beneficiary?.accountName
 					? beneficiary.accountName
 					: requisitionData.accountName,
@@ -325,6 +331,32 @@ const CreateReqModal = ({
 			if (update_response.status === 200) {
 				triggerUpdateRequisition(update_response.data);
 				setPart(1);
+				onClose();
+			}
+		} catch (error) {
+			console.log("Failed to save changes", error.message);
+		} finally {
+			setLoadingSaveEdit(false);
+		}
+	};
+
+	const handleSubmitForRetire = async (event) => {
+		event.preventDefault();
+		try {
+			setLoadingSaveEdit(true);
+			const formValues = {
+				userId: user._id,
+				invoices:
+					requisitionData.invoices.length > 0
+						? [...requisitionData.invoices, ...invoiceArray]
+						: invoiceArray,
+				date: getCurrentDateTimeString(),
+			};
+
+			const response = await sendForRetire(requisitionData._id, formValues);
+
+			if (response.status === 200) {
+				triggerUpdateRequisition(response.data);
 				onClose();
 			}
 		} catch (error) {
@@ -445,7 +477,11 @@ const CreateReqModal = ({
 		// <form onSubmit={formik.handleSubmit}>
 		<Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
 			<DialogTitle sx={{ my: 2 }}>
-				{isEditMode ? "Edit Requisition" : "Create Requisition"}
+				{isEditMode
+					? "Edit Requisition"
+					: retireMode
+					? "Retire Requisition"
+					: "Create Requisition"}
 				<Typography variant="subtitle1">{`Step ${part}`}</Typography>
 			</DialogTitle>
 			<DialogContent>
@@ -454,33 +490,54 @@ const CreateReqModal = ({
 						<Grid container spacing={2}>
 							<Grid item xs={6}>
 								<FormControl fullWidth>
-									<InputLabel>Select Project</InputLabel>
-									<Select
-										label="Select Project"
-										value={projectName}
-										onChange={(e) => setProjectName(e.target.value)}
-									>
-										{projects.map((project) => (
-											<MenuItem key={project._id} value={project.projectName}>
-												{project.projectName}
-											</MenuItem>
-										))}
-									</Select>
+									{retireMode ? (
+										<TextField
+											disabled
+											type="text"
+											value={projectName || ""}
+											variant="outlined"
+										/>
+									) : (
+										<>
+											<InputLabel>Select Project</InputLabel>
+											<Select
+												label="Select Project"
+												value={projectName}
+												onChange={(e) => setProjectName(e.target.value)}
+											>
+												{projects.map((project) => (
+													<MenuItem key={project._id} value={project.projectName}>
+														{project.projectName}
+													</MenuItem>
+												))}
+											</Select>
+										</>
+									)}
 								</FormControl>
 							</Grid>
 							<Grid item xs={6}>
 								<FormControl fullWidth>
-									<InputLabel>Request Type</InputLabel>
-
-									<Select
-										label="Request Type"
-										value={type}
-										onChange={(e) => setType(e.target.value)}
-									>
-										<MenuItem value="Advance">Advance</MenuItem>
-										<MenuItem value="Petty">Petty</MenuItem>
-										<MenuItem value="Reimbursement">Reimbursement</MenuItem>
-									</Select>
+									{retireMode ? (
+										<TextField
+											disabled
+											type="text"
+											value={type || ""}
+											variant="outlined"
+										/>
+									) : (
+										<>
+											<InputLabel>Request Type</InputLabel>
+											<Select
+												label="Request Type"
+												value={type}
+												onChange={(e) => setType(e.target.value)}
+											>
+												<MenuItem value="Advance">Advance</MenuItem>
+												<MenuItem value="Petty">Petty</MenuItem>
+												<MenuItem value="Reimbursement">Reimbursement</MenuItem>
+											</Select>
+										</>
+									)}
 								</FormControl>
 							</Grid>
 						</Grid>
@@ -492,6 +549,7 @@ const CreateReqModal = ({
 							variant="outlined"
 							margin="normal"
 							value={title}
+							disabled={retireMode}
 							onChange={(e) => setTitle(e.target.value)}
 						/>
 
@@ -499,74 +557,82 @@ const CreateReqModal = ({
 							<Grid container spacing={2} sx={{ mt: 1 }}>
 								<Grid item xs={3}>
 									<FormControl fullWidth>
-										<InputLabel>Choose Currency</InputLabel>
-										<Select
-											value={currency}
-											onChange={(e) => setCurrency(e.target.value)}
-										>
-											<MenuItem value="NGN">₦</MenuItem>
-											<MenuItem value="USD">$</MenuItem>
-										</Select>
+										{retireMode ? null : (
+											<>
+												<InputLabel>Choose Currency</InputLabel>
+												<Select
+													value={currency}
+													onChange={(e) => setCurrency(e.target.value)}
+												>
+													<MenuItem value="NGN">₦</MenuItem>
+													<MenuItem value="USD">$</MenuItem>
+												</Select>
+											</>
+										)}
 									</FormControl>
 								</Grid>
 							</Grid>
 
-							<Typography sx={{ mt: 3 }} variant="subtitle2">
-								Add Items
-							</Typography>
-							<Grid container spacing={2}>
-								<Grid item xs={12} sm={6} md={4}>
-									<FormControl fullWidth sx={{ mt: 1 }}>
-										<TextField
-											label="Enter desc"
-											value={newItemTitle}
-											onChange={(e) => setNewItemTitle(e.target.value)}
-											variant="outlined"
-											fullWidth
-										/>
-									</FormControl>
-								</Grid>
-								<Grid item xs={12} sm={6} md={4}>
-									<FormControl fullWidth sx={{ mt: 1 }}>
-										<TextField
-											label="Enter amount"
-											type="number"
-											value={newItemAmount}
-											onChange={(e) => setNewItemAmount(e.target.value)}
-											variant="outlined"
-											fullWidth
-										/>
-									</FormControl>
-								</Grid>
-								<Grid item xs={12} sm={6} md={4}>
-									<FormControl fullWidth sx={{ mt: 1 }}>
-										<Autocomplete
-											fullWidth
-											options={budgetCodes.filter((budgetCode) =>
-												budgetCode.project.includes(projectName),
-											)}
-											getOptionLabel={(budgetCode) => budgetCode?.description || ""}
-											value={newItemCode}
-											onChange={(event, newValue) => {
-												setNewItemCode(newValue);
-											}}
-											renderInput={(params) => (
-												<TextField {...params} label="Budget Line" fullWidth />
-											)}
-										/>
-									</FormControl>
-								</Grid>
-								<Grid item xs={12} sm={6} md={4} sx={{ mt: 0 }}>
-									<Button
-										variant="outlined"
-										color="success"
-										size="medium"
-										onClick={handleAddItem}
-									>
-										Save Item
-									</Button>
-								</Grid>
-							</Grid>
+							{!retireMode ? (
+								<>
+									<Typography sx={{ mt: 3 }} variant="subtitle2">
+										Add Items
+									</Typography>
+									<Grid container spacing={2}>
+										<Grid item xs={12} sm={6} md={4}>
+											<FormControl fullWidth sx={{ mt: 1 }}>
+												<TextField
+													label="Enter desc"
+													value={newItemTitle}
+													onChange={(e) => setNewItemTitle(e.target.value)}
+													variant="outlined"
+													fullWidth
+												/>
+											</FormControl>
+										</Grid>
+										<Grid item xs={12} sm={6} md={4}>
+											<FormControl fullWidth sx={{ mt: 1 }}>
+												<TextField
+													label="Enter amount"
+													type="number"
+													value={newItemAmount}
+													onChange={(e) => setNewItemAmount(e.target.value)}
+													variant="outlined"
+													fullWidth
+												/>
+											</FormControl>
+										</Grid>
+										<Grid item xs={12} sm={6} md={4}>
+											<FormControl fullWidth sx={{ mt: 1 }}>
+												<Autocomplete
+													fullWidth
+													options={budgetCodes.filter((budgetCode) =>
+														budgetCode.project.includes(projectName),
+													)}
+													getOptionLabel={(budgetCode) => budgetCode?.description || ""}
+													value={newItemCode}
+													onChange={(event, newValue) => {
+														setNewItemCode(newValue);
+													}}
+													renderInput={(params) => (
+														<TextField {...params} label="Budget Line" fullWidth />
+													)}
+												/>
+											</FormControl>
+										</Grid>
+										<Grid item xs={12} sm={6} md={4} sx={{ mt: 0 }}>
+											<Button
+												variant="outlined"
+												color="success"
+												size="medium"
+												onClick={handleAddItem}
+											>
+												Save Item
+											</Button>
+										</Grid>
+									</Grid>
+								</>
+							) : null}
 
 							{itemsArray.length > 0 && (
 								<>
@@ -580,7 +646,7 @@ const CreateReqModal = ({
 													<TableCell>Title</TableCell>
 													<TableCell>Amount</TableCell>
 													<TableCell>Budget Line</TableCell>
-													<TableCell>Action</TableCell>
+													{!retireMode && <TableCell>Action</TableCell>}
 												</TableRow>
 											</TableHead>
 											<TableBody>
@@ -589,18 +655,20 @@ const CreateReqModal = ({
 														<TableCell>{item.title}</TableCell>
 														<TableCell>{item.amount}</TableCell>
 														<TableCell>{item.code}</TableCell>
-														<TableCell>
-															<IconButton
-																onClick={() => handleRemoveItem(index)}
-																aria-label="Preview"
-																color="error"
-																sx={{ fontSize: "1rem" }}
-															>
-																<SvgIcon fontSize="small">
-																	<TrashIcon />
-																</SvgIcon>
-															</IconButton>
-														</TableCell>
+														{!retireMode && (
+															<TableCell>
+																<IconButton
+																	onClick={() => handleRemoveItem(index)}
+																	aria-label="Preview"
+																	color="error"
+																	sx={{ fontSize: "1rem" }}
+																>
+																	<SvgIcon fontSize="small">
+																		<TrashIcon />
+																	</SvgIcon>
+																</IconButton>
+															</TableCell>
+														)}
 													</TableRow>
 												))}
 											</TableBody>
@@ -630,7 +698,7 @@ const CreateReqModal = ({
 						<Grid container spacing={2}>
 							<Grid item xs={12} md={6}>
 								<Typography variant="subtitle1" sx={{ mt: 2 }}>
-									Upload receipts
+									Upload supporting documents:(receipts, invoices, etc)
 								</Typography>
 								<input
 									type="file"
@@ -716,55 +784,57 @@ const CreateReqModal = ({
 
 						<Divider sx={{ my: 3, borderColor: "neutral.300" }} />
 
-						<Grid container spacing={2}>
-							<Grid item xs={12} sm={6} md={6}>
-								<Autocomplete
-									options={beneficiaryList.map((holder) => holder.accountName)}
-									renderInput={(params) => (
-										<TextField
-											{...params}
-											name="beneficiary"
-											label="Select Beneficiary"
-											value={beneficiaryName}
-											// onSelect={(e, value) => {
-											//   setBeneficiaryName(value);
-											//   setBeneficiary(
-											//     beneficiaryList.find((account) => account.accountName === value) || {}
-											//   );
-											//   console.log("b::", beneficiary);
-											// }}
-											fullWidth
-											required
-											sx={{ marginBottom: "1rem" }}
-										/>
-									)}
-									onInputChange={(e, value) => {
-										setBeneficiaryName(e.target.value);
-										setBeneficiary(
-											beneficiaryList.find((account) => account.accountName === value) ||
-												{},
-										);
-									}}
-								/>
+						{!retireMode && (
+							<Grid container spacing={2}>
+								<Grid item xs={12} sm={6} md={6}>
+									<Autocomplete
+										options={beneficiaryList.map((holder) => holder.accountName)}
+										renderInput={(params) => (
+											<TextField
+												{...params}
+												name="beneficiary"
+												label="Select Beneficiary"
+												value={beneficiaryName}
+												// onSelect={(e, value) => {
+												//   setBeneficiaryName(value);
+												//   setBeneficiary(
+												//     beneficiaryList.find((account) => account.accountName === value) || {}
+												//   );
+												//   console.log("b::", beneficiary);
+												// }}
+												fullWidth
+												required
+												sx={{ marginBottom: "1rem" }}
+											/>
+										)}
+										onInputChange={(e, value) => {
+											setBeneficiaryName(e.target.value);
+											setBeneficiary(
+												beneficiaryList.find((account) => account.accountName === value) ||
+													{},
+											);
+										}}
+									/>
+								</Grid>
+								<Grid item xs={12} sm={6} md={6}>
+									<Autocomplete
+										options={budgetHolders.map((holder) => holder.name)}
+										renderInput={(params) => (
+											<TextField
+												{...params}
+												name="attentionTo"
+												label="Attention To"
+												value={attentionTo}
+												fullWidth
+												required
+												sx={{ marginBottom: "1rem" }}
+											/>
+										)}
+										onInputChange={(e, newValue) => setAttentionTo(newValue)}
+									/>
+								</Grid>
 							</Grid>
-							<Grid item xs={12} sm={6} md={6}>
-								<Autocomplete
-									options={budgetHolders.map((holder) => holder.name)}
-									renderInput={(params) => (
-										<TextField
-											{...params}
-											name="attentionTo"
-											label="Attention To"
-											value={attentionTo}
-											fullWidth
-											required
-											sx={{ marginBottom: "1rem" }}
-										/>
-									)}
-									onInputChange={(e, newValue) => setAttentionTo(newValue)}
-								/>
-							</Grid>
-						</Grid>
+						)}
 
 						<>
 							{beneficiary &&
@@ -797,67 +867,69 @@ const CreateReqModal = ({
 							)}
 						</>
 
-						<Divider />
 						{/* Adding new beneficiary account */}
-						<>
-							<Box sx={{ display: "flex", alignItems: "center" }}>
-								<Typography variant="subtitle2">Dont find the beneficiary?</Typography>
+						{!retireMode && (
+							<>
+								<Divider />
+								<Box sx={{ display: "flex", alignItems: "center" }}>
+									<Typography variant="subtitle2">Dont find the beneficiary?</Typography>
 
-								<Button
-									variant="text"
-									color={addingNewBeneficiary ? "error" : "success"}
-									onClick={() => setAddingNewBeneficiary(!addingNewBeneficiary)}
-								>
-									{addingNewBeneficiary ? "Close" : "Add new"}
-								</Button>
-							</Box>
-
-							{addingNewBeneficiary && (
-								<>
-									<Grid container spacing={2}>
-										<Grid item xs={12} sm={6} md={4}>
-											<TextField
-												value={newBankName}
-												onChange={(e) => setNewBankName(e.target.value)}
-												fullWidth
-												label="Bank Name"
-												variant="outlined"
-												margin="normal"
-											/>
-										</Grid>
-										<Grid item xs={12} sm={6} md={4}>
-											<TextField
-												value={newAccountNumber}
-												onChange={(e) => setNewAccountNumber(e.target.value)}
-												fullWidth
-												label="Account Number"
-												variant="outlined"
-												margin="normal"
-											/>
-										</Grid>
-										<Grid item xs={12} sm={6} md={4}>
-											<TextField
-												value={newAccountName}
-												onChange={(e) => setNewAccountName(e.target.value)}
-												fullWidth
-												label="Holder Name"
-												variant="outlined"
-												margin="normal"
-											/>
-										</Grid>
-									</Grid>
 									<Button
-										onClick={handleAddNewAccount}
-										variant="outlined"
-										color="success"
-										size="medium"
-										disabled={savingNewBeneficiary}
+										variant="text"
+										color={addingNewBeneficiary ? "error" : "success"}
+										onClick={() => setAddingNewBeneficiary(!addingNewBeneficiary)}
 									>
-										{savingNewBeneficiary ? "Saving..." : "Save"}
+										{addingNewBeneficiary ? "Close" : "Add new"}
 									</Button>
-								</>
-							)}
-						</>
+								</Box>
+
+								{addingNewBeneficiary && (
+									<>
+										<Grid container spacing={2}>
+											<Grid item xs={12} sm={6} md={4}>
+												<TextField
+													value={newBankName}
+													onChange={(e) => setNewBankName(e.target.value)}
+													fullWidth
+													label="Bank Name"
+													variant="outlined"
+													margin="normal"
+												/>
+											</Grid>
+											<Grid item xs={12} sm={6} md={4}>
+												<TextField
+													value={newAccountNumber}
+													onChange={(e) => setNewAccountNumber(e.target.value)}
+													fullWidth
+													label="Account Number"
+													variant="outlined"
+													margin="normal"
+												/>
+											</Grid>
+											<Grid item xs={12} sm={6} md={4}>
+												<TextField
+													value={newAccountName}
+													onChange={(e) => setNewAccountName(e.target.value)}
+													fullWidth
+													label="Holder Name"
+													variant="outlined"
+													margin="normal"
+												/>
+											</Grid>
+										</Grid>
+										<Button
+											onClick={handleAddNewAccount}
+											variant="outlined"
+											color="success"
+											size="medium"
+											disabled={savingNewBeneficiary}
+										>
+											{savingNewBeneficiary ? "Saving..." : "Save"}
+										</Button>
+									</>
+								)}
+							</>
+						)}
 					</>
 				)}
 			</DialogContent>
@@ -888,6 +960,15 @@ const CreateReqModal = ({
 								onClick={(e) => handleSaveEditRequisition(e)}
 							>
 								{loadingSaveEdit ? "Saving.." : "Submit Changes"}
+							</Button>
+						) : retireMode ? (
+							<Button
+								onClick={(e) => handleSubmitForRetire(e)}
+								color="success"
+								variant="contained"
+								disabled={loadingSaveEdit}
+							>
+								{loadingSaveEdit ? "Submitting..." : "Submit Request"}
 							</Button>
 						) : (
 							<Button

@@ -153,7 +153,7 @@ const Requisitions = () => {
                         sx={{ ml: 2 }}
                       >
                         <CreateNewFolderIcon />
-                        &nbsp; Create New
+                        &nbsp; New Request
                       </Button>
                     ) : (
                       <Button href="/profile" startIcon={<Warning />} color="warning">
@@ -216,6 +216,7 @@ const Requisitions = () => {
                 currentTab={selectedTab}
                 setRequisitions={setRequisitions}
                 onEditRequisition={handleEditRequisition}
+                updateTableData={fetchRequisitions}
               />
             </Grid>
           </Grid>
