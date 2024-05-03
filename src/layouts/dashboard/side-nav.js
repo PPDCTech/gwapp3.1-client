@@ -50,8 +50,8 @@ export const SideNav = (props) => {
 
 	const content = (
 		<Scrollbar>
-			<Box
-				sx={{
+			<div
+				style={{
 					display: "flex",
 					flexDirection: "column",
 					height: "100%",
@@ -59,18 +59,18 @@ export const SideNav = (props) => {
 				}}
 			>
 				<Box sx={{ p: 3 }}>
-					<Link to={"/"}>
-						<Box
-							component="a"
-							sx={{
-								display: "inline-flex",
-								height: 32,
-								width: 32,
-							}}
-						>
+					<div
+						style={{
+							display: "inline-flex",
+							height: 32,
+							width: 32,
+						}}
+					>
+						<Link to={"/"}>
 							<Logo />
-						</Box>
-					</Link>
+						</Link>
+					</div>
+
 					<Box
 						sx={{
 							alignItems: "center",
@@ -110,7 +110,7 @@ export const SideNav = (props) => {
 					>
 						{sidebarItems.map((item) => (
 							<SideNavItem
-								active={location.pathname === item.path} // Use location.pathname to compare with item.path
+								active={location.pathname === item.path}
 								disabled={item.disabled}
 								external={item.external}
 								icon={item.icon}
@@ -122,7 +122,7 @@ export const SideNav = (props) => {
 					</Stack>
 				</Box>
 				<Divider sx={{ borderColor: "neutral.700" }} />
-			</Box>
+			</div>
 		</Scrollbar>
 	);
 

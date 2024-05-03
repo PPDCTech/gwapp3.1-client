@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { Box, ButtonBase } from "@mui/material";
+import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 export const SideNavItem = (props) => {
@@ -18,7 +18,7 @@ export const SideNavItem = (props) => {
 
 	return (
 		<li>
-			<ButtonBase
+			<Box
 				sx={{
 					alignItems: "center",
 					borderRadius: 1,
@@ -29,6 +29,7 @@ export const SideNavItem = (props) => {
 					py: "6px",
 					textAlign: "left",
 					width: "100%",
+					cursor: "pointer", // Add cursor pointer
 					...(active && {
 						backgroundColor: "rgba(255, 255, 255, 0.15)",
 					}),
@@ -36,7 +37,7 @@ export const SideNavItem = (props) => {
 						backgroundColor: "rgba(255, 255, 255, 0.04)",
 					},
 				}}
-				onClick={handleNavigate}
+				onClick={handleNavigate} // Handle click event here
 				disabled={disabled}
 			>
 				{icon && (
@@ -76,7 +77,7 @@ export const SideNavItem = (props) => {
 				>
 					{title}
 				</Box>
-			</ButtonBase>
+			</Box>
 		</li>
 	);
 };

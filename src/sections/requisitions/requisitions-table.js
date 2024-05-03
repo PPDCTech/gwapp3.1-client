@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
 	Table,
 	TableBody,
@@ -26,7 +26,7 @@ import {
 	ArrowUturnLeftIcon,
 	DocumentDuplicateIcon,
 	DocumentCheckIcon,
-	EyeIcon
+	EyeIcon,
 } from "@heroicons/react/24/outline";
 import { STATUS_COLOR_TYPE } from "../../services/constants";
 import { formatAmount, getCurrencySign } from "../../utils/format-currency";
@@ -58,6 +58,8 @@ export const RequisitionTable = ({
 	setRequisitions,
 	onEditRequisition,
 	updateTableData,
+	reqId,
+	action,
 }) => {
 	const { user } = useAuth();
 	const [page, setPage] = useState(0);
@@ -71,21 +73,6 @@ export const RequisitionTable = ({
 	const [selectedRequisition, setSelectedRequisition] = useState(null);
 	const [editMode, setEditMode] = useState(false);
 	const [retireMode, setRetireMode] = useState(false);
-
-	useEffect(() => {
-		try {
-			const params = new URLSearchParams(window.location.search);
-			const requisition_id = params.get("id");
-			const action = params.get("action");
-
-			if (action === "openModal" && requisition_id) {
-				setSelectedId(requisition_id);
-				openReqDetails();
-			}
-		} catch (error) {
-			console.log("Error:", error);
-		}
-	}, []);
 
 	const handleChangePage = (event, newPage) => {
 		setPage(newPage);
@@ -138,10 +125,16 @@ export const RequisitionTable = ({
 		}
 	}, [isReqDetailsOpen, setRequisitions]);
 
-	const handleOpenReqDetails = (id) => {
+	const handleOpenReqDetails = useCallback((id) => {
 		setSelectedId(id);
 		openReqDetails();
-	};
+	}, []);
+
+	useEffect(() => {
+		if (reqId && action === "openModal") {
+			handleOpenReqDetails(reqId);
+		}
+	}, [reqId, action, handleOpenReqDetails]);
 
 	const handleOpenEditModal = async (id) => {
 		try {

@@ -9,6 +9,8 @@ export const AuthGuard = (props) => {
 
 	useEffect(() => {
 		if (!isAuthenticated) {
+			// clear local storage
+			localStorage.clear();
 			console.log("Not authenticated, redirecting");
 			// Store continue URL in sessionStorage
 			sessionStorage.setItem(

@@ -6,6 +6,7 @@ import {
 	ListItemText,
 	Typography,
 	Box,
+	Tooltip
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import {
@@ -23,12 +24,12 @@ const NotificationDropdown = (props) => {
 
 	useEffect(() => {
 		const getUserMessages = async () => {
-			const response = await fetchUserMessages(user._id);
+			const response = await fetchUserMessages(user?._id);
 			setUserNotifications(response.data);
 		};
 
 		getUserMessages();
-	}, [user._id]);
+	}, [user?._id]);
 
 	const formatTimeDifference = (timestamp) => {
 		const currentTime = new Date();
@@ -57,7 +58,9 @@ const NotificationDropdown = (props) => {
 
 	const handleReadClick = async (messageId, requisitionId) => {
 		await markMessageAsRead(user?._id, messageId);
-		navigate(`/requisitions?id=${requisitionId}&action=openModal`);
+		navigate(
+			`/requisitions?id=${requisitionId}&action=openModal&selectedTab=allRequisitions`,
+		);
 
 		const updatedNotifications = userNotifications.map((notification) => {
 			const updatedMessages = notification.messages.map((message) => {
@@ -84,15 +87,16 @@ const NotificationDropdown = (props) => {
 			}}
 			open={open}
 			onClose={onClose}
+			PaperProps={{
+				sx: {
+					maxHeight: 400,
+					overflowY: "auto",
+				},
+			}}
 		>
 			<Box
 				p={2}
-				sx={{
-					width: "18vw",
-					"@media (max-width: 600px)": {
-						width: "60vw",
-					},
-				}}
+				sx={{ width: "18vw", "@media (max-width: 600px)": { width: "60vw" } }}
 			>
 				<Typography variant="subtitle1" gutterBottom>
 					Notifications
@@ -100,6 +104,7 @@ const NotificationDropdown = (props) => {
 				{userNotifications.map((notification) => (
 					<div key={notification._id}>
 						{notification.messages.map((message) => (
+							<Tooltip title="Click to view item" key={message._id} placement="left-start">
 							<ListItem
 								key={message._id}
 								onClick={() =>
@@ -120,7 +125,8 @@ const NotificationDropdown = (props) => {
 										</Typography>
 									}
 								/>
-							</ListItem>
+								</ListItem>
+							</Tooltip>
 						))}
 					</div>
 				))}
