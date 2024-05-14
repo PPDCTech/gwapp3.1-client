@@ -30,6 +30,7 @@ import {
 	getDateForPrintSpace,
 } from "../services/helpers";
 import accounting from "accounting";
+import AlertModal from "../components/alert-modal";
 import {
 	DocumentIcon,
 	ChevronDownIcon,
@@ -45,6 +46,7 @@ import {
 	financeCheckRequisition,
 	financeReviewRequisition,
 	getRequisitionById,
+	markAsRetired,
 	sendBackRequisition,
 	updateRequisition,
 } from "../services/api/requisition.api";
@@ -54,7 +56,12 @@ import { addMessage } from "../services/api/message-chat.api";
 import ChatModal from "./chat-modal";
 import { getAllAccountCodes } from "../services/api/account-codes.api";
 
-const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
+const RequisitionDetailsModal = ({
+	isOpen,
+	onClose,
+	requisitionId,
+	triggerUpdateRequisition,
+}) => {
 	const { user } = useAuth();
 	const [loading, setLoading] = useState(false);
 	const [expanded, setExpanded] = useState(false);
@@ -64,6 +71,8 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
 	const [isChatModalOpen, setIsChatModalOpen] = useState(false);
 	const [accountCodes, setAccountCodes] = useState([]);
 	const [newAccountCode, setNewAccountCode] = useState(null);
+	const [rlertModalOpen, setRlertModalOpen] = useState(false);
+	const [itemId, setItemId] = useState("");
 
 	const getAccountCodes = async () => {
 		const response = await getAllAccountCodes();
@@ -83,6 +92,7 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
 			try {
 				const response = await getRequisitionById(requisitionId);
 				setRequisition(response.data);
+				setItemId(requisitionId);
 			} catch (error) {
 				console.error("Error fetching requisition details:", error);
 			} finally {
@@ -206,6 +216,20 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
 	const isValidRequisition =
 		requisition && requisition.title && requisition.status;
 
+	const markAsRetiredHandler = async () => {
+		try {
+			const res = await markAsRetired(itemId);
+			if (res.status === 200) {
+				triggerUpdateRequisition(res.data);
+				toast.success("Requisition marked as retired.");
+				setRlertModalOpen(false);
+			}
+		} catch (error) {
+			console.log("Error marking requisition as retired:", error.message);
+			toast.error("An error occurred. Please try again.");
+		}
+	};
+
 	return (
 		<>
 			<Modal open={isOpen} onClose={onClose}>
@@ -245,6 +269,21 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
 								<Typography variant="h6">Requisition Details</Typography>
 
 								<Box>
+									{/* Mark as Retired button */}
+									{requisition.retiredStatus === "requested" &&
+									requisition.status === "approved" &&
+									["tech", "finance", "financeReviewer"].includes(user.accessLevel) ? (
+										<Button
+											size="small"
+											variant="contained"
+											color="success"
+											onClick={() => {
+												setRlertModalOpen(true);
+											}}
+										>
+											Mark as Retired
+										</Button>
+									) : null}
 									{/* Chat button */}
 									<Button
 										size="small"
@@ -252,7 +291,7 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
 										color="info"
 										onClick={openChatModal}
 									>
-										Open Chat
+										Chat
 									</Button>
 
 									{/* Close details button */}
@@ -762,6 +801,14 @@ const RequisitionDetailsModal = ({ isOpen, onClose, requisitionId }) => {
 					/>
 				</Suspense>
 			)}
+
+			<AlertModal
+				open={rlertModalOpen}
+				onClose={() => setRlertModalOpen(false)}
+				title="Mark Requisition as Retired"
+				content="Are you sure you want to mark this requisition as retired?"
+				onConfirm={markAsRetiredHandler}
+			/>
 		</>
 	);
 };

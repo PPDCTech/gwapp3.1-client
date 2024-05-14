@@ -24,8 +24,6 @@ import {
 	PrinterIcon,
 	PencilSquareIcon,
 	ArrowUturnLeftIcon,
-	DocumentDuplicateIcon,
-	DocumentCheckIcon,
 	EyeIcon,
 } from "@heroicons/react/24/outline";
 import { STATUS_COLOR_TYPE } from "../../services/constants";
@@ -40,7 +38,6 @@ import { useAuth } from "../../hooks/use-auth";
 import {
 	deleteRequisition,
 	getRequisitionById,
-	markAsRetired,
 	sendBackRequisition,
 } from "../../services/api/requisition.api";
 import { getDateMDY } from "../../services/helpers";
@@ -69,10 +66,8 @@ export const RequisitionTable = ({
 	const [isReqDetailsOpen, setIsReqDetailsOpen] = useState(false);
 
 	const [isEditReqModalOpen, setEditReqModalOpen] = useState(false);
-	const [isRetireReqModalOpen, setRetireReqModalOpen] = useState(false);
 	const [selectedRequisition, setSelectedRequisition] = useState(null);
 	const [editMode, setEditMode] = useState(false);
-	const [retireMode, setRetireMode] = useState(false);
 
 	const handleChangePage = (event, newPage) => {
 		setPage(newPage);
@@ -92,25 +87,7 @@ export const RequisitionTable = ({
 		setIsChatModalOpen(false);
 	};
 
-	const [rlertModalOpen, setRlertModalOpen] = useState(false);
 	const [itemId, setItemId] = useState("");
-
-	const markAsRetiredHandler = async () => {
-		try {
-			const res = await markAsRetired(itemId);
-			if (res.status === 200) {
-				updateTableData();
-				toast.success("Requisition marked as retired.");
-				setRequisitions((prevRequisitions) =>
-					prevRequisitions.filter((req) => req._id !== itemId),
-				);
-				setRlertModalOpen(false);
-			}
-		} catch (error) {
-			console.log("Error marking requisition as retired:", error.message);
-			toast.error("An error occurred. Please try again.");
-		}
-	};
 
 	const openReqDetails = () => setIsReqDetailsOpen(true);
 
@@ -146,24 +123,10 @@ export const RequisitionTable = ({
 			console.log("Error getting single requisition:", error.message);
 		}
 	};
-	const handleOpenRetireModal = async (id) => {
-		try {
-			const req = await getRequisitionById(id);
-			setSelectedRequisition(req.data);
-			setRetireMode(true);
-			setRetireReqModalOpen(true);
-		} catch (error) {
-			console.log("Error getting single requisition:", error.message);
-		}
-	};
 
 	const handleCloseEditModal = () => {
 		setEditMode(false);
 		setEditReqModalOpen(false);
-	};
-	const handleCloseRetireModal = () => {
-		setRetireMode(false);
-		setRetireReqModalOpen(false);
 	};
 
 	const updateRequisition = (editedRequisition) => {
@@ -381,49 +344,7 @@ export const RequisitionTable = ({
 																	</MenuItem>
 																</Tooltip>
 															) : null}
-															{/* Request retire condition */}
-															{requisition.status === "approved" &&
-															(requisition.user.name === user.name ||
-																requisition.user.email === user.email ||
-																["tech"].includes(user.accessLevel)) ? (
-																<Tooltip placement="left-start" title="Retire">
-																	<MenuItem
-																		value="retire"
-																		onClick={() => handleOpenRetireModal(requisition._id)}
-																	>
-																		<ListItemIcon sx={{ width: "16px", height: "16px" }}>
-																			<DocumentDuplicateIcon />
-																		</ListItemIcon>
-																		<ListItemText
-																			primaryTypographyProps={{ fontSize: "small" }}
-																			primary="Request Retire"
-																		/>
-																	</MenuItem>
-																</Tooltip>
-															) : null}
-															{/* Mark as retired condition */}
-															{requisition.status === "approved" &&
-															["tech", "finance", "financeReviewer"].includes(
-																user.accessLevel,
-															) ? (
-																<Tooltip placement="left-start" title="Mark as Retired">
-																	<MenuItem
-																		value="Mark as Retired"
-																		onClick={() => {
-																			setRlertModalOpen(true);
-																			setItemId(requisition._id);
-																		}}
-																	>
-																		<ListItemIcon sx={{ width: "16px", height: "16px" }}>
-																			<DocumentCheckIcon />
-																		</ListItemIcon>
-																		<ListItemText
-																			primaryTypographyProps={{ fontSize: "small" }}
-																			primary="Mark as Retired"
-																		/>
-																	</MenuItem>
-																</Tooltip>
-															) : null}
+															
 															{/* Conditions for Printing */}
 															{requisition.status === "approved" &&
 															(requisition.user.name === user.name ||
@@ -503,14 +424,6 @@ export const RequisitionTable = ({
 				reqId={selectedId}
 			/>
 			<AlertModal
-				open={rlertModalOpen}
-				onClose={() => setRlertModalOpen(false)}
-				title="Mark Requisition as Retired"
-				content="Are you sure you want to mark this requisition as retired?"
-				onConfirm={markAsRetiredHandler}
-			/>
-
-			<AlertModal
 				open={dlertModalOpen}
 				onClose={() => setDlertModalOpen(false)}
 				title="Delete Requisition"
@@ -522,11 +435,12 @@ export const RequisitionTable = ({
 				isOpen={isReqDetailsOpen}
 				requisitionId={selectedId}
 				onClose={closeReqDetails}
+				triggerUpdateRequisition={updateRequisition}
 			/>
 			<CreateReqModal
-				open={isEditReqModalOpen ? isEditReqModalOpen : isRetireReqModalOpen}
-				retireMode={retireMode}
-				onClose={retireMode ? handleCloseRetireModal : handleCloseEditModal}
+				open={isEditReqModalOpen}
+				retireMode={false}
+				onClose={handleCloseEditModal}
 				triggerUpdateRequisition={updateRequisition}
 				isEditMode={editMode}
 				requisitionData={selectedRequisition ? selectedRequisition : null}
