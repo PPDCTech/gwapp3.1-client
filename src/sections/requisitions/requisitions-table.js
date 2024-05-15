@@ -198,6 +198,7 @@ export const RequisitionTable = ({
 											<TableCell sx={{ width: "15%" }}>Type</TableCell>
 											<TableCell sx={{ width: "10%" }}>Amount</TableCell>
 											<TableCell sx={{ width: "15%" }}>Date</TableCell>
+											<TableCell sx={{ width: "15%" }}>SN</TableCell>
 											<TableCell sx={{ width: "10%" }}>Status</TableCell>
 											<TableCell
 												sx={{
@@ -234,6 +235,9 @@ export const RequisitionTable = ({
 													{formatAmount(Number(requisition?.total))}
 												</TableCell>
 												<TableCell>{getDateMDY(requisition.date)}</TableCell>
+												<TableCell>
+													{requisition?.serialNumber ? requisition?.serialNumber : "N/A"}
+												</TableCell>
 												<TableCell>
 													<SeverityPill
 														color={STATUS_COLOR_TYPE[requisition.status || "pending"]}
@@ -344,7 +348,7 @@ export const RequisitionTable = ({
 																	</MenuItem>
 																</Tooltip>
 															) : null}
-															
+
 															{/* Conditions for Printing */}
 															{requisition.status === "approved" &&
 															(requisition.user.name === user.name ||

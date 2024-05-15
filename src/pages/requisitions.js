@@ -47,14 +47,13 @@ const Requisitions = () => {
 	const [selectedTab, setSelectedTab] = useState("");
 	const [isCreateReqModalOpen, setCreateReqModalOpen] = useState(false);
 	const [selectedRequisition] = useState(null);
-  const [editMode, setEditMode] = useState(false);
-  
-  useEffect(() => {
-    if (tab) {
-      setSelectedTab(tab);
-    }
-  }, [tab]);
+	const [editMode, setEditMode] = useState(false);
 
+	useEffect(() => {
+		if (tab) {
+			setSelectedTab(tab);
+		}
+	}, [tab]);
 
 	const handleTabChange = (newValue) => {
 		setSelectedTab(newValue);
@@ -123,14 +122,24 @@ const Requisitions = () => {
 	};
 
 	const handleSubmitFilter = async (filters) => {
-		const { user_email, type, status, startDate, endDate } = filters;
+		const {
+			user_email,
+			type,
+			status,
+			startDate,
+			endDate,
+			retiredStatus,
+			serialNumber,
+		} = filters;
 
 		if (
 			user_email !== "" ||
 			type !== "" ||
 			status !== "" ||
 			startDate !== "" ||
-			endDate !== ""
+			endDate !== "" ||
+			retiredStatus !== "" ||
+			serialNumber !== ""
 		) {
 			const response = await searchFilterRequisitions(filters);
 			setFilteredRequisitions(response.data.requisitions);
@@ -241,9 +250,9 @@ const Requisitions = () => {
 								setRequisitions={setRequisitions}
 								onEditRequisition={handleEditRequisition}
 								updateTableData={fetchRequisitions}
-                reqId={reqId}
-                action={action}
-                tab={tab}
+								reqId={reqId}
+								action={action}
+								tab={tab}
 							/>
 						</Grid>
 					</Grid>

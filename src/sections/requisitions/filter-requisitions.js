@@ -40,6 +40,8 @@ export const FilterRequisitions = ({ onSubmitFilters }) => {
 		status: "",
 		startDate: "",
 		endDate: "",
+		retiredStatus: "",
+		serialNumber: "",
 	});
 
 	useEffect(() => {
@@ -69,6 +71,8 @@ export const FilterRequisitions = ({ onSubmitFilters }) => {
 				status: "",
 				startDate: "",
 				endDate: "",
+				retiredStatus: "",
+				serialNumber: "",
 			});
 		} catch (error) {
 			console.error(error.message);
@@ -267,7 +271,7 @@ export const FilterRequisitions = ({ onSubmitFilters }) => {
 									label="Type"
 								>
 									<MenuItem value="Fund Req">Fund Requisition</MenuItem>
-									<MenuItem value="Advance Payment">Advance Payment</MenuItem>
+									<MenuItem value="Advance">Advance</MenuItem>
 									<MenuItem value="Petty Cash">Petty Cash</MenuItem>
 									<MenuItem value="reimbursement">Reimbursement</MenuItem>
 								</Select>
@@ -291,6 +295,25 @@ export const FilterRequisitions = ({ onSubmitFilters }) => {
 									<MenuItem value="checked">Finance Checked</MenuItem>
 									<MenuItem value="reviewed">Reviewed</MenuItem>
 									<MenuItem value="approved">Approved</MenuItem>
+								</Select>
+							</FormControl>
+						</Grid>
+						<Grid item xs={6} md={4}>
+							<FormControl fullWidth>
+								<InputLabel>Retirement</InputLabel>
+								<Select
+									value={filters.retiredStatus}
+									onChange={(event) =>
+										setFilters((prevFilters) => ({
+											...prevFilters,
+											retiredStatus: event.target.value,
+										}))
+									}
+									label="Retirement"
+								>
+									<MenuItem value="pending">Pending</MenuItem>
+									<MenuItem value="requested">Requested</MenuItem>
+									<MenuItem value="retired">Retired</MenuItem>
 								</Select>
 							</FormControl>
 						</Grid>
@@ -341,6 +364,19 @@ export const FilterRequisitions = ({ onSubmitFilters }) => {
 								label="End Date"
 								name="endDate"
 								value={filters.endDate}
+								onChange={handleChangeFilter}
+								InputLabelProps={{
+									shrink: true,
+								}}
+							/>
+						</Grid>
+						<Grid item xs={6} md={4}>
+							<TextField
+								fullWidth
+								type="text"
+								label="Serial Number"
+								name="serialNumber"
+								value={filters.serialNumber}
 								onChange={handleChangeFilter}
 								InputLabelProps={{
 									shrink: true,

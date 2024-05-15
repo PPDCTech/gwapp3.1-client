@@ -303,18 +303,36 @@ const RequisitionDetailsModal = ({
 								</Box>
 							</Box>
 							<Grid container spacing={3} padding={2}>
-								<Grid item xs={4}>
-									<Typography variant="subtitle2">Type</Typography>
-									<Typography variant="h6">{requisition.type}</Typography>
+								<Grid item xs={3}>
+									<Typography variant="subtitle2" align="center">
+										<strong>Type</strong>
+									</Typography>
+									<Typography variant="subtitle2" align="center">
+										{requisition.type}
+									</Typography>
 								</Grid>
-								<Grid item xs={4}>
-									<Typography variant="subtitle2">Raised By</Typography>
-									<Typography variant="h6">{requisition.user.name}</Typography>
+								<Grid item xs={3}>
+									<Typography variant="subtitle2" align="center">
+										<strong>Raised By</strong>
+									</Typography>
+									<Typography variant="subtitle2" align="center">
+										{requisition.user.name}
+									</Typography>
 								</Grid>
-								<Grid item xs={4}>
-									<Typography variant="subtitle2">Date</Typography>
-									<Typography variant="h6">
+								<Grid item xs={3}>
+									<Typography variant="subtitle2" align="center">
+										<strong>Date</strong>
+									</Typography>
+									<Typography variant="subtitle2" align="center">
 										{getDateForPrintSpace(requisition.date)}
+									</Typography>
+								</Grid>
+								<Grid item xs={3}>
+									<Typography variant="subtitle2" align="center">
+										<strong>Serial Number</strong>
+									</Typography>
+									<Typography variant="subtitle2" align="center">
+										{requisition.serialNumber || "N/A"}
 									</Typography>
 								</Grid>
 							</Grid>
