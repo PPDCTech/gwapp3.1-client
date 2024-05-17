@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Modal, Grid } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -14,6 +14,14 @@ const AuthCodeInputModal = ({ openModal, setOpenModal, regToken }) => {
 	const [loading, setLoading] = useState(false);
 	const navigate = useNavigate();
 	const auth = useAuth();
+
+	// auto submit the form when the value is 6 characters long
+	useEffect(() => {
+		if (value.length === 6) {
+			handleSubmit();
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [value]);
 
 	const handleSubmit = async () => {
 		setLoading(true);
@@ -80,7 +88,7 @@ const AuthCodeInputModal = ({ openModal, setOpenModal, regToken }) => {
 							color="info"
 							variant="contained"
 						>
-							{loading ? "Please wait..." : "Verify"}
+							{loading ? "Verifying..." : "Verify"}
 						</Button>
 					</Grid>
 				</Grid>

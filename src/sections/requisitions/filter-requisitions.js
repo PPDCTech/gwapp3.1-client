@@ -21,12 +21,18 @@ import DownloadForOfflineOutlinedIcon from "@mui/icons-material/DownloadForOffli
 import DownloadingOutlinedIcon from "@mui/icons-material/DownloadingOutlined";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
-import { getAllApprovedRequisitions } from "../../services/api/requisition.api";
+import { getAllApprovedRequisitions, searchFilterRequisitions } from "../../services/api/requisition.api";
 import { currentDate, getDateYearMonthDay } from "../../services/helpers";
 import { CSVLink } from "react-csv";
 import { useAuth } from "../../hooks/use-auth";
 
-export const FilterRequisitions = ({ onSubmitFilters }) => {
+export const FilterRequisitions = ({
+	setFilteredRequisitions,
+	filteredPage,
+	filteredLimit,
+	setFilteredTotalCount,
+	setLoading,
+}) => {
 	const [users, setUsers] = useState([]);
 	const [downloadingCSV, setDownloadingCSV] = useState(false);
 	const [csvData, setCsvData] = useState([]);
@@ -43,6 +49,40 @@ export const FilterRequisitions = ({ onSubmitFilters }) => {
 		retiredStatus: "",
 		serialNumber: "",
 	});
+
+	const handleSubmitFilter = async () => {
+		setLoading(true);
+		const {
+			user_email,
+			type,
+			status,
+			startDate,
+			endDate,
+			retiredStatus,
+			serialNumber,
+		} = filters;
+
+		if (
+			user_email !== "" ||
+			type !== "" ||
+			status !== "" ||
+			startDate !== "" ||
+			endDate !== "" ||
+			retiredStatus !== "" ||
+			serialNumber !== ""
+		) {
+			const response = await searchFilterRequisitions(
+				filters,
+				filteredPage,
+				filteredLimit,
+			);
+			setFilteredRequisitions(response.data.requisitions);
+			setFilteredTotalCount(response.data.totalCount);
+			setLoading(false);
+		} else {
+			setFilteredRequisitions([]);
+		}
+	};
 
 	useEffect(() => {
 		const usersList = async () => {
@@ -80,12 +120,11 @@ export const FilterRequisitions = ({ onSubmitFilters }) => {
 	};
 
 	useEffect(() => {
-		onSubmitFilters(filters);
-	}, [filters, onSubmitFilters]);
-
-	const submitFilterRequisitions = () => {
-		onSubmitFilters(filters);
-	};
+		if (filteredPage || filteredLimit) {
+			handleSubmitFilter();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [filteredPage, filteredLimit]);
 
 	const handleCSVDownload = async () => {
 		try {
@@ -396,7 +435,7 @@ export const FilterRequisitions = ({ onSubmitFilters }) => {
 								size="small"
 								color="info"
 								variant="outlined"
-								onClick={submitFilterRequisitions}
+								onClick={() => handleSubmitFilter()}
 							>
 								<ManageSearchIcon />
 								Search

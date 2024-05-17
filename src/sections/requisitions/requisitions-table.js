@@ -57,10 +57,12 @@ export const RequisitionTable = ({
 	updateTableData,
 	reqId,
 	action,
+	page,
+	limit,
+	onPageChange,
+	onLimitChange,
 }) => {
 	const { user } = useAuth();
-	const [page, setPage] = useState(0);
-	const [rowsPerpage, setRowsPerpage] = useState(10);
 	const [isChatModalOpen, setIsChatModalOpen] = useState(false);
 	const [selectedId, setSelectedId] = useState("");
 	const [isReqDetailsOpen, setIsReqDetailsOpen] = useState(false);
@@ -68,15 +70,6 @@ export const RequisitionTable = ({
 	const [isEditReqModalOpen, setEditReqModalOpen] = useState(false);
 	const [selectedRequisition, setSelectedRequisition] = useState(null);
 	const [editMode, setEditMode] = useState(false);
-
-	const handleChangePage = (event, newPage) => {
-		setPage(newPage);
-	};
-
-	const handleChangeRowsPerPage = (event) => {
-		setRowsPerpage(parseInt(event.target.value, 10));
-		setPage(0);
-	};
 
 	const openChatModal = (reqId) => {
 		setSelectedId(reqId);
@@ -184,11 +177,11 @@ export const RequisitionTable = ({
 				</Box>
 			) : (
 				<>
-					{(!requisitions || requisitions.length === 0) && (
+					{(!requisitions || requisitions?.length === 0) && (
 						<Typography sx={{ mt: 2 }}>No requisitions found.</Typography>
 					)}
 
-					{requisitions && requisitions.length > 0 && (
+					{requisitions && requisitions?.length > 0 && (
 						<>
 							<TableContainer sx={{ mt: 2 }}>
 								<Table>
@@ -213,8 +206,8 @@ export const RequisitionTable = ({
 										</TableRow>
 									</TableHead>
 									<TableBody>
-										{requisitions.map((requisition) => (
-											<TableRow key={requisition._id}>
+										{requisitions && requisitions?.map((requisition) => (
+											<TableRow key={requisition?._id}>
 												<TableCell
 													sx={{
 														cursor: "pointer",
@@ -223,26 +216,26 @@ export const RequisitionTable = ({
 															boxShadow: "inset 0 0 5px rgba(0,0,0,0.1)",
 														},
 													}}
-													onClick={() => handleOpenReqDetails(requisition._id)}
+													onClick={() => handleOpenReqDetails(requisition?._id)}
 												>
-													<Tooltip placement="left-start" title={requisition.title}>
-														<>{shortenString(requisition.title, 40)}</>
+													<Tooltip placement="left-start" title={requisition?.title}>
+														<>{shortenString(requisition?.title, 40)}</>
 													</Tooltip>
 												</TableCell>
-												<TableCell>{requisition.type}</TableCell>
+												<TableCell>{requisition?.type}</TableCell>
 												<TableCell>
 													{getCurrencySign(requisition?.currency)}
 													{formatAmount(Number(requisition?.total))}
 												</TableCell>
-												<TableCell>{getDateMDY(requisition.date)}</TableCell>
+												<TableCell>{getDateMDY(requisition?.date)}</TableCell>
 												<TableCell>
 													{requisition?.serialNumber ? requisition?.serialNumber : "N/A"}
 												</TableCell>
 												<TableCell>
 													<SeverityPill
-														color={STATUS_COLOR_TYPE[requisition.status || "pending"]}
+														color={STATUS_COLOR_TYPE[requisition?.status || "pending"]}
 													>
-														{requisition.status}
+														{requisition?.status}
 													</SeverityPill>
 												</TableCell>
 
@@ -285,7 +278,7 @@ export const RequisitionTable = ({
 													>
 														<MenuList sx={{ border: "none" }}>
 															<Tooltip placement="left-start" title="View details">
-																<MenuItem onClick={() => handleOpenReqDetails(requisition._id)}>
+																<MenuItem onClick={() => handleOpenReqDetails(requisition?._id)}>
 																	<ListItemIcon sx={{ width: "16px", height: "16px" }}>
 																		<EyeIcon />
 																	</ListItemIcon>
@@ -296,7 +289,7 @@ export const RequisitionTable = ({
 																</MenuItem>
 															</Tooltip>
 															<Tooltip placement="left-start" title="Messages">
-																<MenuItem onClick={() => openChatModal(requisition._id)}>
+																<MenuItem onClick={() => openChatModal(requisition?._id)}>
 																	<ListItemIcon sx={{ width: "16px", height: "16px" }}>
 																		<ChatBubbleOvalLeftEllipsisIcon />
 																	</ListItemIcon>
@@ -307,14 +300,14 @@ export const RequisitionTable = ({
 																</MenuItem>
 															</Tooltip>
 															{/* Send back icon conditions */}
-															{requisition.status !== "reviewed" &&
-															requisition.status !== "approved" &&
-															user.accessLevel !== "user" &&
-															user.accessLevel !== "userManager" &&
-															requisition.attentionTo.includes(user.email) ? (
+															{requisition?.status !== "reviewed" &&
+															requisition?.status !== "approved" &&
+															user?.accessLevel !== "user" &&
+															user?.accessLevel !== "userManager" &&
+															requisition?.attentionTo.includes(user?.email) ? (
 																<Tooltip placement="left-start" title="Send Back">
 																	<MenuItem
-																		onClick={(e) => handleSendBackRequisition(e, requisition._id)}
+																		onClick={(e) => handleSendBackRequisition(e, requisition?._id)}
 																	>
 																		<ListItemIcon sx={{ width: "16px", height: "16px" }}>
 																			<ArrowUturnLeftIcon />
@@ -327,16 +320,16 @@ export const RequisitionTable = ({
 																</Tooltip>
 															) : null}
 															{/* Edit condition */}
-															{requisition.status !== "reviewed" &&
-															requisition.status !== "approved" &&
-															requisition.status !== "deleted" &&
-															requisition.retiredStatus !== "retired" &&
-															(requisition.user.name === user.name ||
-																requisition.user.email === user.email) ? (
+															{requisition?.status !== "reviewed" &&
+															requisition?.status !== "approved" &&
+															requisition?.status !== "deleted" &&
+															requisition?.retiredStatus !== "retired" &&
+															(requisition?.user?.name === user?.name ||
+																requisition?.user?.email === user?.email) ? (
 																<Tooltip placement="left-start" title="Edit">
 																	<MenuItem
 																		value="edit"
-																		onClick={() => handleOpenEditModal(requisition._id)}
+																		onClick={() => handleOpenEditModal(requisition?._id)}
 																	>
 																		<ListItemIcon sx={{ width: "16px", height: "16px" }}>
 																			<PencilSquareIcon />
@@ -350,19 +343,19 @@ export const RequisitionTable = ({
 															) : null}
 
 															{/* Conditions for Printing */}
-															{requisition.status === "approved" &&
-															(requisition.user.name === user.name ||
-																requisition.user.email === user.email ||
+															{requisition?.status === "approved" &&
+															(requisition?.user?.name === user?.name ||
+																requisition?.user?.email === user?.email ||
 																["tech", "finance", "financeReviewer"].includes(
-																	user.accessLevel,
+																	user?.accessLevel,
 																)) ? (
 																<Tooltip placement="left-start" title="Print">
 																	<MenuItem
 																		value="print"
-																		onClick={() => handlePrint(requisition._id)}
+																		onClick={() => handlePrint(requisition?._id)}
 																	>
 																		<ListItemIcon sx={{ width: "16px", height: "16px" }}>
-																			{printLoading[requisition._id] ? (
+																			{printLoading[requisition?._id] ? (
 																				<CircularProgress size={20} />
 																			) : (
 																				<PrinterIcon />
@@ -376,18 +369,18 @@ export const RequisitionTable = ({
 																</Tooltip>
 															) : null}
 															{/* Delete condition */}
-															{requisition.status !== "approved" &&
-															requisition.status !== "reviewed" &&
-															requisition.status !== "deleted" &&
-															requisition.status !== "retired" &&
-															(requisition.user.name === user.name ||
-																requisition.user.email === user.email) ? (
+															{requisition?.status !== "approved" &&
+															requisition?.status !== "reviewed" &&
+															requisition?.status !== "deleted" &&
+															requisition?.status !== "retired" &&
+															(requisition?.user?.name === user?.name ||
+																requisition?.user?.email === user?.email) ? (
 																<Tooltip placement="left-start" title="Delete">
 																	<MenuItem
 																		value="delete"
 																		onClick={() => {
 																			setDlertModalOpen(true);
-																			setItemId(requisition._id);
+																			setItemId(requisition?._id);
 																		}}
 																	>
 																		<ListItemIcon sx={{ width: "16px", height: "16px" }}>
@@ -413,10 +406,10 @@ export const RequisitionTable = ({
 								rowsPerPageOptions={[5, 10, 25]}
 								component="div"
 								count={Number(totalCount)}
-								rowsPerPage={rowsPerpage}
+								rowsPerPage={limit}
 								page={page}
-								onPageChange={handleChangePage}
-								onRowsPerPageChange={handleChangeRowsPerPage}
+								onPageChange={onPageChange}
+								onRowsPerPageChange={onLimitChange}
 							/>
 						</>
 					)}

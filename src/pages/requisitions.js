@@ -20,7 +20,6 @@ import {
 	getAllRequisitions,
 	getAttentionedToRequisitions,
 	getUserRequisitions,
-	searchFilterRequisitions,
 } from "../services/api/requisition.api";
 import { FilterRequisitions } from "../sections/requisitions/filter-requisitions";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
@@ -48,6 +47,11 @@ const Requisitions = () => {
 	const [isCreateReqModalOpen, setCreateReqModalOpen] = useState(false);
 	const [selectedRequisition] = useState(null);
 	const [editMode, setEditMode] = useState(false);
+	const [page, setPage] = useState(1);
+	const [limit, setLimit] = useState(10);
+	const [filteredPage, setFilteredPage] = useState(1);
+	const [filteredLimit, setFilteredLimit] = useState(10);
+	const [filteredTotalCount, setFilteredTotalCount] = useState(0);
 
 	useEffect(() => {
 		if (tab) {
@@ -77,19 +81,23 @@ const Requisitions = () => {
 			switch (selectedTab) {
 				case "myRequisitions":
 					fetchedRequisitions = [];
-					const myReqs = await getUserRequisitions(user?._id);
+					const myReqs = await getUserRequisitions(user?._id, page, limit);
 					fetchedRequisitions = myReqs.data.requisitions;
 					count = myReqs.data.totalCount;
 					break;
 				case "forMyAttention":
 					fetchedRequisitions = [];
-					const myAttentionReqs = await getAttentionedToRequisitions(user?.email);
+					const myAttentionReqs = await getAttentionedToRequisitions(
+						user?.email,
+						page,
+						limit,
+					);
 					fetchedRequisitions = myAttentionReqs.data.requisitions;
 					count = myAttentionReqs.data.totalCount;
 					break;
 				case "allRequisitions":
 					fetchedRequisitions = [];
-					const allReqs = await getAllRequisitions();
+					const allReqs = await getAllRequisitions(page, limit);
 					fetchedRequisitions = allReqs.data.requisitions;
 					count = allReqs.data.totalCount;
 					break;
@@ -104,11 +112,11 @@ const Requisitions = () => {
 		} finally {
 			setLoading(false);
 		}
-	}, [selectedTab, user]);
+	}, [selectedTab, user, page, limit]);
 
 	useEffect(() => {
 		fetchRequisitions();
-	}, [selectedTab, user, fetchRequisitions]);
+	}, [selectedTab, user, fetchRequisitions, page, limit]);
 
 	const handleOpenCreateModal = () => {
 		setEditMode(false);
@@ -121,38 +129,29 @@ const Requisitions = () => {
 		fetchRequisitions();
 	};
 
-	const handleSubmitFilter = async (filters) => {
-		const {
-			user_email,
-			type,
-			status,
-			startDate,
-			endDate,
-			retiredStatus,
-			serialNumber,
-		} = filters;
-
-		if (
-			user_email !== "" ||
-			type !== "" ||
-			status !== "" ||
-			startDate !== "" ||
-			endDate !== "" ||
-			retiredStatus !== "" ||
-			serialNumber !== ""
-		) {
-			const response = await searchFilterRequisitions(filters);
-			setFilteredRequisitions(response.data.requisitions);
-		} else {
-			setFilteredRequisitions([]);
-		}
-	};
-
 	const handleEditRequisition = (editedRequisition) => {
 		const updatedRequisitions = requisitions.map((req) =>
 			req._id === editedRequisition._id ? editedRequisition : req,
 		);
 		setRequisitions(updatedRequisitions);
+	};
+
+	const handlePageChange = (event, newPage) => {
+		setPage(newPage);
+	};
+
+	const handleLimitChange = (event) => {
+		setLimit(parseInt(event.target.value, 10));
+		setPage(1);
+	};
+
+	const handleFilteredPageChange = (event, newPage) => {
+		setFilteredPage(newPage);
+	};
+
+	const handleFilteredLimitChange = (event) => {
+		setFilteredLimit(parseInt(event.target.value, 10));
+		setFilteredPage(1);
 	};
 
 	return (
@@ -209,7 +208,13 @@ const Requisitions = () => {
 						</Grid>
 
 						<Grid item xs={12}>
-							<FilterRequisitions onSubmitFilters={handleSubmitFilter} />
+							<FilterRequisitions
+								setLoading={setLoading}
+								filteredLimit={filteredLimit}
+								filteredPage={filteredPage}
+								setFilteredTotalCount={setFilteredTotalCount}
+								setFilteredRequisitions={setFilteredRequisitions}
+							/>
 						</Grid>
 
 						<Grid item xs={12}>
@@ -240,12 +245,11 @@ const Requisitions = () => {
 								)}
 							</div>
 							<RequisitionTable
-								requisitions={
-									// requisitions
-									filteredRequisitions.length > 0 ? filteredRequisitions : requisitions
-								}
+								requisitions={filteredRequisitions.length > 0 ? filteredRequisitions : requisitions}
 								loading={loading}
-								totalCount={totalCount}
+								totalCount={
+									filteredRequisitions.length > 0 ? filteredTotalCount : totalCount
+								}
 								currentTab={selectedTab}
 								setRequisitions={setRequisitions}
 								onEditRequisition={handleEditRequisition}
@@ -253,6 +257,18 @@ const Requisitions = () => {
 								reqId={reqId}
 								action={action}
 								tab={tab}
+								page={filteredRequisitions.length > 0 ? filteredPage : page}
+								limit={filteredRequisitions.length > 0 ? filteredLimit : limit}
+								onPageChange={
+									filteredRequisitions.length > 0
+										? handleFilteredPageChange
+										: handlePageChange
+								}
+								onLimitChange={
+									filteredRequisitions.length > 0
+										? handleFilteredLimitChange
+										: handleLimitChange
+								}
 							/>
 						</Grid>
 					</Grid>
