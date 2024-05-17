@@ -12,13 +12,15 @@ import {
 	Box,
 	ListItemIcon,
 	ListItemText,
+	Typography
 } from "@mui/material";
 import { DocumentDuplicateIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { getCurrencySign } from "../../utils/format-currency";
-import { formatAmount } from "../../services/helpers";
+import { formatAmount, capitalizeFirstLetter } from "../../services/helpers";
 import { getRequisitionById } from "../../services/api/requisition.api";
 import RequisitionDetailsModal from "../../components/req-details-modal";
 import CreateReqModal from "../../components/create-req";
+import { STATUS_COLOR_TYPE } from "../../services/constants";
 
 const RetirementsTable = ({ data = [], reloadData }) => {
 	const [page] = useState(0);
@@ -94,8 +96,9 @@ const RetirementsTable = ({ data = [], reloadData }) => {
 					<Table>
 						<TableHead>
 							<TableRow>
-								<TableCell sx={{ width: "60%" }}>Title</TableCell>
+								<TableCell sx={{ width: "40%" }}>Title</TableCell>
 								<TableCell sx={{ width: "20%" }}>Amount</TableCell>
+								<TableCell sx={{ width: "20%" }}>Status</TableCell>
 								<TableCell sx={{ width: "20%" }}>Action</TableCell>
 							</TableRow>
 						</TableHead>
@@ -110,7 +113,28 @@ const RetirementsTable = ({ data = [], reloadData }) => {
 										{getCurrencySign(row?.currency)}
 										{formatAmount(Number(row?.total))}
 									</TableCell>
-									<TableCell sx={{ display: "flex", gap: "8px" }}>
+									<TableCell>
+										<Typography
+											variant="body2"
+											sx={{
+												color: (theme) =>
+													STATUS_COLOR_TYPE[row.retiredStatus || "cancelled"] &&
+													theme.palette.text.primary,
+												backgroundColor: (theme) =>
+													STATUS_COLOR_TYPE[row.retiredStatus || "cancelled"] &&
+													theme.palette[
+														STATUS_COLOR_TYPE[row.retiredStatus || "cancelled"]
+													].light,
+												display: "inline",
+												marginRight: "8px",
+												padding: "4px 8px",
+												borderRadius: "4px",
+											}}
+										>
+											{capitalizeFirstLetter(row.retiredStatus || "controlled")}
+										</Typography>
+									</TableCell>
+									<TableCell sx={{ display: "flex", gap: "5px" }}>
 										<Button
 											size="small"
 											color="default"

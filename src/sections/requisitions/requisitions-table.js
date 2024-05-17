@@ -187,11 +187,11 @@ export const RequisitionTable = ({
 								<Table>
 									<TableHead>
 										<TableRow>
+											<TableCell sx={{ width: "15%" }}>SN</TableCell>
 											<TableCell sx={{ width: "35%" }}>Title</TableCell>
 											<TableCell sx={{ width: "15%" }}>Type</TableCell>
 											<TableCell sx={{ width: "10%" }}>Amount</TableCell>
 											<TableCell sx={{ width: "15%" }}>Date</TableCell>
-											<TableCell sx={{ width: "15%" }}>SN</TableCell>
 											<TableCell sx={{ width: "10%" }}>Status</TableCell>
 											<TableCell
 												sx={{
@@ -206,198 +206,203 @@ export const RequisitionTable = ({
 										</TableRow>
 									</TableHead>
 									<TableBody>
-										{requisitions && requisitions?.map((requisition) => (
-											<TableRow key={requisition?._id}>
-												<TableCell
-													sx={{
-														cursor: "pointer",
-														"&:hover": {
-															backgroundColor: "#F3F4F6",
-															boxShadow: "inset 0 0 5px rgba(0,0,0,0.1)",
-														},
-													}}
-													onClick={() => handleOpenReqDetails(requisition?._id)}
-												>
-													<Tooltip placement="left-start" title={requisition?.title}>
-														<>{shortenString(requisition?.title, 40)}</>
-													</Tooltip>
-												</TableCell>
-												<TableCell>{requisition?.type}</TableCell>
-												<TableCell>
-													{getCurrencySign(requisition?.currency)}
-													{formatAmount(Number(requisition?.total))}
-												</TableCell>
-												<TableCell>{getDateMDY(requisition?.date)}</TableCell>
-												<TableCell>
-													{requisition?.serialNumber ? requisition?.serialNumber : "N/A"}
-												</TableCell>
-												<TableCell>
-													<SeverityPill
-														color={STATUS_COLOR_TYPE[requisition?.status || "pending"]}
-													>
-														{requisition?.status}
-													</SeverityPill>
-												</TableCell>
-
-												{/* Action column */}
-												<TableCell>
-													<Select
+										{requisitions &&
+											requisitions?.map((requisition) => (
+												<TableRow key={requisition?._id}>
+													<TableCell>
+														{requisition?.serialNumber ? requisition?.serialNumber : "N/A"}
+													</TableCell>
+													<TableCell
 														sx={{
-															"& .MuiOutlinedInput-root": {
-																border: "none",
-															},
-															"& .MuiOutlinedInput-notchedOutline": {
-																border: "none",
-															},
-															"&:hover .MuiOutlinedInput-notchedOutline": {
-																border: "none",
-															},
-															"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-																border: "none",
-															},
-															"& .MuiFilledInput-underline:after": {
-																border: "none",
-															},
-															"& .MuiFilledInput-underline:before": {
-																border: "none",
-															},
-															"&:hover .MuiFilledInput-underline:before": {
-																border: "none",
-															},
-															"& .MuiFilledInput-underline.Mui-focused:before": {
-																border: "none",
+															cursor: "pointer",
+															"&:hover": {
+																backgroundColor: "#F3F4F6",
+																boxShadow: "inset 0 0 5px rgba(0,0,0,0.1)",
 															},
 														}}
-														IconComponent={MoreVertIcon}
-														renderValue={(value) => (
-															<span>
-																<MoreVertIcon />
-																{value}
-															</span>
-														)}
+														onClick={() => handleOpenReqDetails(requisition?._id)}
 													>
-														<MenuList sx={{ border: "none" }}>
-															<Tooltip placement="left-start" title="View details">
-																<MenuItem onClick={() => handleOpenReqDetails(requisition?._id)}>
-																	<ListItemIcon sx={{ width: "16px", height: "16px" }}>
-																		<EyeIcon />
-																	</ListItemIcon>
-																	<ListItemText
-																		primaryTypographyProps={{ fontSize: "small" }}
-																		primary="View Details"
-																	/>
-																</MenuItem>
-															</Tooltip>
-															<Tooltip placement="left-start" title="Messages">
-																<MenuItem onClick={() => openChatModal(requisition?._id)}>
-																	<ListItemIcon sx={{ width: "16px", height: "16px" }}>
-																		<ChatBubbleOvalLeftEllipsisIcon />
-																	</ListItemIcon>
-																	<ListItemText
-																		primaryTypographyProps={{ fontSize: "small" }}
-																		primary="Messages"
-																	/>
-																</MenuItem>
-															</Tooltip>
-															{/* Send back icon conditions */}
-															{requisition?.status !== "reviewed" &&
-															requisition?.status !== "approved" &&
-															user?.accessLevel !== "user" &&
-															user?.accessLevel !== "userManager" &&
-															requisition?.attentionTo.includes(user?.email) ? (
-																<Tooltip placement="left-start" title="Send Back">
-																	<MenuItem
-																		onClick={(e) => handleSendBackRequisition(e, requisition?._id)}
-																	>
-																		<ListItemIcon sx={{ width: "16px", height: "16px" }}>
-																			<ArrowUturnLeftIcon />
-																		</ListItemIcon>
-																		<ListItemText
-																			primaryTypographyProps={{ fontSize: "small" }}
-																			primary="Send Back"
-																		/>
-																	</MenuItem>
-																</Tooltip>
-															) : null}
-															{/* Edit condition */}
-															{requisition?.status !== "reviewed" &&
-															requisition?.status !== "approved" &&
-															requisition?.status !== "deleted" &&
-															requisition?.retiredStatus !== "retired" &&
-															(requisition?.user?.name === user?.name ||
-																requisition?.user?.email === user?.email) ? (
-																<Tooltip placement="left-start" title="Edit">
-																	<MenuItem
-																		value="edit"
-																		onClick={() => handleOpenEditModal(requisition?._id)}
-																	>
-																		<ListItemIcon sx={{ width: "16px", height: "16px" }}>
-																			<PencilSquareIcon />
-																		</ListItemIcon>
-																		<ListItemText
-																			primaryTypographyProps={{ fontSize: "small" }}
-																			primary="Edit"
-																		/>
-																	</MenuItem>
-																</Tooltip>
-															) : null}
+														<Tooltip placement="left-start" title={requisition?.title}>
+															<>{shortenString(requisition?.title, 40)}</>
+														</Tooltip>
+													</TableCell>
+													<TableCell>{requisition?.type}</TableCell>
+													<TableCell>
+														{getCurrencySign(requisition?.currency)}
+														{formatAmount(Number(requisition?.total))}
+													</TableCell>
+													<TableCell>{getDateMDY(requisition?.date)}</TableCell>
+													<TableCell>
+														<SeverityPill
+															color={STATUS_COLOR_TYPE[requisition?.status || "pending"]}
+														>
+															{requisition?.status}
+														</SeverityPill>
+													</TableCell>
 
-															{/* Conditions for Printing */}
-															{requisition?.status === "approved" &&
-															(requisition?.user?.name === user?.name ||
-																requisition?.user?.email === user?.email ||
-																["tech", "finance", "financeReviewer"].includes(
-																	user?.accessLevel,
-																)) ? (
-																<Tooltip placement="left-start" title="Print">
+													{/* Action column */}
+													<TableCell>
+														<Select
+															sx={{
+																"& .MuiOutlinedInput-root": {
+																	border: "none",
+																},
+																"& .MuiOutlinedInput-notchedOutline": {
+																	border: "none",
+																},
+																"&:hover .MuiOutlinedInput-notchedOutline": {
+																	border: "none",
+																},
+																"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+																	border: "none",
+																},
+																"& .MuiFilledInput-underline:after": {
+																	border: "none",
+																},
+																"& .MuiFilledInput-underline:before": {
+																	border: "none",
+																},
+																"&:hover .MuiFilledInput-underline:before": {
+																	border: "none",
+																},
+																"& .MuiFilledInput-underline.Mui-focused:before": {
+																	border: "none",
+																},
+															}}
+															IconComponent={MoreVertIcon}
+															renderValue={(value) => (
+																<span>
+																	<MoreVertIcon />
+																	{value}
+																</span>
+															)}
+														>
+															<MenuList sx={{ border: "none" }}>
+																<Tooltip placement="left-start" title="View details">
 																	<MenuItem
-																		value="print"
-																		onClick={() => handlePrint(requisition?._id)}
+																		onClick={() => handleOpenReqDetails(requisition?._id)}
 																	>
 																		<ListItemIcon sx={{ width: "16px", height: "16px" }}>
-																			{printLoading[requisition?._id] ? (
-																				<CircularProgress size={20} />
-																			) : (
-																				<PrinterIcon />
-																			)}
+																			<EyeIcon />
 																		</ListItemIcon>
 																		<ListItemText
 																			primaryTypographyProps={{ fontSize: "small" }}
-																			primary="Print"
+																			primary="View Details"
 																		/>
 																	</MenuItem>
 																</Tooltip>
-															) : null}
-															{/* Delete condition */}
-															{requisition?.status !== "approved" &&
-															requisition?.status !== "reviewed" &&
-															requisition?.status !== "deleted" &&
-															requisition?.status !== "retired" &&
-															(requisition?.user?.name === user?.name ||
-																requisition?.user?.email === user?.email) ? (
-																<Tooltip placement="left-start" title="Delete">
-																	<MenuItem
-																		value="delete"
-																		onClick={() => {
-																			setDlertModalOpen(true);
-																			setItemId(requisition?._id);
-																		}}
-																	>
+																<Tooltip placement="left-start" title="Messages">
+																	<MenuItem onClick={() => openChatModal(requisition?._id)}>
 																		<ListItemIcon sx={{ width: "16px", height: "16px" }}>
-																			<TrashIcon />
+																			<ChatBubbleOvalLeftEllipsisIcon />
 																		</ListItemIcon>
 																		<ListItemText
 																			primaryTypographyProps={{ fontSize: "small" }}
-																			primary="Delete"
+																			primary="Messages"
 																		/>
 																	</MenuItem>
 																</Tooltip>
-															) : null}
-														</MenuList>
-													</Select>
-												</TableCell>
-											</TableRow>
-										))}
+																{/* Send back icon conditions */}
+																{requisition?.status !== "reviewed" &&
+																requisition?.status !== "approved" &&
+																user?.accessLevel !== "user" &&
+																user?.accessLevel !== "userManager" &&
+																requisition?.attentionTo.includes(user?.email) ? (
+																	<Tooltip placement="left-start" title="Send Back">
+																		<MenuItem
+																			onClick={(e) =>
+																				handleSendBackRequisition(e, requisition?._id)
+																			}
+																		>
+																			<ListItemIcon sx={{ width: "16px", height: "16px" }}>
+																				<ArrowUturnLeftIcon />
+																			</ListItemIcon>
+																			<ListItemText
+																				primaryTypographyProps={{ fontSize: "small" }}
+																				primary="Send Back"
+																			/>
+																		</MenuItem>
+																	</Tooltip>
+																) : null}
+																{/* Edit condition */}
+																{requisition?.status !== "reviewed" &&
+																requisition?.status !== "approved" &&
+																requisition?.status !== "deleted" &&
+																requisition?.retiredStatus !== "retired" &&
+																(requisition?.user?.name === user?.name ||
+																	requisition?.user?.email === user?.email) ? (
+																	<Tooltip placement="left-start" title="Edit">
+																		<MenuItem
+																			value="edit"
+																			onClick={() => handleOpenEditModal(requisition?._id)}
+																		>
+																			<ListItemIcon sx={{ width: "16px", height: "16px" }}>
+																				<PencilSquareIcon />
+																			</ListItemIcon>
+																			<ListItemText
+																				primaryTypographyProps={{ fontSize: "small" }}
+																				primary="Edit"
+																			/>
+																		</MenuItem>
+																	</Tooltip>
+																) : null}
+
+																{/* Conditions for Printing */}
+																{requisition?.status === "approved" &&
+																(requisition?.user?.name === user?.name ||
+																	requisition?.user?.email === user?.email ||
+																	["tech", "finance", "financeReviewer"].includes(
+																		user?.accessLevel,
+																	)) ? (
+																	<Tooltip placement="left-start" title="Print">
+																		<MenuItem
+																			value="print"
+																			onClick={() => handlePrint(requisition?._id)}
+																		>
+																			<ListItemIcon sx={{ width: "16px", height: "16px" }}>
+																				{printLoading[requisition?._id] ? (
+																					<CircularProgress size={20} />
+																				) : (
+																					<PrinterIcon />
+																				)}
+																			</ListItemIcon>
+																			<ListItemText
+																				primaryTypographyProps={{ fontSize: "small" }}
+																				primary="Print"
+																			/>
+																		</MenuItem>
+																	</Tooltip>
+																) : null}
+																{/* Delete condition */}
+																{requisition?.status !== "approved" &&
+																requisition?.status !== "reviewed" &&
+																requisition?.status !== "deleted" &&
+																requisition?.status !== "retired" &&
+																(requisition?.user?.name === user?.name ||
+																	requisition?.user?.email === user?.email) ? (
+																	<Tooltip placement="left-start" title="Delete">
+																		<MenuItem
+																			value="delete"
+																			onClick={() => {
+																				setDlertModalOpen(true);
+																				setItemId(requisition?._id);
+																			}}
+																		>
+																			<ListItemIcon sx={{ width: "16px", height: "16px" }}>
+																				<TrashIcon />
+																			</ListItemIcon>
+																			<ListItemText
+																				primaryTypographyProps={{ fontSize: "small" }}
+																				primary="Delete"
+																			/>
+																		</MenuItem>
+																	</Tooltip>
+																) : null}
+															</MenuList>
+														</Select>
+													</TableCell>
+												</TableRow>
+											))}
 									</TableBody>
 								</Table>
 							</TableContainer>
