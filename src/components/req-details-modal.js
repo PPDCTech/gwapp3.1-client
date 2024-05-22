@@ -257,7 +257,7 @@ const RequisitionDetailsModal = ({
 						</Box>
 					)}
 
-					{!isValidRequisition && (
+					{!isValidRequisition && !loading && (
 						<Typography variant="body1" align="center" style={{ marginTop: "50px" }}>
 							No requisition found with the searched ID.
 						</Typography>

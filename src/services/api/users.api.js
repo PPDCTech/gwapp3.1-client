@@ -37,10 +37,11 @@ export const fetchUsers = async (page = 0, rowsPerPage = 25) => {
 
 export const fetchSingleUser = async (userId) => {
   try {
+    console.log('sing', userId);
     const response = await fetchData(`${USERS_API}/${userId}`);
     return response;
   } catch (error) {
-    console.log("Error fetching user:", error);
+    console.log("Error fetching user:", error, error.message);
     throw new Error(error.message);
   }
 };

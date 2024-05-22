@@ -1,4 +1,5 @@
-let API = "https://gwapp3-api.vercel.app";
+// let API = "https://gwapp3-api.vercel.app";
+let API = "http://localhost:3333";
 
 // if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 // 	API = "http://localhost:3333";

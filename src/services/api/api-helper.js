@@ -31,7 +31,7 @@ export const fetchData = async (endpoint) => {
 		const response = axios ? await axios.get(`${API}/${endpoint}`) : null;
 		return response;
 	} catch (error) {
-		console.error("Error during GET request:", error);
+		console.error("Error fetching data:", error.message);
 		let errorMessage = "An error occurred.";
 		if (error.response && error.response.data) {
 			errorMessage = error.response.data.message || error.response.data.error;
