@@ -73,7 +73,7 @@ button:focus-visible {
       background-color: transparent;
   }
   50% {
-      background-color: rgba(255, 0, 0, 0.1); /* light red background */
+      background-color: lightgreen;
   }
   100% {
       background-color: transparent;
@@ -81,6 +81,6 @@ button:focus-visible {
 }
 
 .animated-row {
-  border: 1px solid purple !important;
+  border: 1px solid #d7d7d7;
   animation: rowAnimation 1s linear infinite;
 }
