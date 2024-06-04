@@ -66,3 +66,21 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+
+@keyframes rowAnimation {
+  0% {
+      background-color: transparent;
+  }
+  50% {
+      background-color: rgba(255, 0, 0, 0.1); /* light red background */
+  }
+  100% {
+      background-color: transparent;
+  }
+}
+
+.animated-row {
+  border: 1px solid purple !important;
+  animation: rowAnimation 1s linear infinite;
+}

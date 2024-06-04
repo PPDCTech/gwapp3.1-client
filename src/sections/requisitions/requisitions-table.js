@@ -155,6 +155,7 @@ export const RequisitionTable = ({
 			pdfMake.createPdf(document).open();
 		} catch (error) {
 			console.log(error);
+			toast.error(error.message);
 		} finally {
 			setPrintLoading((prevLoading) => ({ ...prevLoading, [id]: false }));
 		}
@@ -208,7 +209,9 @@ export const RequisitionTable = ({
 									<TableBody>
 										{requisitions &&
 											requisitions?.map((requisition) => (
-												<TableRow key={requisition?._id}>
+												<TableRow key={requisition?._id}
+												className={printLoading[requisition?._id] ? "animated-row" : ""}
+												>
 													<TableCell>
 														{requisition?.serialNumber ? requisition?.serialNumber : "N/A"}
 													</TableCell>

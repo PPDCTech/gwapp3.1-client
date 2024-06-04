@@ -133,9 +133,18 @@ export const AuthProvider = (props) => {
 			const expirationTime = decodedToken.exp * 1000;
 			const isExpired = Date.now() > expirationTime;
 			if (isExpired) {
-				dispatch({
-					type: HANDLERS.SIGN_OUT,
-				});
+				signOut();
+				// dispatch({
+				// 	type: HANDLERS.SIGN_OUT,
+				// });
+			} else {
+				const timeout = expirationTime - Date.now();
+				console.log('token expiration rem::', timeout);
+				const timer = setTimeout(() => {
+					signOut();
+				}, timeout);
+	
+				return () => clearTimeout(timer);
 			}
 		}
 	}, []);

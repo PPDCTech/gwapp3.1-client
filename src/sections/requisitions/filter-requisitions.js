@@ -134,18 +134,17 @@ export const FilterRequisitions = ({
     const [fetchingForDownload, setFetchingForDownload] = useState(false);
     const handleCSVDownload = async () => {
         setFetchingForDownload(true);
-		console.log('fetching for download...', filters);
+
         try {
             // Fetch the approved
             const result = await getApprovedForPrint();
+            // const response = await getAllApprovedRequisitions(filters);
 
             setFetchingForDownload(false);
-			setDownloadingCSV(true);
+            setDownloadingCSV(true);
 
-            return console.log("approved", result);
+            const { requisitions } = result.data;
 
-            const response = await getAllApprovedRequisitions(filters);
-            const { requisitions } = response.data;
             const approvedReqs = requisitions;
 
             if (!approvedReqs || !approvedReqs.length) {
@@ -279,7 +278,7 @@ export const FilterRequisitions = ({
                 </AccordionSummary>
                 <AccordionDetails>
                     <Grid container spacing={2}>
-                        <Grid
+                        {/* <Grid
                             item
                             xs={12}
                             md={12}
@@ -291,14 +290,13 @@ export const FilterRequisitions = ({
                                     variant="outlined"
                                     color="success"
                                     onClick={handleCSVDownload}
-                                    disabled={downloadingCSV}
+                                    disabled={
+                                        fetchingForDownload || downloadingCSV
+                                    }
                                     sx={{ ml: "auto" }}
                                 >
                                     {fetchingForDownload && (
-                                        <>
-                                            <DownloadingOutlinedIcon />
-                                            &nbsp;fetching..
-                                        </>
+                                        <>&nbsp;fetching..</>
                                     )}
                                     {!fetchingForDownload &&
                                         (downloadingCSV ? (
@@ -326,7 +324,7 @@ export const FilterRequisitions = ({
                                         // forceDownload={true}
                                     />
                                 )}
-                        </Grid>
+                        </Grid> */}
                         <Grid item xs={6} md={4}>
                             <FormControl fullWidth>
                                 <InputLabel>Type</InputLabel>
@@ -382,7 +380,7 @@ export const FilterRequisitions = ({
                                 </Select>
                             </FormControl>
                         </Grid>
-                        <Grid item xs={6} md={4}>
+                        {/* <Grid item xs={6} md={4}>
                             <FormControl fullWidth>
                                 <InputLabel>Retirement</InputLabel>
                                 <Select
@@ -395,6 +393,7 @@ export const FilterRequisitions = ({
                                     }
                                     label="Retirement"
                                 >
+                                    <MenuItem value="">Select</MenuItem>
                                     <MenuItem value="pending">Pending</MenuItem>
                                     <MenuItem value="requested">
                                         Requested
@@ -402,7 +401,7 @@ export const FilterRequisitions = ({
                                     <MenuItem value="retired">Retired</MenuItem>
                                 </Select>
                             </FormControl>
-                        </Grid>
+                        </Grid> */}
 
                         {user.accessLevel !== "user" &&
                             user.accessLevel !== "userManager" && (
@@ -485,7 +484,7 @@ export const FilterRequisitions = ({
                             <Button
                                 size="small"
                                 color="info"
-                                variant="outlined"
+                                variant="contained"
                                 onClick={() => handleSubmitFilter()}
                             >
                                 <ManageSearchIcon />
@@ -495,12 +494,42 @@ export const FilterRequisitions = ({
                                 size="small"
                                 sx={{ ml: 1 }}
                                 color="warning"
-                                variant="outlined"
+                                variant="contained"
                                 onClick={handleResetFilters}
                             >
                                 <SearchOffIcon />
                                 Reset
                             </Button>
+                        </Grid>
+                        <Grid item xs={6} md={9} sx={{ display: 'flex', justifyContent: 'end', boder: '1px solid red'}}>
+                            <Tooltip title="Download Approved Requests">
+                                <Button
+                                    size="small"
+                                    variant="outlined"
+                                    color="success"
+                                    onClick={handleCSVDownload}
+                                    disabled={
+                                        fetchingForDownload || downloadingCSV
+                                    }
+                                    sx={{ ml: "auto" }}
+                                >
+                                    {fetchingForDownload && (
+                                        <>&nbsp;fetching..</>
+                                    )}
+                                    {!fetchingForDownload &&
+                                        (downloadingCSV ? (
+                                            <>
+                                                <DownloadingOutlinedIcon />
+                                                &nbsp;downloading..
+                                            </>
+                                        ) : (
+                                            <>
+                                                <DownloadForOfflineOutlinedIcon />
+                                                &nbsp;Download
+                                            </>
+                                        ))}
+                                </Button>
+                            </Tooltip>
                         </Grid>
                     </Grid>
                 </AccordionDetails>

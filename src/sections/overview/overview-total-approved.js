@@ -32,13 +32,11 @@ export const OverviewTotalApproved = (props) => {
                             <Typography variant="h4">
                                 {totalApproved}
                             </Typography>
-                            <Stack
+                            {/* <Stack
                                 direction="row"
                                 spacing={2}
                                 justifyContent="center"
                             >
-                                {" "}
-                                {/* Stack the amounts side by side */}
                                 <Typography
                                     variant="subtitle2"
                                     sx={{ color: success.light }}
@@ -55,7 +53,7 @@ export const OverviewTotalApproved = (props) => {
                                         amounts ? amounts.dollars : 0
                                     )}
                                 </Typography>
-                            </Stack>
+                            </Stack> */}
                         </Box>
                     </Stack>
 
