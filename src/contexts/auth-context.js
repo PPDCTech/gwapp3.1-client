@@ -10,6 +10,7 @@ import { jwtDecode } from "jwt-decode";
 
 import { fetchSingleUser } from "../services/api/users.api";
 import { verifyLogin } from "../services/api/auth.api";
+import { useNavigate } from "react-router-dom";
 
 const HANDLERS = {
 	INITIALIZE: "INITIALIZE",
@@ -74,6 +75,8 @@ export const AuthProvider = (props) => {
 	const { children } = props;
 	const [state, dispatch] = useReducer(reducer, initialState);
 	const initialized = useRef(false);
+
+	const navigate = useNavigate();
 
 	const setUser = (user) => {
 		dispatch({
@@ -182,6 +185,8 @@ export const AuthProvider = (props) => {
 		dispatch({
 			type: HANDLERS.SIGN_OUT,
 		});
+
+		navigate("/");
 	};
 
 	return (
