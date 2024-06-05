@@ -1,5 +1,5 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/ppdcorg/public_html/gwapp3-1
+    - export DEPLOYPATH=/home/ppdcorg/public_html/
     - /bin/cp -R * $DEPLOYPATH
