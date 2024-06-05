@@ -10,7 +10,6 @@ import { jwtDecode } from "jwt-decode";
 
 import { fetchSingleUser } from "../services/api/users.api";
 import { verifyLogin } from "../services/api/auth.api";
-import { useNavigate } from "react-router-dom";
 
 const HANDLERS = {
 	INITIALIZE: "INITIALIZE",
@@ -76,8 +75,6 @@ export const AuthProvider = (props) => {
 	const [state, dispatch] = useReducer(reducer, initialState);
 	const initialized = useRef(false);
 
-	const navigate = useNavigate();
-
 	const setUser = (user) => {
 		dispatch({
 			type: HANDLERS.SET_USER,
@@ -102,16 +99,6 @@ export const AuthProvider = (props) => {
 		}
 
 		if (isAuthenticated) {
-			const token = window.localStorage.getItem("token");
-			if (token) {
-				const decodedToken = jwtDecode(token);
-				const expirationTime = decodedToken.exp * 1000;
-				if (Date.now() > expirationTime) {
-					signOut();
-					return;
-				}
-			}
-
 			const userId = window.localStorage.getItem("gwapp_userId");
 
 			if (userId) {
@@ -195,8 +182,6 @@ export const AuthProvider = (props) => {
 		dispatch({
 			type: HANDLERS.SIGN_OUT,
 		});
-
-		navigate("/");
 	};
 
 	return (
