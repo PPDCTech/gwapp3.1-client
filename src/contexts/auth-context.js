@@ -102,6 +102,16 @@ export const AuthProvider = (props) => {
 		}
 
 		if (isAuthenticated) {
+			const token = window.localStorage.getItem("token");
+			if (token) {
+				const decodedToken = jwtDecode(token);
+				const expirationTime = decodedToken.exp * 1000;
+				if (Date.now() > expirationTime) {
+					signOut();
+					return;
+				}
+			}
+
 			const userId = window.localStorage.getItem("gwapp_userId");
 
 			if (userId) {
