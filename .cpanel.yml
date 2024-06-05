@@ -6,4 +6,4 @@ deployment:
     - cd $REPO_PATH
     - npm install
     - npm run build
-    - /bin/cp -R * $DEPLOYPATH
+    - cp -R $REPO_PATH/build/* $DEPLOYPATH
