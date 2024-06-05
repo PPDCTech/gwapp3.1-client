@@ -2,4 +2,7 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/ppdcorg/public_html/gwapp3-1
+    - cd $REPO_PATH
+    - npm install
+    - npm run build
     - /bin/cp -R * $DEPLOYPATH
