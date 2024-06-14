@@ -142,41 +142,35 @@ const CreateReqModal = ({
 		}
 	};
 
-	const getBudgetHolders = async () => {
-		const response = await fetchBudgetHolders();
-		if (response && response.data) {
-			const { budget_holders } = response.data;
-			setBudgetHolders(budget_holders);
-		}
-	};
-
-	const getBeneficiaries = async () => {
-		const response = await getAllVendors();
-		setBeneficiaryList(response.data);
-	};
-
-	const geProjects = async () => {
-		const response = await getAllProjects();
-		setProjects(response.data);
-	};
-
-	const getBudgetCodes = async () => {
-		const response = await getAllBudgetCodes();
-		setBudgetCodes(response.data);
-	};
-
-	// const getRequisitionDataForEdit = async (reqId) => {
-	// 	if (!requisitionData) {
-	// 		return;
-	// 	}
-	// };
-
 	useEffect(() => {
-		getBudgetHolders();
-		getBeneficiaries();
-		geProjects();
-		getBudgetCodes();
-		// getRequisitionDataForEdit();
+		const fetchData = async () => {
+			try {
+				const [
+					budgetHoldersResponse,
+					beneficiariesResponse,
+					projectsResponse,
+					budgetCodesResponse,
+				] = await Promise.all([
+					fetchBudgetHolders(),
+					getAllVendors(),
+					getAllProjects(),
+					getAllBudgetCodes(),
+				]);
+
+				if (budgetHoldersResponse && budgetHoldersResponse.data) {
+					const { budget_holders } = budgetHoldersResponse.data;
+					setBudgetHolders(budget_holders);
+				}
+
+				setBeneficiaryList(beneficiariesResponse.data);
+				setProjects(projectsResponse.data);
+				setBudgetCodes(budgetCodesResponse.data);
+			} catch (error) {
+				console.error(error);
+			}
+		};
+
+		fetchData();
 	}, []);
 
 	const handleSubmitRequisition = async (event) => {
@@ -231,10 +225,10 @@ const CreateReqModal = ({
 			}
 
 			const response = await createRequisition(formValues);
-
-			if (response.status === 200) {
+			if (response.status === 201) {
+				toast.success("Request created successfully");
 				onClose();
-			}
+			} 
 		} catch (error) {
 			toast.error(`Error creating request\n${error.message}`);
 			console.log("Error creating request", error.message);
@@ -319,7 +313,6 @@ const CreateReqModal = ({
 				!formValues.attentionTo ||
 				!formValues.projectChargedTo
 			) {
-				console.log(formValues);
 				return toast.warning("Missing parameters");
 			}
 
@@ -356,6 +349,7 @@ const CreateReqModal = ({
 			const response = await sendForRetire(requisitionData._id, formValues);
 
 			if (response.status === 200) {
+				toast.success("Request sent for retirement");
 				triggerUpdateRequisition(response.data);
 				onClose();
 			}
@@ -607,9 +601,15 @@ const CreateReqModal = ({
 												<Autocomplete
 													fullWidth
 													options={budgetCodes.filter((budgetCode) =>
-														budgetCode.project.includes(projectName),
+														budgetCode.project.includes(projectName)
+															? budgetCode
+															: budgetCodes,
 													)}
-													getOptionLabel={(budgetCode) => budgetCode?.description || ""}
+													getOptionLabel={(budgetCode) =>
+														budgetCode
+															? `${budgetCode.code}-(${budgetCode.project})-${budgetCode.description}`
+															: ""
+													}
 													value={newItemCode}
 													onChange={(event, newValue) => {
 														setNewItemCode(newValue);
@@ -725,7 +725,7 @@ const CreateReqModal = ({
 										disabled={loadingFileUpload || selectedFiles.length === 0}
 										onClick={(e) => uploadFiles(e)}
 									>
-										Upload
+										Upload{fileUploadSuccess ? "ed" : ""}
 										{loadingFileUpload && (
 											<CircularProgress
 												size={20}

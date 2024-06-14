@@ -33,7 +33,6 @@ const Members = () => {
 	const [alumniPage, setAlumniPage] = useState(0);
 	const [rowsPerPage, setRowsPerPage] = useState(10);
 	const [searchQuery, setSearchQuery] = useState("");
-	console.log(searchQuery);
 	const [tabValue, setTabValue] = useState(0);
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 

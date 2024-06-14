@@ -10,7 +10,9 @@ export const AuthGuard = (props) => {
 	useEffect(() => {
 		if (!isAuthenticated) {
 			// clear local storage
-			localStorage.clear();
+			window.localStorage.removeItem("token");
+			window.localStorage.removeItem("authenticated");
+			window.localStorage.removeItem("gwapp_userId");
 			console.log("Not authenticated, redirecting");
 			// Store continue URL in sessionStorage
 			sessionStorage.setItem(

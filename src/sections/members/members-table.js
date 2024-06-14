@@ -156,6 +156,7 @@ export const MembersTable = (props) => {
 																<MenuItem value="finance">Finance</MenuItem>
 																<MenuItem value="financeReviewer">Finance Reviewer</MenuItem>
 																<MenuItem value="tech">Tech</MenuItem>
+																<MenuItem value="user">User</MenuItem>
 															</Select>
 														</Tooltip>
 													</Stack>

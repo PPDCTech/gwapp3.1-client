@@ -139,7 +139,6 @@ export const AuthProvider = (props) => {
 				// });
 			} else {
 				const timeout = expirationTime - Date.now();
-				console.log('token expiration rem::', timeout);
 				const timer = setTimeout(() => {
 					signOut();
 				}, timeout);
