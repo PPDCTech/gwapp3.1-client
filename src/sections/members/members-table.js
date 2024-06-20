@@ -22,6 +22,7 @@ import {
 import { Scrollbar } from "../../components/scrollbar";
 import { getInitials } from "../../utils/get-initials";
 import BlockIcon from "@mui/icons-material/Block";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { toast } from "react-toastify";
 import { USER_ACCESS_LABELS } from "../../services/constants";
 import { useAuth } from "../../hooks/use-auth";
@@ -36,26 +37,38 @@ export const MembersTable = (props) => {
 		rowsPerPage = 0,
 		isAlumni = false,
 		onDeactivate,
+		activateHandler,
 		onChangeRole,
 		setActiveMembers,
+		updateHandler,
 	} = props;
 
 	const { user } = useAuth();
 
 	const [deactivateLoading, setDeactivateLoading] = useState({});
+	const [activateLoading, setActivateLoading] = useState({});
 	const [selectedRole] = useState("");
 
 	const handleDeactivate = async (id) => {
 		try {
 			setDeactivateLoading((prevLoading) => ({ ...prevLoading, [id]: true }));
 			onDeactivate(id);
-			setActiveMembers((prevMembers) =>
-				prevMembers.filter((member) => member._id !== id),
-			);
+			updateHandler();
 		} catch (error) {
 			toast.error(error.message);
 		} finally {
 			setDeactivateLoading((prevLoading) => ({ ...prevLoading, [id]: false }));
+		}
+	};
+	const handleActivate = async (id) => {
+		try {
+			setActivateLoading((prevLoading) => ({ ...prevLoading, [id]: true }));
+			activateHandler(id);
+			updateHandler();
+		} catch (error) {
+			toast.error(error.message);
+		} finally {
+			setActivateLoading((prevLoading) => ({ ...prevLoading, [id]: false }));
 		}
 	};
 
@@ -76,10 +89,10 @@ export const MembersTable = (props) => {
 									<>
 										<TableCell>Phone</TableCell>
 										<TableCell>Access Level</TableCell>
-										{user && user?.accessLevel === "userManagaer" && (
-											<TableCell>Action</TableCell>
-										)}
 									</>
+								)}
+								{user && ["tech", "userManagaer"].includes(user.accessLevel) && (
+									<TableCell>Action</TableCell>
 								)}
 							</TableRow>
 						</TableHead>
@@ -158,6 +171,33 @@ export const MembersTable = (props) => {
 																<MenuItem value="tech">Tech</MenuItem>
 																<MenuItem value="user">User</MenuItem>
 															</Select>
+														</Tooltip>
+													</Stack>
+												</TableCell>
+											)}
+										</>
+									)}
+									{isAlumni && (
+										<>
+											{user && ["tech", "userManagaer"].includes(user.accessLevel) && (
+												<TableCell>
+													<Stack direction="row" spacing={1}>
+														<Tooltip title="Activate">
+															<IconButton
+																onClick={() => handleActivate(member._id)}
+																aria-label="Preview"
+																color="error"
+																sx={{ fontSize: "1rem" }}
+																disabled={activateLoading[member._id]}
+															>
+																{activateLoading[member._id] ? (
+																	<CircularProgress size={14} />
+																) : (
+																	<SvgIcon fontSize="small">
+																		<AddCircleOutlineIcon />
+																	</SvgIcon>
+																)}
+															</IconButton>
 														</Tooltip>
 													</Stack>
 												</TableCell>

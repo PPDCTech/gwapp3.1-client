@@ -550,229 +550,228 @@ const RequisitionDetailsModal = ({
 								<Grid item xs={12}>
 									<Divider sx={{ borderColor: "neutral.300" }} />
 								</Grid>
-
-								{/* Project Account Section */}
-								{requisition.projectChargedTo && (
-									<Grid item xs={12}>
-										<Typography variant="subtitle1">
-											Project Charged to:{" "}
-											<strong>{requisition.projectChargedTo?.projectName || ""}</strong>
-										</Typography>
-									</Grid>
-								)}
 							</Grid>
 
-							{!(user?.role === "staff" || user?.role === "user") && (
-								<>
-									{requisition.projectChargedTo && (
-										<Grid container space={2} padding={2}>
-											<Grid item xs={4}>
-												<Typography variant="subtitle2">Source Bank</Typography>
-												<Typography variant="body1">
-													{requisition.projectChargedTo.account.bankName}
+							{/* {!(user?.role === "staff" || user?.role === "user") && ( */}
+							<>
+								{requisition.projectChargedTo && (
+									<Grid container space={2} padding={2}>
+										<Typography sx={{ my: 3 }}>Project Account Section</Typography>
+										{requisition.projectChargedTo && (
+											<Grid item xs={12}>
+												<Typography variant="subtitle1">
+													Project Charged to:{" "}
+													<strong>{requisition.projectChargedTo?.projectName || ""}</strong>
 												</Typography>
 											</Grid>
+										)}
+										<Grid item xs={4}>
+											<Typography variant="subtitle2">Source Bank</Typography>
+											<Typography variant="body1">
+												{requisition.projectChargedTo.account.bankName}
+											</Typography>
+										</Grid>
+										<Grid item xs={4}>
+											<Typography variant="subtitle2">Holder</Typography>
+											<Typography variant="body1">
+												{requisition.projectChargedTo.account.accountName}
+											</Typography>
+										</Grid>
+										<Grid item xs={4}>
+											<Typography variant="subtitle2">Account Number</Typography>
+											<Typography variant="body1">
+												{requisition.projectChargedTo.account.accountNumber}
+											</Typography>
+										</Grid>
+									</Grid>
+								)}
+
+								<Divider />
+
+								{/* Select account codes (for finance) */}
+								{(requisition.status === "holderCheck" ||
+									requisition.status === "holderChecked") &&
+									user.accessLevel === "finance" && (
+										<Grid container spacing={3} sx={{ pl: 2 }}>
 											<Grid item xs={4}>
-												<Typography variant="subtitle2">Holder</Typography>
-												<Typography variant="body1">
-													{requisition.projectChargedTo.account.accountName}
+												<Typography variant="body1" sx={{ my: 1 }}>
+													Select Account Code
 												</Typography>
-											</Grid>
-											<Grid item xs={4}>
-												<Typography variant="subtitle2">Account Number</Typography>
-												<Typography variant="body1">
-													{requisition.projectChargedTo.account.accountNumber}
-												</Typography>
+												<Autocomplete
+													fullWidth
+													options={accountCodes}
+													getOptionLabel={(accountCode) =>
+														`${accountCode?.value}-${accountCode?.description}` || ""
+													}
+													value={newAccountCode}
+													onChange={(event, newValue) => {
+														setNewAccountCode(newValue);
+													}}
+													renderInput={(params) => (
+														<TextField {...params} label="Account Codes" fullWidth />
+													)}
+												/>
 											</Grid>
 										</Grid>
 									)}
 
-									<Divider />
-
-									{/* Select account codes (for finance) */}
-									{requisition.status === "holderCheck" ||
-										(requisition.status === "holderChecked" &&
-											user.accessLevel === "finance" && (
-												<Grid container spacing={3} sx={{ pl: 2 }}>
-													<Grid item xs={4}>
-														<Typography variant="body1" sx={{ my: 1 }}>
-															Select Account Code
-														</Typography>
-														<Autocomplete
-															fullWidth
-															options={accountCodes}
-															getOptionLabel={(accountCode) =>
-																`${accountCode?.value}-${accountCode?.description}` || ""
-															}
-															value={newAccountCode}
-															onChange={(event, newValue) => {
-																setNewAccountCode(newValue);
-															}}
-															renderInput={(params) => (
-																<TextField {...params} label="Account Codes" fullWidth />
-															)}
-														/>
-													</Grid>
-												</Grid>
-											))}
-
-									{/* Action/Check section */}
-									<Container>
-										{/* Buttons based on requisition status and user access level */}
-										{(requisition.status === "pending" &&
-											user.accessLevel === "budgetHolder") ||
-										(requisition.status === "pending" &&
-											user.accessLevel === "finance" &&
-											requisition.attentionTo.includes(user?.email)) ? (
-											<>
-												<Button
-													variant="contained"
-													color="secondary"
-													size="small"
-													onClick={handleBudgetHolderChecked}
-													disabled={loadingCheckBtn}
-												>
-													{loadingCheckBtn ? "Loading..." : "Check as Budget Holder"}
-												</Button>
-												<Button
-													size="small"
-													sx={{ ml: 2 }}
-													variant="outlined"
-													color="error"
-													onClick={handleSendBack}
-													disabled={loadingCheckBtn}
-												>
-													{loadingCheckBtn ? "Loading..." : "Send Back"}
-												</Button>
-											</>
-										) : requisition.status === "pending" ? (
-											<Typography style={{ color: info.main }}>
-												Request Awaiting Budget Holder Check
-											</Typography>
-										) : (requisition.status === "holderCheck" ||
-												requisition.status === "holderChecked") &&
-										  user.accessLevel === "finance" ? (
-											<>
-												<Button
-													variant="contained"
-													color="primary"
-													disabled={loadingCheckBtn}
-													size="small"
-													onClick={handleFinanceChecked}
-												>
-													{loadingCheckBtn ? "Loading..." : "Finance Check"}
-												</Button>
-												<Button size="small" onClick={handleSendBack}>
-													Send Back
-												</Button>
-											</>
-										) : requisition.status === "holderCheck" ||
-										  requisition.status === "holderChecked" ? (
-											<Typography sx={{ color: indigo.main }}>
-												Request Awaiting Finance Check
-											</Typography>
-										) : requisition.status === "checked" &&
-										  user.accessLevel === "financeReviewer" ? (
-											<>
-												<Button
-													onClick={handleFinanceReviewed}
-													variant="contained"
-													color="info"
-													disabled={loadingCheckBtn}
-													size="small"
-												>
-													{loadingCheckBtn ? "Loading..." : "Finance Review"}
-												</Button>
-												<Button size="small" onClick={() => onClose}>
-													Cancel
-												</Button>
-											</>
-										) : requisition.status === "checked" ? (
-											<Typography sx={{ color: success.main }}>
-												Request Awaiting Finance Review
-											</Typography>
-										) : requisition.status === "reviewed" &&
-										  user.accessLevel === "superUser" ? (
+								{/* Action/Check section */}
+								<Container>
+									{/* Buttons based on requisition status and user access level */}
+									{(requisition.status === "pending" &&
+										user.accessLevel === "budgetHolder") ||
+									(requisition.status === "pending" &&
+										user.accessLevel === "finance" &&
+										requisition.attentionTo.includes(user?.email)) ? (
+										<>
 											<Button
-												size="small"
-												onClick={handleApprove}
 												variant="contained"
-												color="success"
+												color="secondary"
+												size="small"
+												onClick={handleBudgetHolderChecked}
 												disabled={loadingCheckBtn}
 											>
-												{loadingCheckBtn ? "Loading..." : "Approve"}
+												{loadingCheckBtn ? "Loading..." : "Check as Budget Holder"}
 											</Button>
-										) : requisition.status === "reviewed" ? (
-											<Typography sx={{ color: success.ppdc }}>
-												Request Awaiting Approval
-											</Typography>
-										) : requisition.status === "approved" &&
-										  (user?.accessLevel === "finance" ||
-												user?.accessLevel === "financeReviewer") ? (
-											<Button size="small" onClick={handleCancelPayment}>
-												Cancel Payment
+											<Button
+												size="small"
+												sx={{ ml: 2 }}
+												variant="outlined"
+												color="error"
+												onClick={handleSendBack}
+												disabled={loadingCheckBtn}
+											>
+												{loadingCheckBtn ? "Loading..." : "Send Back"}
 											</Button>
-										) : null}
+										</>
+									) : requisition.status === "pending" ? (
+										<Typography style={{ color: info.main }}>
+											Request Awaiting Budget Holder Check
+										</Typography>
+									) : (requisition.status === "holderCheck" ||
+											requisition.status === "holderChecked") &&
+									  user.accessLevel === "finance" ? (
+										<>
+											<Button
+												variant="contained"
+												color="primary"
+												disabled={loadingCheckBtn}
+												size="small"
+												onClick={handleFinanceChecked}
+											>
+												{loadingCheckBtn ? "Loading..." : "Finance Check"}
+											</Button>
+											<Button size="small" onClick={handleSendBack}>
+												Send Back
+											</Button>
+										</>
+									) : requisition.status === "holderCheck" ||
+									  requisition.status === "holderChecked" ? (
+										<Typography sx={{ color: indigo.main }}>
+											Request Awaiting Finance Check
+										</Typography>
+									) : requisition.status === "checked" &&
+									  user.accessLevel === "financeReviewer" ? (
+										<>
+											<Button
+												onClick={handleFinanceReviewed}
+												variant="contained"
+												color="info"
+												disabled={loadingCheckBtn}
+												size="small"
+											>
+												{loadingCheckBtn ? "Loading..." : "Finance Review"}
+											</Button>
+											<Button size="small" onClick={() => onClose}>
+												Cancel
+											</Button>
+										</>
+									) : requisition.status === "checked" ? (
+										<Typography sx={{ color: success.main }}>
+											Request Awaiting Finance Review
+										</Typography>
+									) : requisition.status === "reviewed" &&
+									  user.accessLevel === "superUser" ? (
+										<Button
+											size="small"
+											onClick={handleApprove}
+											variant="contained"
+											color="success"
+											disabled={loadingCheckBtn}
+										>
+											{loadingCheckBtn ? "Loading..." : "Approve"}
+										</Button>
+									) : requisition.status === "reviewed" ? (
+										<Typography sx={{ color: success.ppdc }}>
+											Request Awaiting Approval
+										</Typography>
+									) : requisition.status === "approved" &&
+									  (user?.accessLevel === "finance" ||
+											user?.accessLevel === "financeReviewer") ? (
+										<Button size="small" onClick={handleCancelPayment}>
+											Cancel Payment
+										</Button>
+									) : null}
 
-										{requisition.status === "approved" && (
-											<Typography sx={{ mt: 2, color: success.ppdc, textAlign: "center" }}>
-												<strong>This request is Approved!</strong>
-											</Typography>
+									{requisition.status === "approved" && (
+										<Typography sx={{ mt: 2, color: success.ppdc, textAlign: "center" }}>
+											<strong>This request is Approved!</strong>
+										</Typography>
+									)}
+
+									<Divider sx={{ my: 1 }} />
+
+									{/* Send Back and Cancel Actions */}
+									<>
+										{showReasonInput && (
+											<Grid container spacing={1} alignItems="center">
+												<Grid item xs={8}>
+													<TextField
+														label="Enter Reason"
+														variant="outlined"
+														value={reason}
+														onChange={(e) => setReason(e.target.value)}
+														fullWidth
+													/>
+												</Grid>
+												<Grid item xs={2}>
+													<Button
+														size="small"
+														variant="contained"
+														color="info"
+														onClick={handleSubmit}
+													>
+														Submit
+													</Button>
+												</Grid>
+												<Grid item xs={2}>
+													<Button
+														size="small"
+														variant="contained"
+														color="secondary"
+														onClick={handleAbort}
+													>
+														Abort
+													</Button>
+												</Grid>
+											</Grid>
 										)}
 
-										<Divider sx={{ my: 1 }} />
-
-										{/* Send Back and Cancel Actions */}
-										<>
-											{showReasonInput && (
-												<Grid container spacing={1} alignItems="center">
-													<Grid item xs={8}>
-														<TextField
-															label="Enter Reason"
-															variant="outlined"
-															value={reason}
-															onChange={(e) => setReason(e.target.value)}
-															fullWidth
-														/>
-													</Grid>
-													<Grid item xs={2}>
+										{!showReasonInput && (
+											<>
+												{requisition.status === "approved" &&
+													user.accessLevel === "financeReviewer" && (
 														<Button
-															size="small"
 															variant="contained"
-															color="info"
-															onClick={handleSubmit}
-														>
-															Submit
-														</Button>
-													</Grid>
-													<Grid item xs={2}>
-														<Button
 															size="small"
-															variant="contained"
-															color="secondary"
-															onClick={handleAbort}
+															color="error"
+															onClick={() => handleButtonClick("Cancel")}
 														>
-															Abort
+															Cancel
 														</Button>
-													</Grid>
-												</Grid>
-											)}
+													)}
 
-											{!showReasonInput && (
-												<>
-													{requisition.status === "approved" &&
-														user.accessLevel === "financeReviewer" && (
-															<Button
-																variant="contained"
-																size="small"
-																color="error"
-																onClick={() => handleButtonClick("Cancel")}
-															>
-																Cancel
-															</Button>
-														)}
-
-													{/* {requisition.status !== "approved" &&
+												{/* {requisition.status !== "approved" &&
                             ["budgetHolder", "finance", "financeReviewer"].includes(
                               user.accessLevel
                             ) && (
@@ -786,26 +785,26 @@ const RequisitionDetailsModal = ({
                                 Send Back
                               </Button>
                             )} */}
-												</>
-											)}
-										</>
+											</>
+										)}
+									</>
 
-										{/* Delete button */}
-										{requisition.status !== "approved" &&
-											requisition?.user?.name === user?.name && (
-												<Button
-													sx={{ ml: 2 }}
-													variant="outlined"
-													color="error"
-													size="small"
-													onClick={handleDeleteRequisition}
-												>
-													Delete Request
-												</Button>
-											)}
-									</Container>
-								</>
-							)}
+									{/* Delete button */}
+									{requisition.status !== "approved" &&
+										requisition?.user?.name === user?.name && (
+											<Button
+												sx={{ ml: 2 }}
+												variant="outlined"
+												color="error"
+												size="small"
+												onClick={handleDeleteRequisition}
+											>
+												Delete Request
+											</Button>
+										)}
+								</Container>
+							</>
+							{/**  )} **/}
 						</>
 					)}
 				</Paper>

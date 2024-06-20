@@ -144,6 +144,17 @@ const Members = () => {
 			toast.error("Failed to deactivate user");
 		}
 	};
+	const handleActivate = async (id) => {
+		try {
+			await deactivateUser(id);
+			fetchActiveMembers(activePage, rowsPerPage);
+			fetchAlumniMembers(alumniPage, rowsPerPage);
+			toast.info("User has been activated");
+		} catch (error) {
+			console.error(error);
+			toast.error("Failed to activate user");
+		}
+	};
 
 	const handleChangeRole = async (id, newRole) => {
 		try {
@@ -162,6 +173,11 @@ const Members = () => {
 			toast.error("Failed to change user access");
 		}
 	};
+
+	const updateHandler = async () => {
+		fetchActiveMembers(activePage, rowsPerPage)
+		fetchAlumniMembers(alumniPage, rowsPerPage)
+	}
 
 	return (
 		<>
@@ -224,6 +240,7 @@ const Members = () => {
 								onDeactivate={handleDeactivate}
 								setActiveMembers={setActiveMembers}
 								onChangeRole={handleChangeRole}
+								updateHandler={updateHandler}
 							/>
 						)}
 						{tabValue === 1 && (
@@ -234,10 +251,13 @@ const Members = () => {
 								page={alumniPage}
 								onPageChange={handleAlumniPageChange}
 								onRowsPerPageChange={handleRowsPerPageChange}
+								activateHandler={handleActivate}
+								setActiveMembers={setActiveMembers}
 								rowsPerPage={rowsPerPage}
 								activeTab={false}
 								isAlumni={true}
 								count={totalAlumni}
+								updateHandler={updateHandler}
 							/>
 						)}
 					</Stack>
