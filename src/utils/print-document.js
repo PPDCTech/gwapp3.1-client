@@ -55,7 +55,7 @@ export const printDocument = async (req) => {
         ],
         [
           { text: "Budget Holder", style: "labelStyle" },
-          { text: req.holderCheck.name, style: "fieldStyle" },
+          { text: req.holderCheck?.name || req.hoderCheck?.name, style: "fieldStyle" },
           { text: budgetHolderDate, style: "fieldStyle" },
           { image: budgetHolderSig, width: 30, height: 30 },
         ],
