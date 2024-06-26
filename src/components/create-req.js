@@ -532,7 +532,7 @@ const CreateReqModal = ({
 					? "Edit Requisition"
 					: retireMode
 					? "Retire Requisition"
-					: "le Create Requisition"}
+					: "Create Requisition"}
 				<Typography variant="subtitle1">{`Step ${part}`}</Typography>
 			</DialogTitle>
 			<DialogContent>
