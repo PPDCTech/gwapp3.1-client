@@ -74,10 +74,12 @@ export const RequisitionTable = ({
 	const openChatModal = (reqId) => {
 		setSelectedId(reqId);
 		setIsChatModalOpen(true);
+		updateTableData();
 	};
 	const closeChatModal = () => {
 		setSelectedId("");
 		setIsChatModalOpen(false);
+		updateTableData();
 	};
 
 	const [itemId, setItemId] = useState("");
@@ -87,6 +89,7 @@ export const RequisitionTable = ({
 	const closeReqDetails = () => {
 		setIsReqDetailsOpen(false);
 		setSelectedId("");
+		updateTableData();
 	};
 
 	useEffect(() => {
@@ -112,6 +115,7 @@ export const RequisitionTable = ({
 			setSelectedRequisition(req.data);
 			setEditMode(true);
 			setEditReqModalOpen(true);
+			updateTableData();
 		} catch (error) {
 			console.log("Error getting single requisition:", error.message);
 		}
@@ -120,10 +124,12 @@ export const RequisitionTable = ({
 	const handleCloseEditModal = () => {
 		setEditMode(false);
 		setEditReqModalOpen(false);
+		updateTableData();
 	};
 
 	const updateRequisition = (editedRequisition) => {
 		onEditRequisition(editedRequisition);
+		updateTableData();
 	};
 
 	const [dlertModalOpen, setDlertModalOpen] = useState(false);
@@ -142,6 +148,7 @@ export const RequisitionTable = ({
 	const handleSendBackRequisition = async (id) => {
 		await sendBackRequisition(id);
 		closeReqDetails();
+		updateTableData();
 	};
 
 	const [printLoading, setPrintLoading] = useState({});

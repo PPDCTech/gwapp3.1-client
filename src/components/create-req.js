@@ -47,7 +47,7 @@ import {
 import { getAllProjects } from "../services/api/projects.api";
 import { getAllBudgetCodes } from "../services/api/budget-codes.api";
 import { CheckCircleOutline } from "@mui/icons-material";
-import { uploadFileAPI } from "../services/api/uploads.api";
+import { removeFileAPI, uploadFileAPI } from "../services/api/uploads.api";
 import { addVendor, getAllVendors } from "../services/api/vendors.api";
 
 const CreateReqModal = ({
@@ -228,7 +228,7 @@ const CreateReqModal = ({
 			if (response.status === 201) {
 				toast.success("Request created successfully");
 				onClose();
-			} 
+			}
 		} catch (error) {
 			toast.error(`Error creating request\n${error.message}`);
 			console.log("Error creating request", error.message);
@@ -415,21 +415,11 @@ const CreateReqModal = ({
 
 	const handleFileUpload = (event) => {
 		const files = event.target.files;
-		const newFiles = Array.from(files).filter(
-			(file) =>
-				!selectedFiles.some((selectedFile) => selectedFile.name === file.name),
-		);
-		setSelectedFiles((prevFiles) => [...prevFiles, ...newFiles]);
+		setSelectedFiles([...selectedFiles, ...Array.from(files)]);
 	};
 
 	const uploadFiles = async (event) => {
 		event.preventDefault();
-
-		if (selectedFiles.length === 0) {
-			toast.warn("No files selected for upload.");
-			return;
-		}
-
 
 		try {
 			setLoadingFileUpload(true);
@@ -439,25 +429,21 @@ const CreateReqModal = ({
 
 			formData.append("destination", "invoices");
 
-			for (const file of selectedFiles) {
-				if (file.size > 10485760) {
-					// Check if file size is greater than 10MB
-					throw new Error(`File ${file.name} exceeds the 10MB size limit.`);
-				}
-				formData.append("files", file);
-				newInvoices.push({ name: file.name });
+			for (let i = 0; i < selectedFiles.length; i++) {
+				formData.append("files", selectedFiles[i]);
+				newInvoices.push({ name: selectedFiles[i].name });
 			}
 
 			const response = await uploadFileAPI(formData);
 			const { imageUrls } = await response.data;
 
-			imageUrls.forEach((url, index) => {
-				newInvoices[index].url = url.imageUrl;
-				newInvoices[index].id = url.public_id;
-			});
+			for (let i = 0; i < imageUrls.length; i++) {
+				newInvoices[i].url = imageUrls[i].imageUrl;
+				newInvoices[i].id = imageUrls[i].public_id;
+			}
 
-			setInvoiceArray((prevArray) => [...prevArray, ...newInvoices]);
-			setSelectedFiles([]); // Clear the selected files after upload
+			setInvoiceArray([...invoiceArray, ...newInvoices]);
+			setSelectedFiles([]); // Clear selected files
 
 			setFileUploadSuccess(true);
 
@@ -465,19 +451,36 @@ const CreateReqModal = ({
 				setFileUploadSuccess(false);
 			}, 3000);
 		} catch (error) {
-			toast.error(`Error uploading file(s): ${error.message}`);
+			toast.error("Error uploading files");
 			console.log("Error uploading files:", error.message);
 		} finally {
 			setLoadingFileUpload(false);
 		}
 	};
 
-	const handleRemoveFile = (index) => {
-		setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+	const handleRemoveSelectedFile = (index) => {
+		const updatedFiles = [...selectedFiles];
+		updatedFiles.splice(index, 1);
+		setSelectedFiles(updatedFiles);
+	};
+
+	const handleRemoveFile = async (index, id) => {
+		try {
+			const response = await removeFileAPI(id); 
+			if (response.status === 204) {
+				setInvoiceArray((prevArray) => prevArray.filter((_, i) => i !== index));
+			}
+		} catch (error) {
+			toast.error(`Error deleting file: ${error.message}`);
+			console.log("Error deleting file:", error.message);
+		}
 	};
 
 	const handleOpenFile = (file) => {
 		window.open(URL.createObjectURL(file));
+	};
+	const handleOpenInvoice = (file) => {
+		window.open(file.url);
 	};
 
 	return (
@@ -717,10 +720,13 @@ const CreateReqModal = ({
 									Please for multiple files, hold down the Ctrl/cmd key and select a
 									maximum of 5 files.
 								</Typography>{" "}
+							</Grid>
+							<Grid item xs={12} md={6}>
+								{" "}
 								<input
 									type="file"
 									id="fileInput"
-									accept=".jpg, .jpeg, .png, .pdf"
+									accept=".jpg, .jpeg, .png, .pdf .xls, .xlsx"
 									multiple
 									style={{ display: "none" }}
 									onChange={handleFileUpload}
@@ -761,13 +767,16 @@ const CreateReqModal = ({
 									</Button>
 								</label>
 							</Grid>
+						</Grid>
+
+						<Grid container spacing={4}>
 							<Grid item xs={12} md={6}>
 								{selectedFiles && selectedFiles.length > 0 && (
 									<Typography variant="subtitle1" sx={{ mt: 2 }}>
-										Uploads
+										Selected Files
 									</Typography>
 								)}
-								<List sx={{ mt: 2 }}>
+								<List>
 									{selectedFiles.map((file, index) => (
 										<ListItem key={index} sx={{ mt: -1 }}>
 											<ListItemText primary={file.name} />
@@ -783,13 +792,49 @@ const CreateReqModal = ({
 													</SvgIcon>
 												</IconButton>
 												<IconButton
-													onClick={() => handleRemoveFile(index)}
-													aria-label="Delete"
+													onClick={() => handleRemoveSelectedFile(index)}
+													aria-label="Remove"
 													color="error"
 													sx={{ fontSize: "10px" }}
 												>
 													<SvgIcon fontSize="small">
 														<XCircleIcon />
+													</SvgIcon>
+												</IconButton>
+											</ListItemSecondaryAction>
+										</ListItem>
+									))}
+								</List>
+							</Grid>
+							<Grid item xs={12} md={6}>
+								{invoiceArray && invoiceArray.length > 0 && (
+									<Typography variant="subtitle1" sx={{ mt: 2 }}>
+										Uploaded Files
+									</Typography>
+								)}
+								<List>
+									{invoiceArray.map((file, index) => (
+										<ListItem key={index} sx={{ mt: -1 }}>
+											<ListItemText primary={file.name} />
+											<ListItemSecondaryAction>
+												<IconButton
+													onClick={() => handleOpenInvoice(file)}
+													aria-label="Preview"
+													color="primary"
+													sx={{ fontSize: "10px" }}
+												>
+													<SvgIcon fontSize="small">
+														<EyeIcon />
+													</SvgIcon>
+												</IconButton>
+												<IconButton
+													onClick={() => handleRemoveFile(index, file.id)}
+													aria-label="Delete"
+													color="error"
+													sx={{ fontSize: "10px" }}
+												>
+													<SvgIcon fontSize="small">
+														<TrashIcon />
 													</SvgIcon>
 												</IconButton>
 											</ListItemSecondaryAction>

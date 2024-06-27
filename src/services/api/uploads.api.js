@@ -40,3 +40,19 @@ export const removeFileAPI = async (publicId) => {
     throw new Error(error.message);
   }
 };
+
+export const removeFilesAPI = async (publicIds) => {
+  try {
+    setAuthorizationHeader();
+    const response = await axios.delete(`${API}/remove-files`, {
+      data: { publicIds },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error removing file:", error.message);
+    throw new Error(error.message);
+  }
+};
