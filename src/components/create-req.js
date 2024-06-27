@@ -415,11 +415,21 @@ const CreateReqModal = ({
 
 	const handleFileUpload = (event) => {
 		const files = event.target.files;
-		setSelectedFiles([...selectedFiles, ...Array.from(files)]);
+		const newFiles = Array.from(files).filter(
+			(file) =>
+				!selectedFiles.some((selectedFile) => selectedFile.name === file.name),
+		);
+		setSelectedFiles((prevFiles) => [...prevFiles, ...newFiles]);
 	};
 
 	const uploadFiles = async (event) => {
 		event.preventDefault();
+
+		if (selectedFiles.length === 0) {
+			toast.warn("No files selected for upload.");
+			return;
+		}
+
 
 		try {
 			setLoadingFileUpload(true);
@@ -429,20 +439,25 @@ const CreateReqModal = ({
 
 			formData.append("destination", "invoices");
 
-			for (let i = 0; i < selectedFiles.length; i++) {
-				formData.append("files", selectedFiles[i]);
-				newInvoices.push({ name: selectedFiles[i].name });
+			for (const file of selectedFiles) {
+				if (file.size > 10485760) {
+					// Check if file size is greater than 10MB
+					throw new Error(`File ${file.name} exceeds the 10MB size limit.`);
+				}
+				formData.append("files", file);
+				newInvoices.push({ name: file.name });
 			}
 
 			const response = await uploadFileAPI(formData);
 			const { imageUrls } = await response.data;
 
-			for (let i = 0; i < imageUrls.length; i++) {
-				newInvoices[i].url = imageUrls[i].imageUrl;
-				newInvoices[i].id = imageUrls[i].public_id;
-			}
+			imageUrls.forEach((url, index) => {
+				newInvoices[index].url = url.imageUrl;
+				newInvoices[index].id = url.public_id;
+			});
 
-			setInvoiceArray([...invoiceArray, ...newInvoices]);
+			setInvoiceArray((prevArray) => [...prevArray, ...newInvoices]);
+			setSelectedFiles([]); // Clear the selected files after upload
 
 			setFileUploadSuccess(true);
 
@@ -450,7 +465,7 @@ const CreateReqModal = ({
 				setFileUploadSuccess(false);
 			}, 3000);
 		} catch (error) {
-			toast.error("Error uploading files");
+			toast.error(`Error uploading file(s): ${error.message}`);
 			console.log("Error uploading files:", error.message);
 		} finally {
 			setLoadingFileUpload(false);
@@ -458,9 +473,7 @@ const CreateReqModal = ({
 	};
 
 	const handleRemoveFile = (index) => {
-		const updatedFiles = [...selectedFiles];
-		updatedFiles.splice(index, 1);
-		setSelectedFiles(updatedFiles);
+		setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
 	};
 
 	const handleOpenFile = (file) => {
@@ -700,6 +713,10 @@ const CreateReqModal = ({
 								<Typography variant="subtitle1" sx={{ mt: 2 }}>
 									Upload supporting documents:(receipts, invoices, etc)
 								</Typography>
+								<Typography variant="body2" sx={{ color: "text.secondary", mt: 1 }}>
+									Please for multiple files, hold down the Ctrl/cmd key and select a
+									maximum of 5 files.
+								</Typography>{" "}
 								<input
 									type="file"
 									id="fileInput"
