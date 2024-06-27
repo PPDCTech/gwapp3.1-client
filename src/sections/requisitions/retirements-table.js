@@ -10,9 +10,7 @@ import {
 	TableRow,
 	Paper,
 	Box,
-	ListItemIcon,
-	ListItemText,
-	Typography
+	Typography,
 } from "@mui/material";
 import { DocumentDuplicateIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { getCurrencySign } from "../../utils/format-currency";
@@ -23,9 +21,6 @@ import CreateReqModal from "../../components/create-req";
 import { STATUS_COLOR_TYPE } from "../../services/constants";
 
 const RetirementsTable = ({ data = [], reloadData }) => {
-	const [page] = useState(0);
-	const [rowsPerPage] = useState(10);
-	// const [loadingIds, setLoadingIds] = useState([]);
 	const [isReqDetailsOpen, setIsReqDetailsOpen] = useState(false);
 	const [selectedId, setSelectedId] = useState(null);
 	const [selectedRequisition, setSelectedRequisition] = useState(null);
@@ -34,7 +29,7 @@ const RetirementsTable = ({ data = [], reloadData }) => {
 
 	const closeReqDetails = () => {
 		setIsReqDetailsOpen(false);
-		setSelectedId("");
+		setSelectedId(null);
 	};
 
 	const handleOpenRetireModal = async (id) => {
@@ -44,42 +39,100 @@ const RetirementsTable = ({ data = [], reloadData }) => {
 			setRetireMode(true);
 			setRetireReqModalOpen(true);
 		} catch (error) {
-			console.log("Error getting single requisition:", error.message);
+			console.error("Error getting single requisition:", error.message);
 		}
 	};
+
 	const handleCloseRetireModal = () => {
 		setRetireMode(false);
 		setRetireReqModalOpen(false);
 	};
 
-	const openReqDetails = () => setIsReqDetailsOpen(true);
-
 	const handleOpenReqDetails = useCallback((id) => {
 		setSelectedId(id);
-		openReqDetails();
+		setIsReqDetailsOpen(true);
 	}, []);
 
-	// const handleClick = async (id) => {
-	// 	setLoadingIds((prevLoadingIds) => [...prevLoadingIds, id]);
-	// 	try {
-	// 		await markAsRetired(id);
-	// 		reloadData();
-	// 	} catch (error) {
-	// 		console.error("Error marking requisition as retired:", error);
-	// 	} finally {
-	// 		setLoadingIds((prevLoadingIds) =>
-	// 			prevLoadingIds.filter((loadingId) => loadingId !== id),
-	// 		);
-	// 	}
-	// };
-
-	const emptyRows =
-		rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
+	const renderTableCell = (row, column) => {
+		switch (column) {
+			case "title":
+				return row?.title;
+			case "amount":
+				return `${getCurrencySign(row?.currency)}${formatAmount(
+					Number(row?.total),
+				)}`;
+			case "status":
+				return (
+					<Typography
+						variant="body2"
+						sx={{
+							color: (theme) =>
+								STATUS_COLOR_TYPE[row?.retiredStatus || "cancelled"] &&
+								theme.palette.text.primary,
+							backgroundColor: (theme) =>
+								STATUS_COLOR_TYPE[row?.retiredStatus || "cancelled"] &&
+								theme.palette[STATUS_COLOR_TYPE[row?.retiredStatus || "cancelled"]]
+									.light,
+							display: "inline",
+							marginRight: "8px",
+							padding: "4px 8px",
+							borderRadius: "4px",
+						}}
+					>
+						{capitalizeFirstLetter(row?.retiredStatus || "controlled")}
+					</Typography>
+				);
+			case "action":
+				return (
+					<Box sx={{ display: "flex", gap: "10px" }}>
+						<Button
+							size="small"
+							onClick={() => handleOpenReqDetails(row?._id)}
+							variant="outlined"
+							sx={{
+								display: "flex",
+								alignItems: "center",
+								color: "text.primary",
+								borderColor: "text.primary",
+								"&:hover": {
+									borderColor: "primary.main",
+									color: "primary.main",
+								},
+							}}
+						>
+							<EyeIcon style={{ width: 16, height: 16, marginRight: 5 }} />
+							View
+						</Button>
+						<Button
+							size="small"
+							onClick={() => handleOpenRetireModal(row?._id)}
+							variant="contained"
+							sx={{
+								display: "flex",
+								alignItems: "center",
+								backgroundColor: "primary.main",
+								color: "white",
+								"&:hover": {
+									backgroundColor: "primary.dark",
+								},
+							}}
+						>
+							<DocumentDuplicateIcon
+								style={{ width: 16, height: 16, marginRight: 5 }}
+							/>
+							Request
+						</Button>
+					</Box>
+				);
+			default:
+				return null;
+		}
+	};
 
 	return (
 		<>
 			<TableContainer component={Paper}>
-				{data.length === 0 && (
+				{data.length === 0 ? (
 					<Box
 						sx={{
 							display: "flex",
@@ -91,8 +144,7 @@ const RetirementsTable = ({ data = [], reloadData }) => {
 					>
 						<Box sx={{ mt: 2 }}>You have no pending retirements 😃!</Box>
 					</Box>
-				)}
-				{data.length > 0 && (
+				) : (
 					<Table>
 						<TableHead>
 							<TableRow>
@@ -103,74 +155,14 @@ const RetirementsTable = ({ data = [], reloadData }) => {
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{(rowsPerPage > 0
-								? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-								: data
-							).map((row) => (
-								<TableRow key={row._id}>
-									<TableCell>{row.title}</TableCell>
-									<TableCell>
-										{getCurrencySign(row?.currency)}
-										{formatAmount(Number(row?.total))}
-									</TableCell>
-									<TableCell>
-										<Typography
-											variant="body2"
-											sx={{
-												color: (theme) =>
-													STATUS_COLOR_TYPE[row.retiredStatus || "cancelled"] &&
-													theme.palette.text.primary,
-												backgroundColor: (theme) =>
-													STATUS_COLOR_TYPE[row.retiredStatus || "cancelled"] &&
-													theme.palette[
-														STATUS_COLOR_TYPE[row.retiredStatus || "cancelled"]
-													].light,
-												display: "inline",
-												marginRight: "8px",
-												padding: "4px 8px",
-												borderRadius: "4px",
-											}}
-										>
-											{capitalizeFirstLetter(row.retiredStatus || "controlled")}
-										</Typography>
-									</TableCell>
-									<TableCell sx={{ display: "flex", gap: "5px" }}>
-										<Button
-											size="small"
-											color="default"
-											onClick={() => handleOpenReqDetails(row._id)}
-											variant="contained"
-										>
-											<ListItemIcon sx={{ width: "16px", height: "16px" }}>
-												<EyeIcon />
-											</ListItemIcon>
-											<ListItemText
-												primaryTypographyProps={{ fontSize: "small" }}
-												primary="View Details"
-											/>
-										</Button>
-										<Button
-											size="small"
-											color="primary"
-											onClick={() => handleOpenRetireModal(row._id)}
-											variant="contained"
-										>
-											<ListItemIcon sx={{ width: "16px", height: "16px" }}>
-												<DocumentDuplicateIcon />
-											</ListItemIcon>
-											<ListItemText
-												primaryTypographyProps={{ fontSize: "small" }}
-												primary="Request Retire"
-											/>
-										</Button>
-									</TableCell>
+							{data.map((row) => (
+								<TableRow key={row?._id}>
+									<TableCell>{renderTableCell(row, "title")}</TableCell>
+									<TableCell>{renderTableCell(row, "amount")}</TableCell>
+									<TableCell>{renderTableCell(row, "status")}</TableCell>
+									<TableCell>{renderTableCell(row, "action")}</TableCell>
 								</TableRow>
 							))}
-							{emptyRows > 0 && (
-								<TableRow style={{ height: 53 * emptyRows }}>
-									<TableCell colSpan={3} />
-								</TableRow>
-							)}
 						</TableBody>
 					</Table>
 				)}
@@ -186,7 +178,7 @@ const RetirementsTable = ({ data = [], reloadData }) => {
 				onClose={handleCloseRetireModal}
 				triggerUpdateRequisition={reloadData}
 				isEditMode={false}
-				requisitionData={selectedRequisition ? selectedRequisition : null}
+				requisitionData={selectedRequisition}
 			/>
 		</>
 	);

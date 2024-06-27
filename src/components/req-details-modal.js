@@ -770,21 +770,6 @@ const RequisitionDetailsModal = ({
 															Cancel
 														</Button>
 													)}
-
-												{/* {requisition.status !== "approved" &&
-                            ["budgetHolder", "finance", "financeReviewer"].includes(
-                              user.accessLevel
-                            ) && (
-                              <Button
-                                variant="contained"
-                                color="warning"
-                                size="small"
-                                sx={{ ml: 2 }}
-                                onClick={() => handleButtonClick("Send Back")}
-                              >
-                                Send Back
-                              </Button>
-                            )} */}
 											</>
 										)}
 									</>

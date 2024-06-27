@@ -194,9 +194,9 @@ const CreateReqModal = ({
 				currency,
 				amountInWords: "",
 				total: Number(totalItemsAmount),
-				accountName: beneficiary?.accountName,
-				accountNumber: Number(beneficiary?.accountNumber),
-				bankName: beneficiary?.bankName,
+				accountName: beneficiary?.accountName || newAccountName,
+				accountNumber: Number(beneficiary?.accountNumber) || newAccountNumber,
+				bankName: beneficiary?.bankName || newBankName,
 				attentionTo: attentionToUser?.email || "",
 				projectChargedTo: {
 					account: {
