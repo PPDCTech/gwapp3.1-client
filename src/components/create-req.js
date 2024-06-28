@@ -764,7 +764,7 @@ const CreateReqModal = ({
 								<input
 									type="file"
 									id="fileInput"
-									accept=".jpg, .jpeg, .png, .pdf .xls, .xlsx"
+									accept=".jpg, .jpeg, .png, .pdf, .xls, .xlsx"
 									multiple
 									style={{ display: "none" }}
 									onChange={handleFileUpload}
