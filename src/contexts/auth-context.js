@@ -6,7 +6,6 @@ import {
 	useRef,
 } from "react";
 import PropTypes from "prop-types";
-import { jwtDecode } from "jwt-decode";
 
 import { fetchSingleUser } from "../services/api/users.api";
 import { verifyLogin } from "../services/api/auth.api";
@@ -124,29 +123,6 @@ export const AuthProvider = (props) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[],
 	);
-
-	useEffect(() => {
-		const token = window.localStorage.getItem("token");
-
-		if (token) {
-			const decodedToken = jwtDecode(token);
-			const expirationTime = decodedToken.exp * 1000;
-			const isExpired = Date.now() > expirationTime;
-			if (isExpired) {
-				signOut();
-				// dispatch({
-				// 	type: HANDLERS.SIGN_OUT,
-				// });
-			} else {
-				const timeout = expirationTime - Date.now();
-				const timer = setTimeout(() => {
-					signOut();
-				}, timeout);
-	
-				return () => clearTimeout(timer);
-			}
-		}
-	}, []);
 
 	const signIn = async (password) => {
 		try {
