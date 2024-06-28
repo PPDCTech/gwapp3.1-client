@@ -48,7 +48,11 @@ import { getAllProjects } from "../services/api/projects.api";
 import { getAllBudgetCodes } from "../services/api/budget-codes.api";
 import { CheckCircleOutline } from "@mui/icons-material";
 import { removeFileAPI, uploadFileAPI } from "../services/api/uploads.api";
-import { addVendor, getAllVendors } from "../services/api/vendors.api";
+import {
+	addVendor,
+	getAllVendors,
+	getUserVendors,
+} from "../services/api/vendors.api";
 
 const CreateReqModal = ({
 	open,
@@ -153,7 +157,7 @@ const CreateReqModal = ({
 					budgetCodesResponse,
 				] = await Promise.all([
 					fetchBudgetHolders(),
-					getAllVendors(),
+					getUserVendors(user._id),
 					getAllProjects(),
 					getAllBudgetCodes(),
 				]);
