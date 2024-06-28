@@ -76,6 +76,7 @@ const CreateReqModal = ({
 	const [newItemTitle, setNewItemTitle] = useState("");
 	const [newItemAmount, setNewItemAmount] = useState("");
 	const [newItemCode, setNewItemCode] = useState("");
+	let budgetLineItems = [];
 	const [itemsArray, setItemsArray] = useState([]);
 	const [totalItemsAmount, setTotalItemsAmount] = useState(0);
 
@@ -173,6 +174,40 @@ const CreateReqModal = ({
 		fetchData();
 	}, []);
 
+	useEffect(() => {
+		if (newItemCode) {
+			budgetLineItems.push(newItemCode);
+		}
+		// eslint-disable-next-line
+	}, [newItemCode]);
+
+	const resetForm = () => {
+		setNewItemTitle("");
+		setNewItemAmount("");
+		setNewItemCode("");
+		budgetLineItems = [];
+		setItemsArray([]);
+		setTotalItemsAmount(0);
+
+		setSelectedFiles([]);
+		setInvoiceArray([]);
+
+		setBudgetHolders([]);
+		setAttentionTo("");
+
+		setBeneficiaryList([]);
+		setBeneficiaryName("");
+		setBeneficiary({});
+
+		setNewBankName("");
+		setNewAccountNumber("");
+		setNewAccountName("");
+
+		setProjects([]);
+		setBudgetCodes([]);
+	};
+
+
 	const handleSubmitRequisition = async (event) => {
 		event.preventDefault();
 
@@ -209,6 +244,7 @@ const CreateReqModal = ({
 					funder: selectedProject ? selectedProject.funder : "",
 					projectName: projectName,
 				},
+				budgetLineItems,
 				date: getCurrentDateTimeString(),
 			};
 
@@ -228,6 +264,7 @@ const CreateReqModal = ({
 			if (response.status === 201) {
 				toast.success("Request created successfully");
 				onClose();
+				resetForm();
 			}
 		} catch (error) {
 			toast.error(`Error creating request\n${error.message}`);
@@ -466,7 +503,7 @@ const CreateReqModal = ({
 
 	const handleRemoveFile = async (index, id) => {
 		try {
-			const response = await removeFileAPI(id); 
+			const response = await removeFileAPI(id);
 			if (response.status === 204) {
 				setInvoiceArray((prevArray) => prevArray.filter((_, i) => i !== index));
 			}
@@ -719,6 +756,7 @@ const CreateReqModal = ({
 								<Typography variant="body2" sx={{ color: "text.secondary", mt: 1 }}>
 									Please for multiple files, hold down the Ctrl/cmd key and select a
 									maximum of 5 files.
+									<br />Don't forget to press the Upload button after selecting file(s).
 								</Typography>{" "}
 							</Grid>
 							<Grid item xs={12} md={6}>

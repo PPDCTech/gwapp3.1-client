@@ -214,7 +214,7 @@ const RequisitionDetailsModal = ({
 	};
 
 	const isValidRequisition =
-		requisition && requisition.title && requisition.status;
+		requisition && requisition?.title && requisition?.status;
 
 	const markAsRetiredHandler = async () => {
 		try {
@@ -484,14 +484,17 @@ const RequisitionDetailsModal = ({
 								<Grid item xs={12}>
 									<Typography variant="subtitle2">Invoices</Typography>
 									<Grid container spacing={2}>
-										{requisition.invoices.map((invoice, index) => (
+										{(requisition.invoices && requisition.invoices.length > 0
+											? requisition.invoices
+											: requisition.receipts || []
+										).map((document, index) => (
 											<Grid item key={index}>
-												{isImage(invoice.url) ? (
+												{isImage(document.url) ? (
 													<img
-														src={invoice.url}
-														alt={invoice.name}
+														src={document.url}
+														alt={document.name}
 														style={{ width: "100px", height: "100px", cursor: "pointer" }}
-														onClick={() => window.open(invoice.url, "_blank")}
+														onClick={() => window.open(document.url, "_blank")}
 													/>
 												) : (
 													<div
@@ -509,7 +512,7 @@ const RequisitionDetailsModal = ({
 															borderRadius: "5px",
 															transition: "background-color 0.3s ease",
 														}}
-														onClick={() => window.open(invoice.url, "_blank")}
+														onClick={() => window.open(document.url, "_blank")}
 														onMouseEnter={(e) =>
 															(e.currentTarget.style.backgroundColor = "#D2D6DB")
 														}
@@ -518,7 +521,7 @@ const RequisitionDetailsModal = ({
 														}
 													>
 														<DocumentIcon style={{ height: 24, width: 24 }} />
-														<Typography variant="caption">{invoice.name}</Typography>
+														<Typography variant="caption">{document.name}</Typography>
 													</div>
 												)}
 											</Grid>
