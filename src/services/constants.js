@@ -2,7 +2,7 @@ import { API } from "./base-url";
 
 export const STATUS_COLOR_TYPE = {
 	pending: "warning",
-	holderChecked: "secondary",
+	holderChecked: "neutral",
 	requested: "secondary",
 	checked: "primary",
 	reviewed: "info",
@@ -11,7 +11,7 @@ export const STATUS_COLOR_TYPE = {
 	sentBack: "error",
 	cancelled: "error",
 	controlled: "error",
-	deleted: "warning",
+	deleted: "error",
 };
 
 export const VERIFY_PASSWORD_API = `${API}/verify-password`;
