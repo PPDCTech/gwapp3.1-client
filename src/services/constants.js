@@ -1,16 +1,18 @@
 import { API } from "./base-url";
 
 export const STATUS_COLOR_TYPE = {
-	pending: "warning",
-	holderChecked: "secondary",
+	pending: "neutral",
+	holderChecked: "blue",
+	holderCheck: "blue",
 	requested: "secondary",
 	checked: "primary",
 	reviewed: "info",
 	approved: "success",
 	retired: "success",
-	sentBack: "error",
+	sentBack: "warning",
 	cancelled: "error",
 	controlled: "error",
+	deleted: "error",
 };
 
 export const VERIFY_PASSWORD_API = `${API}/verify-password`;

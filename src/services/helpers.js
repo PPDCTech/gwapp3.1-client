@@ -52,29 +52,55 @@ export const getDateYearMonthDay = (dateString) => {
   return `${year}-${month}-${day}`;
 };
 
+// export const tobase64 = (url) => {
+//   return new Promise((resolve, reject) => {
+//     const canvas = document.createElement("canvas");
+//     let img = document.createElement("img");
+//     let ctx = canvas.getContext("2d");
+
+//     img.setAttribute("src", url);
+//     img.crossOrigin = "anonymous";
+
+//     img.onload = function () {
+//       canvas.width = img.width;
+//       canvas.height = img.height;
+//       ctx.drawImage(img, 0, 0);
+//       let dataUrl = canvas.toDataURL("image/png");
+//       resolve(dataUrl);
+//     };
+
+//     img.onerror = function (e) {
+//       console.info("error: ", e.message);
+//       reject(e.message);
+//     };
+//   });
+// };
+
 export const tobase64 = (url) => {
   return new Promise((resolve, reject) => {
     const canvas = document.createElement("canvas");
-    let img = document.createElement("img");
-    let ctx = canvas.getContext("2d");
+    const img = new Image();
+    const ctx = canvas.getContext("2d");
 
-    img.setAttribute("src", url);
     img.crossOrigin = "anonymous";
 
     img.onload = function () {
       canvas.width = img.width;
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
-      let dataUrl = canvas.toDataURL("image/png");
+      const dataUrl = canvas.toDataURL("image/png");
       resolve(dataUrl);
     };
 
     img.onerror = function (e) {
-      console.info("error: ", e.message);
-      reject(e.message);
+      console.error("Failed to load image:", e.message);
+      reject(new Error(`Failed to load image from URL: ${url}. Error: ${e.message}`));
     };
+
+    img.src = url;
   });
 };
+
 
 export const capitalizeFirstLetter = (str) => {
   if (!str) {

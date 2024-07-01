@@ -25,7 +25,7 @@ const SeverityPillRoot = styled('span')(({ theme, ownerState }) => {
     minWidth: 20,
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1),
-    textTransform: 'uppercase',
+    textTransform: 'capitalize',
     whiteSpace: 'nowrap'
   };
 });
@@ -53,6 +53,7 @@ SeverityPill.propTypes = {
     'error',
     'info',
     'warning',
-    'success'
+    'success',
+    'blue'
   ])
 };

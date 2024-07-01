@@ -16,6 +16,7 @@ import {
 	ListItemIcon,
 	ListItemText,
 	Select,
+	Chip,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
@@ -195,9 +196,9 @@ export const RequisitionTable = ({
 								<Table>
 									<TableHead>
 										<TableRow>
-											<TableCell sx={{ width: "15%" }}>SN</TableCell>
+											<TableCell sx={{ width: "10%" }}>SN</TableCell>
 											<TableCell sx={{ width: "35%" }}>Title</TableCell>
-											<TableCell sx={{ width: "15%" }}>Type</TableCell>
+											<TableCell sx={{ width: "20%" }}>Raised By</TableCell>
 											<TableCell sx={{ width: "10%" }}>Amount</TableCell>
 											<TableCell sx={{ width: "15%" }}>Date</TableCell>
 											<TableCell sx={{ width: "10%" }}>Status</TableCell>
@@ -230,14 +231,33 @@ export const RequisitionTable = ({
 																backgroundColor: "#F3F4F6",
 																boxShadow: "inset 0 0 5px rgba(0,0,0,0.1)",
 															},
+															paddingTop: "2rem",
 														}}
 														onClick={() => handleOpenReqDetails(requisition?._id)}
 													>
-														<Tooltip placement="top-start" title={requisition?.title}>
-															<>{shortenString(requisition?.title, 40)}</>
-														</Tooltip>
+														<div
+															style={{
+																position: "relative",
+																display: "inline-block",
+															}}
+														>
+															<Chip
+																label={requisition?.type}
+																style={{
+																	position: "absolute",
+																	top: "-20px",
+																	left: "0",
+																	fontSize: "10px",
+																	height: "18px",
+																	lineHeight: "18px",
+																}}
+															/>
+															<Tooltip placement="top-start" title={requisition?.title}>
+																<span>{shortenString(requisition?.title, 50)}</span>
+															</Tooltip>
+														</div>
 													</TableCell>
-													<TableCell>{requisition?.type}</TableCell>
+													<TableCell>{requisition?.user?.name}</TableCell>
 													<TableCell>
 														{getCurrencySign(requisition?.currency)}
 														{formatAmount(Number(requisition?.total))}
@@ -247,7 +267,9 @@ export const RequisitionTable = ({
 														<SeverityPill
 															color={STATUS_COLOR_TYPE[requisition?.status || "pending"]}
 														>
-															{requisition?.status}
+															{requisition?.status === "checked"
+																? "financeCheck"
+																: requisition?.status}
 														</SeverityPill>
 													</TableCell>
 
@@ -288,27 +310,45 @@ export const RequisitionTable = ({
 																</span>
 															)}
 														>
-															<MenuList sx={{ border: "none" }}>
-																<Tooltip placement="top-start" title="View Details">
+															<MenuList
+																sx={{
+																	border: "none",
+																}}
+															>
+																<Tooltip placement="top-start" title="View details">
 																	<MenuItem
 																		onClick={() => handleOpenReqDetails(requisition?._id)}
 																	>
-																		<ListItemIcon sx={{ width: "16px", height: "16px" }}>
+																		<ListItemIcon
+																			sx={{
+																				width: "16px",
+																				height: "16px",
+																			}}
+																		>
 																			<EyeIcon />
 																		</ListItemIcon>
 																		<ListItemText
-																			primaryTypographyProps={{ fontSize: "small" }}
+																			primaryTypographyProps={{
+																				fontSize: "small",
+																			}}
 																			primary="View Details"
 																		/>
 																	</MenuItem>
 																</Tooltip>
 																<Tooltip placement="top-start" title="Messages">
 																	<MenuItem onClick={() => openChatModal(requisition?._id)}>
-																		<ListItemIcon sx={{ width: "16px", height: "16px" }}>
+																		<ListItemIcon
+																			sx={{
+																				width: "16px",
+																				height: "16px",
+																			}}
+																		>
 																			<ChatBubbleOvalLeftEllipsisIcon />
 																		</ListItemIcon>
 																		<ListItemText
-																			primaryTypographyProps={{ fontSize: "small" }}
+																			primaryTypographyProps={{
+																				fontSize: "small",
+																			}}
 																			primary="Messages"
 																		/>
 																	</MenuItem>
@@ -325,11 +365,18 @@ export const RequisitionTable = ({
 																				handleSendBackRequisition(e, requisition?._id)
 																			}
 																		>
-																			<ListItemIcon sx={{ width: "16px", height: "16px" }}>
+																			<ListItemIcon
+																				sx={{
+																					width: "16px",
+																					height: "16px",
+																				}}
+																			>
 																				<ArrowUturnLeftIcon />
 																			</ListItemIcon>
 																			<ListItemText
-																				primaryTypographyProps={{ fontSize: "small" }}
+																				primaryTypographyProps={{
+																					fontSize: "small",
+																				}}
 																				primary="Send Back"
 																			/>
 																		</MenuItem>
@@ -347,11 +394,18 @@ export const RequisitionTable = ({
 																			value="edit"
 																			onClick={() => handleOpenEditModal(requisition?._id)}
 																		>
-																			<ListItemIcon sx={{ width: "16px", height: "16px" }}>
+																			<ListItemIcon
+																				sx={{
+																					width: "16px",
+																					height: "16px",
+																				}}
+																			>
 																				<PencilSquareIcon />
 																			</ListItemIcon>
 																			<ListItemText
-																				primaryTypographyProps={{ fontSize: "small" }}
+																				primaryTypographyProps={{
+																					fontSize: "small",
+																				}}
 																				primary="Edit"
 																			/>
 																		</MenuItem>
@@ -370,7 +424,12 @@ export const RequisitionTable = ({
 																			value="print"
 																			onClick={() => handlePrint(requisition?._id)}
 																		>
-																			<ListItemIcon sx={{ width: "16px", height: "16px" }}>
+																			<ListItemIcon
+																				sx={{
+																					width: "16px",
+																					height: "16px",
+																				}}
+																			>
 																				{printLoading[requisition?._id] ? (
 																					<CircularProgress size={20} />
 																				) : (
@@ -378,7 +437,9 @@ export const RequisitionTable = ({
 																				)}
 																			</ListItemIcon>
 																			<ListItemText
-																				primaryTypographyProps={{ fontSize: "small" }}
+																				primaryTypographyProps={{
+																					fontSize: "small",
+																				}}
 																				primary="Print"
 																			/>
 																		</MenuItem>
@@ -399,11 +460,18 @@ export const RequisitionTable = ({
 																				setItemId(requisition?._id);
 																			}}
 																		>
-																			<ListItemIcon sx={{ width: "16px", height: "16px" }}>
+																			<ListItemIcon
+																				sx={{
+																					width: "16px",
+																					height: "16px",
+																				}}
+																			>
 																				<TrashIcon />
 																			</ListItemIcon>
 																			<ListItemText
-																				primaryTypographyProps={{ fontSize: "small" }}
+																				primaryTypographyProps={{
+																					fontSize: "small",
+																				}}
 																				primary="Delete"
 																			/>
 																		</MenuItem>

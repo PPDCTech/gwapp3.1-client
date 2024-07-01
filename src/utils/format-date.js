@@ -1,6 +1,9 @@
 import dayjs from "dayjs";
 
 export const formatDate = (date) => {
+  if (!date) {
+    return "-"
+  }
   if (new Date(date).toString() === "Invalid Date") {
     return "N/A";
   }

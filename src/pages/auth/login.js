@@ -17,6 +17,7 @@ import { loginUser } from "../../services/api/auth.api";
 const Login = () => {
 	useNProgress();
 	const [openModal, setOpenModal] = useState(false);
+	// const [openModal, setOpenModal] = useState(true); // for debugging - will remove later
 
 	const [loadingSubmit, setLoadingSubmit] = useState(false);
 	const [method, setMethod] = useState("email");
