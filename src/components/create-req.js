@@ -307,13 +307,13 @@ const CreateReqModal = ({
 					  Number(requisitionData.total),
 				accountName: beneficiary?.accountName
 					? beneficiary.accountName
-					: requisitionData.accountName,
+					: newAccountName || requisitionData.accountName,
 				accountNumber: beneficiary?.accountNumber
 					? Number(beneficiary.accountNumber)
-					: Number(requisitionData.accountNumber),
+					: Number(newAccountNumber) || Number(requisitionData.accountNumber),
 				bankName: beneficiary?.bankName
 					? beneficiary.bankName
-					: requisitionData.bankName,
+					: newBankName || requisitionData.bankName,
 				attentionTo: attentionToUser?.email
 					? attentionToUser.email
 					: requisitionData.attentionTo,
