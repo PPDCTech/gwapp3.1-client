@@ -6,7 +6,7 @@ import {
 	ListItemText,
 	Typography,
 	Box,
-	Tooltip
+	Tooltip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import {
@@ -104,27 +104,31 @@ const NotificationDropdown = (props) => {
 				{userNotifications.map((notification) => (
 					<div key={notification._id}>
 						{notification.messages.map((message) => (
-							<Tooltip title="Click to view item" key={message._id} placement="left-start">
-							<ListItem
+							<Tooltip
+								title="Click to view item"
 								key={message._id}
-								onClick={() =>
-									handleReadClick(message._id, notification.requisition_id)
-								}
-								style={{
-									cursor: "pointer",
-									backgroundColor: `${message.read ? "transparent" : success.lightest}`,
-									borderBottom: "0.1px solid #aaa",
-								}}
+								placement="top-start"
 							>
-								<ListItemText
-									sx={{ margin: 0, padding: 0 }}
-									primary={<Typography variant="body2">{message.message}</Typography>}
-									secondary={
-										<Typography variant="caption">
-											{formatTimeDifference(notification.createdAt)}
-										</Typography>
+								<ListItem
+									key={message._id}
+									onClick={() =>
+										handleReadClick(message._id, notification.requisition_id)
 									}
-								/>
+									style={{
+										cursor: "pointer",
+										backgroundColor: `${message.read ? "transparent" : success.lightest}`,
+										borderBottom: "0.1px solid #aaa",
+									}}
+								>
+									<ListItemText
+										sx={{ margin: 0, padding: 0 }}
+										primary={<Typography variant="body2">{message.message}</Typography>}
+										secondary={
+											<Typography variant="caption">
+												{formatTimeDifference(notification.createdAt)}
+											</Typography>
+										}
+									/>
 								</ListItem>
 							</Tooltip>
 						))}

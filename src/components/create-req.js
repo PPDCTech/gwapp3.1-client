@@ -1063,7 +1063,7 @@ const CreateReqModal = ({
 								variant="contained"
 								onClick={(e) => handleSaveEditRequisition(e)}
 							>
-								{loadingSaveEdit ? "Saving.." : "Submit Changes"}
+								{loadingSaveEdit ? "Saving..." : "Submit Changes"}
 							</Button>
 						) : retireMode ? (
 							<Button

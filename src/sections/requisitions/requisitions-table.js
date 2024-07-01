@@ -216,8 +216,9 @@ export const RequisitionTable = ({
 									<TableBody>
 										{requisitions &&
 											requisitions?.map((requisition) => (
-												<TableRow key={requisition?._id}
-												className={printLoading[requisition?._id] ? "animated-row" : ""}
+												<TableRow
+													key={requisition?._id}
+													className={printLoading[requisition?._id] ? "animated-row" : ""}
 												>
 													<TableCell>
 														{requisition?.serialNumber ? requisition?.serialNumber : "N/A"}
@@ -232,7 +233,7 @@ export const RequisitionTable = ({
 														}}
 														onClick={() => handleOpenReqDetails(requisition?._id)}
 													>
-														<Tooltip placement="left-start" title={requisition?.title}>
+														<Tooltip placement="top-start" title={requisition?.title}>
 															<>{shortenString(requisition?.title, 40)}</>
 														</Tooltip>
 													</TableCell>
@@ -288,7 +289,7 @@ export const RequisitionTable = ({
 															)}
 														>
 															<MenuList sx={{ border: "none" }}>
-																<Tooltip placement="left-start" title="View details">
+																<Tooltip placement="top-start" title="View Details">
 																	<MenuItem
 																		onClick={() => handleOpenReqDetails(requisition?._id)}
 																	>
@@ -301,7 +302,7 @@ export const RequisitionTable = ({
 																		/>
 																	</MenuItem>
 																</Tooltip>
-																<Tooltip placement="left-start" title="Messages">
+																<Tooltip placement="top-start" title="Messages">
 																	<MenuItem onClick={() => openChatModal(requisition?._id)}>
 																		<ListItemIcon sx={{ width: "16px", height: "16px" }}>
 																			<ChatBubbleOvalLeftEllipsisIcon />
@@ -318,7 +319,7 @@ export const RequisitionTable = ({
 																user?.accessLevel !== "user" &&
 																user?.accessLevel !== "userManager" &&
 																requisition?.attentionTo.includes(user?.email) ? (
-																	<Tooltip placement="left-start" title="Send Back">
+																	<Tooltip placement="top-start" title="Send Back">
 																		<MenuItem
 																			onClick={(e) =>
 																				handleSendBackRequisition(e, requisition?._id)
@@ -341,7 +342,7 @@ export const RequisitionTable = ({
 																requisition?.retiredStatus !== "retired" &&
 																(requisition?.user?.name === user?.name ||
 																	requisition?.user?.email === user?.email) ? (
-																	<Tooltip placement="left-start" title="Edit">
+																	<Tooltip placement="top-start" title="Edit">
 																		<MenuItem
 																			value="edit"
 																			onClick={() => handleOpenEditModal(requisition?._id)}
@@ -364,7 +365,7 @@ export const RequisitionTable = ({
 																	["tech", "finance", "financeReviewer"].includes(
 																		user?.accessLevel,
 																	)) ? (
-																	<Tooltip placement="left-start" title="Print">
+																	<Tooltip placement="top-start" title="Print">
 																		<MenuItem
 																			value="print"
 																			onClick={() => handlePrint(requisition?._id)}
@@ -390,7 +391,7 @@ export const RequisitionTable = ({
 																requisition?.status !== "retired" &&
 																(requisition?.user?.name === user?.name ||
 																	requisition?.user?.email === user?.email) ? (
-																	<Tooltip placement="left-start" title="Delete">
+																	<Tooltip placement="top-start" title="Delete">
 																		<MenuItem
 																			value="delete"
 																			onClick={() => {
