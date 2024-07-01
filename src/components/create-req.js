@@ -290,13 +290,21 @@ const CreateReqModal = ({
 				(holder) => holder.name === attentionTo,
 			);
 
+			// Filter out invoices that are already in requisitionData.invoices
+			const existingInvoiceNames = requisitionData.invoices.map(
+				(invoice) => invoice.name,
+			);
+			const newInvoices = invoiceArray.filter(
+				(invoice) => !existingInvoiceNames.includes(invoice.name),
+			);
+
 			const formValues = {
 				userId: user._id,
 				type: type ? type : requisitionData.type,
 				title: title ? title : requisitionData.title,
 				invoices:
 					invoiceArray.length > 0
-						? [...requisitionData.invoices, ...invoiceArray]
+						? [...requisitionData.invoices, ...newInvoices]
 						: requisitionData.invoices,
 				items: itemsArray ? itemsArray : requisitionData.itemsArray,
 				currency: currency ? currency : requisitionData.currency,
@@ -363,6 +371,7 @@ const CreateReqModal = ({
 			);
 
 			if (update_response.status === 200) {
+				toast.success("Request updated successfully");
 				triggerUpdateRequisition(update_response.data);
 				setPart(1);
 				onClose();

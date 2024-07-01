@@ -24,7 +24,6 @@ export const AuthGuard = (props) => {
 						window.localStorage.removeItem("gwapp_userId");
 						console.log("Token expired, redirecting");
 						window.location.href = "/user/login";
-						window.location.reload();
 					}
 				} catch (error) {
 					console.error("Failed to decode token:", error);
@@ -32,7 +31,6 @@ export const AuthGuard = (props) => {
 					window.localStorage.removeItem("authenticated");
 					window.localStorage.removeItem("gwapp_userId");
 					window.location.href = "/user/login";
-					window.location.reload();
 				}
 			}
 
@@ -42,7 +40,6 @@ export const AuthGuard = (props) => {
 				window.localStorage.removeItem("gwapp_userId");
 				console.log("Not authenticated, redirecting");
 				window.location.href = "/user/login";
-				window.location.reload();
 			}
 		};
 
