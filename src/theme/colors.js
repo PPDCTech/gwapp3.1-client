@@ -71,8 +71,11 @@ export const error = withAlphas({
     contrastText: "#FFFFFF",
 });
 
-export const orange = withAlphas({
-    main: "#ff5722",
-    dark: "#e64a19",
-    alpha12: "rgba(255, 87, 34, 0.12)",
+export const blue = withAlphas({
+  lightest: '#E3F2FD',
+  light: '#90CAF9',
+  main: '#2196F3',
+  dark: '#1976D2',
+  darkest: '#0D47A1',
+  contrastText: '#FFFFFF'
 });

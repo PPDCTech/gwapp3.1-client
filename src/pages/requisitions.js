@@ -61,6 +61,7 @@ const Requisitions = () => {
 
     const handleTabChange = (newValue) => {
         setSelectedTab(newValue);
+        setPage(1);
     };
 
     useEffect(() => {

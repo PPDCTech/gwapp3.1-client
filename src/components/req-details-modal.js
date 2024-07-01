@@ -511,7 +511,7 @@ const RequisitionDetailsModal = ({
                                 </Grid>
 
                                 {/* Check history */}
-                                <Grid item xs={8}>
+                                <Grid item xs={8} sx={{ boxShadow: "0 0 2px grey"}}>
                                     {/* <Accordion expanded={expanded} onChange={handleAccordionChange}>
 										<AccordionSummary
 											expandIcon={<ChevronDownIcon className="h-6 w-6 text-gray-500" />}
