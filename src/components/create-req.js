@@ -252,16 +252,34 @@ const CreateReqModal = ({
 				date: getCurrentDateTimeString(),
 			};
 
-			if (
-				!formValues.type ||
-				!formValues.title ||
-				(formValues.items && formValues.items.length < 1) ||
-				!formValues.bankName ||
-				!formValues.accountNumber ||
-				!formValues.attentionTo ||
-				!formValues.projectChargedTo
-			) {
-				return toast.warning("Missing parameters");
+			// Validate each parameter separately
+			if (!formValues.type) {
+				toast.warning("Type is missing");
+				return;
+			}
+			if (!formValues.title) {
+				toast.warning("Title is missing");
+				return;
+			}
+			if (!formValues.items || formValues.items.length < 1) {
+				toast.warning("No items added");
+				return;
+			}
+			if (!formValues.bankName) {
+				toast.warning("Bank name is missing");
+				return;
+			}
+			if (!formValues.accountNumber) {
+				toast.warning("Account number is missing");
+				return;
+			}
+			if (!formValues.attentionTo) {
+				toast.warning("Attention to is missing");
+				return;
+			}
+			if (!selectedProject) {
+				toast.warning("Please select a project");
+				return;
 			}
 
 			const response = await createRequisition(formValues);
@@ -353,16 +371,34 @@ const CreateReqModal = ({
 				date: getCurrentDateTimeString(),
 			};
 
-			if (
-				!formValues.type ||
-				!formValues.title ||
-				(formValues.itemsArray && formValues.itemsArray.length < 1) ||
-				!formValues.bankName ||
-				!formValues.accountNumber ||
-				!formValues.attentionTo ||
-				!formValues.projectChargedTo
-			) {
-				return toast.warning("Missing parameters");
+			// Validate each parameter separately
+			if (!formValues.type) {
+				toast.warning("Type is missing");
+				return;
+			}
+			if (!formValues.title) {
+				toast.warning("Title is missing");
+				return;
+			}
+			if (!formValues.items || formValues.items.length < 1) {
+				toast.warning("No items added");
+				return;
+			}
+			if (!formValues.bankName) {
+				toast.warning("Bank name is missing");
+				return;
+			}
+			if (!formValues.accountNumber) {
+				toast.warning("Account number is missing");
+				return;
+			}
+			if (!formValues.attentionTo) {
+				toast.warning("Attention to is missing");
+				return;
+			}
+			if (!selectedProject) {
+				toast.warning("Please select a project");
+				return;
 			}
 
 			const update_response = await updateRequisition(
