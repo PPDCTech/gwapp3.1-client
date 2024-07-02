@@ -312,6 +312,8 @@ const CreateReqModal = ({
 			const existingInvoiceNames = requisitionData.invoices.map(
 				(invoice) => invoice.name,
 			);
+
+			// Filter new invoices to avoid duplicates
 			const newInvoices = invoiceArray.filter(
 				(invoice) => !existingInvoiceNames.includes(invoice.name),
 			);
@@ -320,10 +322,10 @@ const CreateReqModal = ({
 				userId: user._id,
 				type: type ? type : requisitionData.type,
 				title: title ? title : requisitionData.title,
-				invoices:
-					invoiceArray.length > 0
-						? [...requisitionData.invoices, ...newInvoices]
-						: requisitionData.invoices,
+				invoices: [
+					...requisitionData.invoices,
+					...newInvoices, 
+				],
 				items: itemsArray ? itemsArray : requisitionData.itemsArray,
 				currency: currency ? currency : requisitionData.currency,
 				amountInWords: "",
@@ -411,6 +413,7 @@ const CreateReqModal = ({
 				triggerUpdateRequisition(update_response.data);
 				setPart(1);
 				onClose();
+				resetForm();
 			}
 		} catch (error) {
 			console.log("Failed to save changes", error.message);

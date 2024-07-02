@@ -25,7 +25,21 @@ const NotificationDropdown = (props) => {
 	useEffect(() => {
 		const getUserMessages = async () => {
 			const response = await fetchUserMessages(user?._id);
-			setUserNotifications(response.data);
+			const data = response.data;
+
+			const allMessages = data.flatMap((notification) =>
+				notification.messages.map((message) => ({
+					...message,
+					notificationId: notification._id,
+					requisitionId: notification.requisition_id,
+					createdAt: notification.createdAt,
+				})),
+			);
+
+			const userMessages = allMessages.filter(
+				(message) => message.user_id === user?._id,
+			);
+			setUserNotifications(userMessages);
 		};
 
 		getUserMessages();
@@ -62,14 +76,11 @@ const NotificationDropdown = (props) => {
 			`/requisitions?id=${requisitionId}&action=openModal&selectedTab=allRequisitions`,
 		);
 
-		const updatedNotifications = userNotifications.map((notification) => {
-			const updatedMessages = notification.messages.map((message) => {
-				if (message._id === messageId) {
-					return { ...message, read: true };
-				}
-				return message;
-			});
-			return { ...notification, messages: updatedMessages };
+		const updatedNotifications = userNotifications.map((message) => {
+			if (message._id === messageId) {
+				return { ...message, read: true };
+			}
+			return message;
 		});
 		setUserNotifications(updatedNotifications);
 	};
@@ -101,38 +112,32 @@ const NotificationDropdown = (props) => {
 				<Typography variant="subtitle1" gutterBottom>
 					Notifications
 				</Typography>
-				{userNotifications.map((notification) => (
-					<div key={notification._id}>
-						{notification.messages.map((message) => (
-							<Tooltip
-								title="Click to view item"
-								key={message._id}
-								placement="top-start"
-							>
-								<ListItem
-									key={message._id}
-									onClick={() =>
-										handleReadClick(message._id, notification.requisition_id)
-									}
-									style={{
-										cursor: "pointer",
-										backgroundColor: `${message.read ? "transparent" : success.lightest}`,
-										borderBottom: "0.1px solid #aaa",
-									}}
-								>
-									<ListItemText
-										sx={{ margin: 0, padding: 0 }}
-										primary={<Typography variant="body2">{message.message}</Typography>}
-										secondary={
-											<Typography variant="caption">
-												{formatTimeDifference(notification.createdAt)}
-											</Typography>
-										}
-									/>
-								</ListItem>
-							</Tooltip>
-						))}
-					</div>
+				{userNotifications.map((message) => (
+					<Tooltip
+						title="Click to view item"
+						key={message._id}
+						placement="top-start"
+					>
+						<ListItem
+							key={message._id}
+							onClick={() => handleReadClick(message._id, message.requisitionId)}
+							style={{
+								cursor: "pointer",
+								backgroundColor: `${message.read ? "transparent" : success.lightest}`,
+								borderBottom: "0.1px solid #aaa",
+							}}
+						>
+							<ListItemText
+								sx={{ margin: 0, padding: 0 }}
+								primary={<Typography variant="body2">{message.message}</Typography>}
+								secondary={
+									<Typography variant="caption">
+										{formatTimeDifference(message.createdAt)}
+									</Typography>
+								}
+							/>
+						</ListItem>
+					</Tooltip>
 				))}
 				{userNotifications.length === 0 && (
 					<Typography variant="body2" color="textSecondary">
