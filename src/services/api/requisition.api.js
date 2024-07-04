@@ -47,7 +47,7 @@ export const getApprovedForPrint = async (params = {}) => {
         : "";
     const endpointWithQuery = `print/approved${query}`;
 
-    return await fetchData(endpointWithQuery);
+    return fetchData(endpointWithQuery);
 };
 
 export const getUserRequisitions = (userId, page, limit) => {

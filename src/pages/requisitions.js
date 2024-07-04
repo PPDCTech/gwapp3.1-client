@@ -7,6 +7,8 @@ import {
     Grid,
     Typography,
     Divider,
+    Alert,
+    AlertTitle,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import CreateReqModal from "../components/create-req";
@@ -47,7 +49,7 @@ const Requisitions = () => {
     const [isCreateReqModalOpen, setCreateReqModalOpen] = useState(false);
     const [selectedRequisition] = useState(null);
     const [editMode, setEditMode] = useState(false);
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(0);
     const [limit, setLimit] = useState(10);
     const [filteredPage, setFilteredPage] = useState(1);
     const [filteredLimit, setFilteredLimit] = useState(10);
@@ -61,12 +63,14 @@ const Requisitions = () => {
 
     const handleTabChange = (newValue) => {
         setSelectedTab(newValue);
-        setPage(1);
+        setPage(0);
     };
 
     useEffect(() => {
         if (["user", "staff", "tech"].includes(user.accessLevel)) {
             setSelectedTab("myRequisitions");
+        } else if (user.accessLevel === "superUser") {
+            setSelectedTab("allRequisitions");
         } else {
             setSelectedTab("forMyAttention");
         }
@@ -95,7 +99,7 @@ const Requisitions = () => {
                     const myAttentionReqs = await getAttentionedToRequisitions(
                         user?.email
                     );
-                    
+
                     fetchedRequisitions = myAttentionReqs.data.requisitions;
                     count = myAttentionReqs.data.totalCount;
                     break;
@@ -146,7 +150,7 @@ const Requisitions = () => {
 
     const handleLimitChange = (event) => {
         setLimit(parseInt(event.target.value, 10));
-        setPage(1);
+        setPage(0);
     };
 
     const handleFilteredPageChange = (event, newPage) => {
@@ -257,18 +261,21 @@ const Requisitions = () => {
                                         label="My Requisitions"
                                     />
                                 )}
-                                {user.accessLevel !== "user" && (
-                                    <CustomTab
-                                        isActive={
-                                            selectedTab === "forMyAttention"
-                                        }
-                                        value="forMyAttention"
-                                        onClick={() =>
-                                            handleTabChange("forMyAttention")
-                                        }
-                                        label="Requisitions for my attention"
-                                    />
-                                )}
+                                {user.accessLevel !== "user" &&
+                                    user.accessLevel !== "superUser" && (
+                                        <CustomTab
+                                            isActive={
+                                                selectedTab === "forMyAttention"
+                                            }
+                                            value="forMyAttention"
+                                            onClick={() =>
+                                                handleTabChange(
+                                                    "forMyAttention"
+                                                )
+                                            }
+                                            label="Requisitions for my attention"
+                                        />
+                                    )}
                                 {user.accessLevel !== "user" &&
                                     user.accessLevel !== "budgetHolder" && (
                                         <CustomTab
@@ -286,6 +293,69 @@ const Requisitions = () => {
                                         />
                                     )}
                             </div>
+
+                            {selectedTab === "allRequisitions" && (
+                                <>
+                                    {user.accessLevel === "finance" && (
+                                        <Alert
+                                            severity="info"
+                                            onClose={() => {}}
+                                        >
+                                            <AlertTitle>Hint</AlertTitle>
+                                            <div>
+                                                Use the 'filter requisitions'
+                                                section above to filter requests
+                                                that have been checked by the
+                                                Budget Holder (Holder Checked),
+                                                now ready for your checking
+                                            </div>
+                                            <small>
+                                                You are seeing this because you
+                                                have Finance access
+                                            </small>
+                                        </Alert>
+                                    )}
+                                    {user.accessLevel === "financeReviewer" && (
+                                        <Alert
+                                            severity="info"
+                                            onClose={() => {}}
+                                        >
+                                            <AlertTitle>Hint</AlertTitle>
+                                            <div>
+                                                Use the 'filter requisitions'
+                                                section above to filter requests
+                                                that have been checked by the
+                                                Finance (Finance Checked), now
+                                                ready for your final review
+                                            </div>
+                                            <small>
+                                                You are seeing this because you
+                                                have Finance Reviewer access
+                                            </small>
+                                        </Alert>
+                                    )}
+                                    {user.accessLevel === "superUser" && (
+                                        <Alert
+                                            severity="info"
+                                            onClose={() => {}}
+                                        >
+                                            <AlertTitle>Hint</AlertTitle>
+                                            <div>
+                                                Use the 'filter requisitions'
+                                                section above to filter requests
+                                                that have been reviewed by the
+                                                Finance (Finance Reviewed), now
+                                                ready for your approval
+                                            </div>
+                                            <small>
+                                                You are seeing this because you
+                                                are an Approver
+                                            </small>
+                                        </Alert>
+                                    )}
+                                </>
+                            )}
+
                             <RequisitionTable
                                 requisitions={
                                     filteredRequisitions.length > 0

@@ -1,8 +1,5 @@
 import { useState, useEffect, Suspense } from "react";
 import {
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
     Modal,
     Grid,
     Paper,
@@ -33,7 +30,6 @@ import accounting from "accounting";
 import AlertModal from "../components/alert-modal";
 import {
     DocumentIcon,
-    ChevronDownIcon,
     XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { EMPTY_REQ_VALUES, STATUS_COLOR_TYPE } from "../services/constants";
@@ -64,8 +60,6 @@ const RequisitionDetailsModal = ({
 }) => {
     const { user } = useAuth();
     const [loading, setLoading] = useState(false);
-    const [expanded, setExpanded] = useState(false);
-    const [expandedText, setExpandedText] = useState("View");
     const [requisition, setRequisition] = useState(EMPTY_REQ_VALUES);
     const [loadingCheckBtn, setLoadingCheckBtn] = useState(false);
     const [isChatModalOpen, setIsChatModalOpen] = useState(false);
@@ -104,13 +98,6 @@ const RequisitionDetailsModal = ({
             fetchRequisitionDetails();
         }
     }, [isOpen, requisitionId]);
-
-    const handleAccordionChange = () => {
-        setExpanded(!expanded);
-        expandedText === "View"
-            ? setExpandedText("Close")
-            : setExpandedText("View");
-    };
 
     const renderCheckRow = (status, checkedBy) => {
         return (
@@ -381,6 +368,24 @@ const RequisitionDetailsModal = ({
                                         {requisition.serialNumber || "N/A"}
                                     </Typography>
                                 </Grid>
+
+                                {requisition.status === "approved" && (
+                                    <Grid item xs={3}>
+                                        <Typography
+                                            variant="subtitle2"
+                                            align="center"
+                                        >
+                                            <strong>Approval Number</strong>
+                                        </Typography>
+                                        <Typography
+                                            variant="subtitle2"
+                                            align="center"
+                                        >
+                                            {requisition.approvalNumber ||
+                                                "N/A"}
+                                        </Typography>
+                                    </Grid>
+                                )}
                             </Grid>
 
                             <Divider
@@ -511,7 +516,11 @@ const RequisitionDetailsModal = ({
                                 </Grid>
 
                                 {/* Check history */}
-                                <Grid item xs={8} sx={{ boxShadow: "0 0 2px grey"}}>
+                                <Grid
+                                    item
+                                    xs={8}
+                                    sx={{ boxShadow: "0 0 2px grey" }}
+                                >
                                     {/* <Accordion expanded={expanded} onChange={handleAccordionChange}>
 										<AccordionSummary
 											expandIcon={<ChevronDownIcon className="h-6 w-6 text-gray-500" />}

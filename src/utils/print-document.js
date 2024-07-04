@@ -16,10 +16,14 @@ export const printDocument = async (req) => {
         let budgetHolderDate = formatDate(
             req?.hoderCheckDate || req?.holderCheckDate
         );
-        let checkDate = formatDate(req.checkDate);
-        let reviewedDate = formatDate(req.reviewDate);
+
+        let reviewedDate = req.reviewedDate
+            ? formatDate(req.reviewedDate)
+            : req.checkedDate
+            ? formatDate(req.checkedDate)
+            : null;
         let approveDate = formatDate(req.approvedDate);
-        let reqDate = formatDate(req.date);
+        // let reqDate = formatDate(req.date);
         let date = formatDateSpace(req.date);
 
         const title =
@@ -38,19 +42,17 @@ export const printDocument = async (req) => {
             ref =
                 formatDateHyphen(req.date) + req?.projectName
                     ? req.projectName.substr(0, 3).toUpperCase()
-                    : "";
+                    : req.projectChargedTo?.projectName.substr(0, 3).toUpperCase() || "";
 
             let budgetHolderSig =
                 req.holderCheck && req.holderCheck?.signatureUrl
                     ? await tobase64(req.holderCheck.signatureUrl)
                     : blank_document;
-            let checkedSignature =
-                req.checkedBy && req.checkedBy.signatureUrl
-                    ? await tobase64(req.checkedBy.signatureUrl)
-                    : blank_document;
             let reviewedSignature =
                 req.reviewedBy && req.reviewedBy.signatureUrl
                     ? await tobase64(req.reviewedBy.signatureUrl)
+                    : req.checkedBy && req.checkedBy.signatureUrl
+                    ? await tobase64(req.checkedBy.signatureUrl)
                     : blank_document;
 
             SignatureSection = [
@@ -63,20 +65,23 @@ export const printDocument = async (req) => {
                 [
                     { text: "Budget Holder", style: "labelStyle" },
                     {
-                        text: req.holderCheck?.name || "-",
+                        text: req.holderCheck?.name || " ",
                         style: "fieldStyle",
                     },
-                    { text: budgetHolderDate || "-", style: "fieldStyle" },
-                    { image: budgetHolderSig || "-", width: 30, height: 30 },
+                    { text: budgetHolderDate || " ", style: "fieldStyle" },
+                    { image: budgetHolderSig || " ", width: 30, height: 30 },
                 ],
                 [
                     { text: "Reviewed By", style: "labelStyle" },
                     {
-                        text: req?.reviewedBy?.name || "-",
+                        text:
+                            req?.reviewedBy?.name ||
+                            req?.checkedBy?.name ||
+                            " ",
                         style: "fieldStyle",
                     },
                     {
-                        text: reviewedDate || "-",
+                        text: reviewedDate || " ",
                         style: "fieldStyle",
                     },
                     { image: reviewedSignature, width: 30, height: 30 },
@@ -170,7 +175,7 @@ export const printDocument = async (req) => {
                         height: 30,
                     },
                     {
-                        text: ref,
+                        text: `${ref}/${req.approvalNumber}`,
                         margin: [130, 0, 0, 0],
                         style: "reference",
                     },
@@ -178,7 +183,7 @@ export const printDocument = async (req) => {
                 margin: [20, 10],
             },
             footer: {
-                text: "Gwapp 3.1.0",
+                text: "Gwapp 3.0",
                 style: "footerStyle",
             },
             content: [
@@ -343,7 +348,7 @@ export const printDocument = async (req) => {
                     fontSize: 8,
                     margin: [0, 0],
                     italics: true,
-                    color: "#7cda24",
+                    color: "#006c37",
                 },
             },
         };

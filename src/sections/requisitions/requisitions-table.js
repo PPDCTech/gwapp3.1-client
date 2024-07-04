@@ -190,227 +190,361 @@ export const RequisitionTable = ({
 						<Typography sx={{ mt: 2 }}>No requisitions found.</Typography>
 					)}
 
-					{requisitions && requisitions?.length > 0 && (
-						<>
-							<TableContainer sx={{ mt: 2 }}>
-								<Table>
-									<TableHead>
-										<TableRow>
-											<TableCell sx={{ width: "10%" }}>SN</TableCell>
-											<TableCell sx={{ width: "35%" }}>Title</TableCell>
-											<TableCell sx={{ width: "20%" }}>Raised By</TableCell>
-											<TableCell sx={{ width: "10%" }}>Amount</TableCell>
-											<TableCell sx={{ width: "15%" }}>Date</TableCell>
-											<TableCell sx={{ width: "10%" }}>Status</TableCell>
-											<TableCell
-												sx={{
-													width: "15%",
-													"@media (max-width: 600px)": {
-														display: "none",
-													},
-												}}
-											>
-												Actions
-											</TableCell>
-										</TableRow>
-									</TableHead>
-									<TableBody>
-										{requisitions &&
-											requisitions?.map((requisition) => (
-												<TableRow
-													key={requisition?._id}
-													className={printLoading[requisition?._id] ? "animated-row" : ""}
-												>
-													<TableCell>
-														{requisition?.serialNumber ? requisition?.serialNumber : "N/A"}
-													</TableCell>
-													<TableCell
-														sx={{
-															cursor: "pointer",
-															"&:hover": {
-																backgroundColor: "#F3F4F6",
-																boxShadow: "inset 0 0 5px rgba(0,0,0,0.1)",
-															},
-															paddingTop: "2rem",
-														}}
-														onClick={() => handleOpenReqDetails(requisition?._id)}
-													>
-														<div
-															style={{
-																position: "relative",
-																display: "inline-block",
-															}}
-														>
-															<Chip
-																label={requisition?.type}
-																style={{
-																	position: "absolute",
-																	top: "-20px",
-																	left: "0",
-																	fontSize: "10px",
-																	height: "18px",
-																	lineHeight: "18px",
-																}}
-															/>
-															<Tooltip placement="top-start" title={requisition?.title}>
-																<span>{shortenString(requisition?.title, 50)}</span>
-															</Tooltip>
-														</div>
-													</TableCell>
-													<TableCell>{requisition?.user?.name}</TableCell>
-													<TableCell>
-														{getCurrencySign(requisition?.currency)}
-														{formatAmount(Number(requisition?.total))}
-													</TableCell>
-													<TableCell>{getDateMDY(requisition?.date)}</TableCell>
-													<TableCell>
-														<SeverityPill
-															color={STATUS_COLOR_TYPE[requisition?.status || "pending"]}
-														>
-															{requisition?.status === "checked"
-																? "financeCheck"
-																: requisition?.status}
-														</SeverityPill>
-													</TableCell>
+                    {requisitions && requisitions?.length > 0 && (
+                        <>
+                            <TableContainer sx={{ mt: 2 }}>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell sx={{ width: "10%" }}>
+                                                SN
+                                            </TableCell>
+                                            <TableCell sx={{ width: "35%" }}>
+                                                Title
+                                            </TableCell>
+                                            <TableCell sx={{ width: "20%" }}>
+                                                Raised By
+                                            </TableCell>
+                                            <TableCell sx={{ width: "10%" }}>
+                                                Amount
+                                            </TableCell>
+                                            <TableCell sx={{ width: "15%" }}>
+                                                Date
+                                            </TableCell>
+                                            <TableCell sx={{ width: "10%" }}>
+                                                Status
+                                            </TableCell>
+                                            <TableCell
+                                                sx={{
+                                                    width: "15%",
+                                                    "@media (max-width: 600px)":
+                                                        {
+                                                            display: "none",
+                                                        },
+                                                }}
+                                            >
+                                                Actions
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {requisitions &&
+                                            requisitions?.map((requisition) => (
+                                                <TableRow
+                                                    key={requisition?._id}
+                                                >
+                                                    <TableCell>
+                                                        {requisition?.serialNumber
+                                                            ? requisition?.serialNumber
+                                                            : "N/A"}
+                                                    </TableCell>
+                                                    <TableCell
+                                                        sx={{
+                                                            cursor: "pointer",
+                                                            "&:hover": {
+                                                                backgroundColor:
+                                                                    "#F3F4F6",
+                                                                boxShadow:
+                                                                    "inset 0 0 5px rgba(0,0,0,0.1)",
+                                                            },
+                                                            paddingTop: "2rem",
+                                                        }}
+                                                        onClick={() =>
+                                                            handleOpenReqDetails(
+                                                                requisition?._id
+                                                            )
+                                                        }
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                position:
+                                                                    "relative",
+                                                                display:
+                                                                    "inline-block",
+                                                            }}
+                                                        >
+                                                            <Chip
+                                                                label={
+                                                                    requisition?.type
+                                                                }
+                                                                style={{
+                                                                    position:
+                                                                        "absolute",
+                                                                    top: "-20px",
+                                                                    left: "0",
+                                                                    fontSize:
+                                                                        "10px",
+                                                                    height: "18px",
+                                                                    lineHeight:
+                                                                        "18px",
+                                                                }}
+                                                            />
+                                                            <Tooltip
+                                                                placement="left-start"
+                                                                title={
+                                                                    requisition?.title
+                                                                }
+                                                            >
+                                                                <span>
+                                                                    {shortenString(
+                                                                        requisition?.title,
+                                                                        50
+                                                                    )}
+                                                                </span>
+                                                            </Tooltip>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {
+                                                            requisition?.user
+                                                                ?.name
+                                                        }
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {getCurrencySign(
+                                                            requisition?.currency
+                                                        )}
+                                                        {formatAmount(
+                                                            Number(
+                                                                requisition?.total
+                                                            )
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {getDateMDY(
+                                                            requisition?.date
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <SeverityPill
+                                                            color={
+                                                                STATUS_COLOR_TYPE[
+                                                                    requisition?.status ||
+                                                                        "pending"
+                                                                ]
+                                                            }
+                                                        >
+                                                            {requisition?.status ===
+                                                            "checked"
+                                                                ? "financeCheck"
+                                                                : requisition?.status}
+                                                        </SeverityPill>
+                                                    </TableCell>
 
-													{/* Action column */}
-													<TableCell>
-														<Select
-															sx={{
-																"& .MuiOutlinedInput-root": {
-																	border: "none",
-																},
-																"& .MuiOutlinedInput-notchedOutline": {
-																	border: "none",
-																},
-																"&:hover .MuiOutlinedInput-notchedOutline": {
-																	border: "none",
-																},
-																"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-																	border: "none",
-																},
-																"& .MuiFilledInput-underline:after": {
-																	border: "none",
-																},
-																"& .MuiFilledInput-underline:before": {
-																	border: "none",
-																},
-																"&:hover .MuiFilledInput-underline:before": {
-																	border: "none",
-																},
-																"& .MuiFilledInput-underline.Mui-focused:before": {
-																	border: "none",
-																},
-															}}
-															IconComponent={MoreVertIcon}
-															renderValue={(value) => (
-																<span>
-																	<MoreVertIcon />
-																	{value}
-																</span>
-															)}
-														>
-															<MenuList
-																sx={{
-																	border: "none",
-																}}
-															>
-																<Tooltip placement="top-start" title="View details">
-																	<MenuItem
-																		onClick={() => handleOpenReqDetails(requisition?._id)}
-																	>
-																		<ListItemIcon
-																			sx={{
-																				width: "16px",
-																				height: "16px",
-																			}}
-																		>
-																			<EyeIcon />
-																		</ListItemIcon>
-																		<ListItemText
-																			primaryTypographyProps={{
-																				fontSize: "small",
-																			}}
-																			primary="View Details"
-																		/>
-																	</MenuItem>
-																</Tooltip>
-																<Tooltip placement="top-start" title="Messages">
-																	<MenuItem onClick={() => openChatModal(requisition?._id)}>
-																		<ListItemIcon
-																			sx={{
-																				width: "16px",
-																				height: "16px",
-																			}}
-																		>
-																			<ChatBubbleOvalLeftEllipsisIcon />
-																		</ListItemIcon>
-																		<ListItemText
-																			primaryTypographyProps={{
-																				fontSize: "small",
-																			}}
-																			primary="Messages"
-																		/>
-																	</MenuItem>
-																</Tooltip>
-																{/* Send back icon conditions */}
-																{requisition?.status !== "reviewed" &&
-																requisition?.status !== "approved" &&
-																user?.accessLevel !== "user" &&
-																user?.accessLevel !== "userManager" &&
-																requisition?.attentionTo.includes(user?.email) ? (
-																	<Tooltip placement="top-start" title="Send Back">
-																		<MenuItem
-																			onClick={(e) =>
-																				handleSendBackRequisition(e, requisition?._id)
-																			}
-																		>
-																			<ListItemIcon
-																				sx={{
-																					width: "16px",
-																					height: "16px",
-																				}}
-																			>
-																				<ArrowUturnLeftIcon />
-																			</ListItemIcon>
-																			<ListItemText
-																				primaryTypographyProps={{
-																					fontSize: "small",
-																				}}
-																				primary="Send Back"
-																			/>
-																		</MenuItem>
-																	</Tooltip>
-																) : null}
-																{/* Edit condition */}
-																{requisition?.status !== "reviewed" &&
-																requisition?.status !== "approved" &&
-																requisition?.status !== "deleted" &&
-																requisition?.retiredStatus !== "retired" &&
-																(requisition?.user?.name === user?.name ||
-																	requisition?.user?.email === user?.email) ? (
-																	<Tooltip placement="top-start" title="Edit">
-																		<MenuItem
-																			value="edit"
-																			onClick={() => handleOpenEditModal(requisition?._id)}
-																		>
-																			<ListItemIcon
-																				sx={{
-																					width: "16px",
-																					height: "16px",
-																				}}
-																			>
-																				<PencilSquareIcon />
-																			</ListItemIcon>
-																			<ListItemText
-																				primaryTypographyProps={{
-																					fontSize: "small",
-																				}}
-																				primary="Edit"
-																			/>
-																		</MenuItem>
-																	</Tooltip>
-																) : null}
+                                                    {/* Action column */}
+                                                    <TableCell className="animated-border">
+                                                        {printLoading[
+                                                            requisition._id
+                                                        ] && (
+                                                            <sup>
+                                                                <CircularProgress
+                                                                    size={10}
+                                                                />
+                                                                <small>
+                                                                    &nbsp;Loading..
+                                                                </small>
+                                                            </sup>
+                                                        )}
+
+                                                        <Select
+                                                            sx={{
+                                                                "& .MuiOutlinedInput-root":
+                                                                    {
+                                                                        border: "none",
+                                                                    },
+                                                                "& .MuiOutlinedInput-notchedOutline":
+                                                                    {
+                                                                        border: "none",
+                                                                    },
+                                                                "&:hover .MuiOutlinedInput-notchedOutline":
+                                                                    {
+                                                                        border: "none",
+                                                                    },
+                                                                "&.Mui-focused .MuiOutlinedInput-notchedOutline":
+                                                                    {
+                                                                        border: "none",
+                                                                    },
+                                                                "& .MuiFilledInput-underline:after":
+                                                                    {
+                                                                        border: "none",
+                                                                    },
+                                                                "& .MuiFilledInput-underline:before":
+                                                                    {
+                                                                        border: "none",
+                                                                    },
+                                                                "&:hover .MuiFilledInput-underline:before":
+                                                                    {
+                                                                        border: "none",
+                                                                    },
+                                                                "& .MuiFilledInput-underline.Mui-focused:before":
+                                                                    {
+                                                                        border: "none",
+                                                                    },
+                                                            }}
+                                                            IconComponent={
+                                                                MoreVertIcon
+                                                            }
+                                                            renderValue={(
+                                                                value
+                                                            ) => (
+                                                                <span>
+                                                                    <MoreVertIcon />
+                                                                    {value}
+                                                                </span>
+                                                            )}
+                                                        >
+                                                            <MenuList
+                                                                sx={{
+                                                                    border: "none",
+                                                                }}
+                                                            >
+                                                                <Tooltip
+                                                                    placement="left-start"
+                                                                    title="View details"
+                                                                >
+                                                                    <MenuItem
+                                                                        onClick={() =>
+                                                                            handleOpenReqDetails(
+                                                                                requisition?._id
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <ListItemIcon
+                                                                            sx={{
+                                                                                width: "16px",
+                                                                                height: "16px",
+                                                                            }}
+                                                                        >
+                                                                            <EyeIcon />
+                                                                        </ListItemIcon>
+                                                                        <ListItemText
+                                                                            primaryTypographyProps={{
+                                                                                fontSize:
+                                                                                    "small",
+                                                                            }}
+                                                                            primary="View Details"
+                                                                        />
+                                                                    </MenuItem>
+                                                                </Tooltip>
+                                                                <Tooltip
+                                                                    placement="left-start"
+                                                                    title="Messages"
+                                                                >
+                                                                    <MenuItem
+                                                                        onClick={() =>
+                                                                            openChatModal(
+                                                                                requisition?._id
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <ListItemIcon
+                                                                            sx={{
+                                                                                width: "16px",
+                                                                                height: "16px",
+                                                                            }}
+                                                                        >
+                                                                            <ChatBubbleOvalLeftEllipsisIcon />
+                                                                        </ListItemIcon>
+                                                                        <ListItemText
+                                                                            primaryTypographyProps={{
+                                                                                fontSize:
+                                                                                    "small",
+                                                                            }}
+                                                                            primary="Messages"
+                                                                        />
+                                                                    </MenuItem>
+                                                                </Tooltip>
+                                                                {/* Send back icon conditions */}
+                                                                {requisition?.status !==
+                                                                    "reviewed" &&
+                                                                requisition?.status !==
+                                                                    "approved" &&
+                                                                user?.accessLevel !==
+                                                                    "user" &&
+                                                                user?.accessLevel !==
+                                                                    "userManager" &&
+                                                                requisition?.attentionTo.includes(
+                                                                    user?.email
+                                                                ) ? (
+                                                                    <Tooltip
+                                                                        placement="left-start"
+                                                                        title="Send Back"
+                                                                    >
+                                                                        <MenuItem
+                                                                            onClick={(
+                                                                                e
+                                                                            ) =>
+                                                                                handleSendBackRequisition(
+                                                                                    e,
+                                                                                    requisition?._id
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <ListItemIcon
+                                                                                sx={{
+                                                                                    width: "16px",
+                                                                                    height: "16px",
+                                                                                }}
+                                                                            >
+                                                                                <ArrowUturnLeftIcon />
+                                                                            </ListItemIcon>
+                                                                            <ListItemText
+                                                                                primaryTypographyProps={{
+                                                                                    fontSize:
+                                                                                        "small",
+                                                                                }}
+                                                                                primary="Send Back"
+                                                                            />
+                                                                        </MenuItem>
+                                                                    </Tooltip>
+                                                                ) : null}
+                                                                {/* Edit condition */}
+                                                                {requisition?.status !==
+                                                                    "reviewed" &&
+                                                                requisition?.status !==
+                                                                    "approved" &&
+                                                                requisition?.status !==
+                                                                    "deleted" &&
+                                                                requisition?.retiredStatus !==
+                                                                    "retired" &&
+                                                                (requisition
+                                                                    ?.user
+                                                                    ?.name ===
+                                                                    user?.name ||
+                                                                    requisition
+                                                                        ?.user
+                                                                        ?.email ===
+                                                                        user?.email) ? (
+                                                                    <Tooltip
+                                                                        placement="left-start"
+                                                                        title="Edit"
+                                                                    >
+                                                                        <MenuItem
+                                                                            value="edit"
+                                                                            onClick={() =>
+                                                                                handleOpenEditModal(
+                                                                                    requisition?._id
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <ListItemIcon
+                                                                                sx={{
+                                                                                    width: "16px",
+                                                                                    height: "16px",
+                                                                                }}
+                                                                            >
+                                                                                <PencilSquareIcon />
+                                                                            </ListItemIcon>
+                                                                            <ListItemText
+                                                                                primaryTypographyProps={{
+                                                                                    fontSize:
+                                                                                        "small",
+                                                                                }}
+                                                                                primary="Edit"
+                                                                            />
+                                                                        </MenuItem>
+                                                                    </Tooltip>
+                                                                ) : null}
 
 																{/* Conditions for Printing */}
 																{requisition?.status === "approved" &&

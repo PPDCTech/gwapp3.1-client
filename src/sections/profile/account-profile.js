@@ -121,7 +121,7 @@ export const AccountProfile = () => {
 						{user?.email}
 					</Typography>
 					<Typography variant="body2">
-						Role: {capitalizeFirstLetter(user?.role)}
+						Role: {capitalizeFirstLetter(user?.accessLevel)}
 					</Typography>
 				</Box>
 			</CardContent>

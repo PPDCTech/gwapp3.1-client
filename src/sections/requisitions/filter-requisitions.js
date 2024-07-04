@@ -22,7 +22,7 @@ import DownloadingOutlinedIcon from "@mui/icons-material/DownloadingOutlined";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
 import {
-    getAllApprovedRequisitions,
+
     getApprovedForPrint,
     searchFilterRequisitions,
 } from "../../services/api/requisition.api";
@@ -41,6 +41,7 @@ export const FilterRequisitions = ({
     const [downloadingCSV, setDownloadingCSV] = useState(false);
     const [csvData, setCsvData] = useState([]);
     const [csvHeaders, setCsvHeaders] = useState([]);
+    const [fetchingForDownload, setFetchingForDownload] = useState(false);
     const csvLinkRef = useRef(null);
     const { user } = useAuth();
 
@@ -130,31 +131,24 @@ export const FilterRequisitions = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filteredPage, filteredLimit]);
 
-    // Loading state for fetching all/filtered requisitions for printing
-    const [fetchingForDownload, setFetchingForDownload] = useState(false);
     const handleCSVDownload = async () => {
-        setFetchingForDownload(true);
-
         try {
-            // Fetch the approved
+            setFetchingForDownload(true);
+
             const result = await getApprovedForPrint();
-            // const response = await getAllApprovedRequisitions(filters);
 
             setFetchingForDownload(false);
             setDownloadingCSV(true);
 
             const { requisitions } = result.data;
 
-            const approvedReqs = requisitions;
-
-            if (!approvedReqs || !approvedReqs.length) {
-                // Handle empty data or error
+            if (!requisitions || !requisitions.length) {
                 console.info("No data available for CSV generation");
                 return;
             }
 
-            // Sort the totalApprovedReqs array based on the approvedDate property
-            approvedReqs.sort((a, b) => {
+            // Sort the total approved reqs array based on the approvedDate property
+            requisitions.sort((a, b) => {
                 if (a.approvedDate && b.approvedDate) {
                     return a.approvedDate > b.approvedDate
                         ? 1
@@ -171,7 +165,7 @@ export const FilterRequisitions = ({
 
             // Calculate the maximum number of items available in any requisition data
             const max_items = Math.max(
-                ...approvedReqs.map(
+                ...requisitions.map(
                     (requisitionData) => requisitionData.items.length
                 )
             );
@@ -186,9 +180,10 @@ export const FilterRequisitions = ({
             );
 
             // Generate the CSV data
-            const csv_data = approvedReqs.map((requisition, index) => {
+            const csv_data = requisitions.map((requisition) => {
                 const row = {
-                    serialNumber: index + 1,
+                    serialNumber: requisition.serialNumber,
+                    approvalNumber: requisition.approvalNumber,
                     date: getDateYearMonthDay(requisition.approvedDate),
                     title: requisition.title || "N/A",
                     total: requisition.total || "N/A",
@@ -231,6 +226,7 @@ export const FilterRequisitions = ({
             // Combine the dynamic item headers with the rest of the headers
             const csv_headers = [
                 { label: "S/N", key: "serialNumber" },
+                { label: "Approval/N", key: "approvalNumber" },
                 { label: "Date approved", key: "date" },
                 { label: "Title", key: "title" },
                 { label: "Total", key: "total" },
@@ -278,53 +274,6 @@ export const FilterRequisitions = ({
                 </AccordionSummary>
                 <AccordionDetails>
                     <Grid container spacing={2}>
-                        {/* <Grid
-                            item
-                            xs={12}
-                            md={12}
-                            sx={{ display: "flex", justifyContent: "flex-end" }}
-                        >
-                            <Tooltip title="Download Approved">
-                                <Button
-                                    size="small"
-                                    variant="outlined"
-                                    color="success"
-                                    onClick={handleCSVDownload}
-                                    disabled={
-                                        fetchingForDownload || downloadingCSV
-                                    }
-                                    sx={{ ml: "auto" }}
-                                >
-                                    {fetchingForDownload && (
-                                        <>&nbsp;fetching..</>
-                                    )}
-                                    {!fetchingForDownload &&
-                                        (downloadingCSV ? (
-                                            <>
-                                                <DownloadingOutlinedIcon />
-                                                &nbsp;downloading..
-                                            </>
-                                        ) : (
-                                            <>
-                                                <DownloadForOfflineOutlinedIcon />
-                                                &nbsp;Download
-                                            </>
-                                        ))}
-                                </Button>
-                            </Tooltip>
-                            {csvData &&
-                                csvData.length > 0 &&
-                                csvHeaders &&
-                                csvHeaders.length > 0 && (
-                                    <CSVLink
-                                        ref={csvLinkRef}
-                                        data={csvData}
-                                        headers={csvHeaders}
-                                        filename={`requisitions_${currentDate}.csv`}
-                                        // forceDownload={true}
-                                    />
-                                )}
-                        </Grid> */}
                         <Grid item xs={6} md={4}>
                             <FormControl fullWidth>
                                 <InputLabel>Type</InputLabel>
@@ -501,7 +450,16 @@ export const FilterRequisitions = ({
                                 Reset
                             </Button>
                         </Grid>
-                        <Grid item xs={6} md={9} sx={{ display: 'flex', justifyContent: 'end', boder: '1px solid red'}}>
+                        <Grid
+                            item
+                            xs={6}
+                            md={9}
+                            sx={{
+                                display: "flex",
+                                justifyContent: "end",
+                                boder: "1px solid red",
+                            }}
+                        >
                             <Tooltip title="Download Approved Requests">
                                 <Button
                                     size="small"
@@ -531,6 +489,14 @@ export const FilterRequisitions = ({
                                 </Button>
                             </Tooltip>
                         </Grid>
+                        <CSVLink
+                            data={csvData}
+                            headers={csvHeaders}
+                            filename={`approved_requisitions-${currentDate}.csv`}
+                            className="hidden"
+                            ref={csvLinkRef}
+                            target="_blank"
+                        />
                     </Grid>
                 </AccordionDetails>
             </Accordion>
