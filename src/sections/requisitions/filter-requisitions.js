@@ -135,7 +135,7 @@ export const FilterRequisitions = ({
         try {
             setFetchingForDownload(true);
 
-            const result = await getApprovedForPrint();
+            const result = await getApprovedForPrint(filters);
 
             setFetchingForDownload(false);
             setDownloadingCSV(true);
