@@ -553,7 +553,7 @@ export const RequisitionTable = ({
 																	["tech", "finance", "financeReviewer"].includes(
 																		user?.accessLevel,
 																	)) ? (
-																	<Tooltip placement="top-start" title="Print">
+																	<Tooltip placement="left-start" title="Print">
 																		<MenuItem
 																			value="print"
 																			onClick={() => handlePrint(requisition?._id)}

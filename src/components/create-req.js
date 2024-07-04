@@ -233,9 +233,9 @@ const CreateReqModal = ({
 				currency,
 				amountInWords: "",
 				total: Number(totalItemsAmount),
-				accountName: beneficiary?.accountName || newAccountName,
-				accountNumber: Number(beneficiary?.accountNumber) || newAccountNumber,
-				bankName: beneficiary?.bankName || newBankName,
+				accountName: beneficiary?.accountName || newAccountName || "Nil",
+				accountNumber: beneficiary?.accountNumber || newAccountNumber || "Nil",
+				bankName: beneficiary?.bankName || newBankName || "Nil",
 				attentionTo: attentionToUser?.email || "",
 				projectChargedTo: {
 					account: {
@@ -263,14 +263,6 @@ const CreateReqModal = ({
 			}
 			if (!formValues.items || formValues.items.length < 1) {
 				toast.warning("No items added");
-				return;
-			}
-			if (!formValues.bankName) {
-				toast.warning("Bank name is missing");
-				return;
-			}
-			if (!formValues.accountNumber) {
-				toast.warning("Account number is missing");
 				return;
 			}
 			if (!formValues.attentionTo) {
@@ -335,13 +327,13 @@ const CreateReqModal = ({
 					  Number(requisitionData.total),
 				accountName: beneficiary?.accountName
 					? beneficiary.accountName
-					: newAccountName || requisitionData.accountName,
+					: newAccountName || requisitionData.accountName || "Nil",
 				accountNumber: beneficiary?.accountNumber
-					? Number(beneficiary.accountNumber)
-					: Number(newAccountNumber) || Number(requisitionData.accountNumber),
+					? beneficiary.accountNumber
+					: newAccountNumber || requisitionData.accountNumber || "Nil",
 				bankName: beneficiary?.bankName
 					? beneficiary.bankName
-					: newBankName || requisitionData.bankName,
+					: newBankName || requisitionData.bankName || "Nil",
 				attentionTo: attentionToUser?.email
 					? attentionToUser.email
 					: requisitionData.attentionTo,
@@ -384,14 +376,6 @@ const CreateReqModal = ({
 			}
 			if (!formValues.items || formValues.items.length < 1) {
 				toast.warning("No items added");
-				return;
-			}
-			if (!formValues.bankName) {
-				toast.warning("Bank name is missing");
-				return;
-			}
-			if (!formValues.accountNumber) {
-				toast.warning("Account number is missing");
 				return;
 			}
 			if (!formValues.attentionTo) {

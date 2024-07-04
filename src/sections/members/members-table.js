@@ -132,7 +132,7 @@ export const MembersTable = (props) => {
 																)}
 															</IconButton>
 														</Tooltip>
-														<Tooltip title="Change Access">
+														<Tooltip title="Change Access" placement="left-start">
 															<Select
 																size="small"
 																sx={{
@@ -182,7 +182,7 @@ export const MembersTable = (props) => {
 											{user && ["tech", "userManagaer"].includes(user.accessLevel) && (
 												<TableCell>
 													<Stack direction="row" spacing={1}>
-														<Tooltip title="Activate">
+														<Tooltip placement="left-start" title="Activate">
 															<IconButton
 																onClick={() => handleActivate(member._id)}
 																aria-label="Preview"
