@@ -123,7 +123,7 @@ export const FilterRequisitions = ({
 	useEffect(() => {
 		if (filteredPage || filteredLimit) {
 			handleSubmitFilter();
-        }
+		}
 	}, [filteredPage, filteredLimit]);
 
 	const handleCSVDownload = async () => {
@@ -138,8 +138,11 @@ export const FilterRequisitions = ({
 				return acc;
 			}, {});
 
+			console.log("FILTERS::", filters);
+
 			const result = await getApprovedForPrint(activeFilters);
 
+			console.log("RESULT::", result);
 			setFetchingForDownload(false);
 			setDownloadingCSV(true);
 
