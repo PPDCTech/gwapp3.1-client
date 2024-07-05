@@ -1,10 +1,24 @@
+import React, { useEffect } from "react";
+import io from "socket.io-client";
 import PropTypes from "prop-types";
 import { Box, Typography, Unstable_Grid2 as Grid } from "@mui/material";
 import { Logo } from "../../components/logo";
 import { Link } from "react-router-dom";
+import { SOCKET_API } from "../../services/base-url";
 
 export const Layout = (props) => {
 	const { children } = props;
+
+	useEffect(() => {
+		const socket = io(SOCKET_API);
+		socket.on("ping", (data) => {
+			console.log(`Received ping: ${data}`);
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, []);
 
 	return (
 		<Box
@@ -71,7 +85,7 @@ export const Layout = (props) => {
 								fontSize: "24px",
 								lineHeight: "32px",
 								mb: 1,
-								mt: 3
+								mt: 3,
 							}}
 							variant="h1"
 						>

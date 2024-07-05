@@ -40,6 +40,21 @@ export const fetchData = async (endpoint) => {
 	}
 };
 
+export const fetchBlob = async (endpoint) => {
+	try {
+		setAuthorizationHeader();
+		const response = axios ? await axios.get(`${API}/${endpoint}`, { responseType: "blob" }) : null;
+		return response;
+	} catch (error) {
+		console.error("Error fetching blob data:", error.message);
+		let errorMessage = "An error occurred.";
+		if (error.response && error.response.data) {
+			errorMessage = error.response.data.message || error.response.data.error;
+		}
+		throw new Error(errorMessage);
+	}
+}
+
 export const putData = async (endpoint, data) => {
 	try {
 		setAuthorizationHeader();

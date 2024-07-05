@@ -130,132 +130,39 @@ export const FilterRequisitions = ({
 		try {
 			setFetchingForDownload(true);
 
+			const cast_filter = { ...filters };
 			// Filter out empty filter values
-			const activeFilters = Object.keys(filters).reduce((acc, key) => {
+			const activeFilters = Object.keys(cast_filter).reduce((acc, key) => {
 				if (filters[key]) {
 					acc[key] = filters[key];
 				}
 				return acc;
 			}, {});
 
-			console.log("FILTERS::", filters);
+			const response = await getApprovedForPrint(activeFilters);
 
-			const result = await getApprovedForPrint(activeFilters);
+			// Create a blob object from the response data
+			const blob = new Blob([response.data], { type: "text/csv" });
 
-			console.log("RESULT::", result);
+			// Create a URL for the blob object
+			const url = window.URL.createObjectURL(blob);
+
+			// Create a temporary anchor element
+			const link = document.createElement("a");
+			link.href = url;
+			link.setAttribute("download", "approved_requisitions.csv");
+
+			// Append the anchor element to the body
+			document.body.appendChild(link);
+
+			// Programmatically click the anchor to trigger the download
+			link.click();
+
+			// Clean up: remove the anchor from the DOM
+			document.body.removeChild(link);
+
+			setDownloadingCSV(false);
 			setFetchingForDownload(false);
-			setDownloadingCSV(true);
-
-			const { requisitions } = result.data;
-
-			if (!requisitions || !requisitions.length) {
-				console.info("No data available for CSV generation");
-				setFetchingForDownload(false);
-				return;
-			}
-
-			// Sort the total approved reqs array based on the approvedDate property
-			requisitions.sort((a, b) => {
-				if (a.approvedDate && b.approvedDate) {
-					return a.approvedDate > b.approvedDate
-						? 1
-						: a.approvedDate < b.approvedDate
-						? -1
-						: 0;
-				} else if (!a.approvedDate && b.approvedDate) {
-					return 1;
-				} else if (a.approvedDate && !b.approvedDate) {
-					return -1;
-				}
-				return 0;
-			});
-
-			// Calculate the maximum number of items available in any requisition data
-			const max_items = Math.max(
-				...requisitions.map((requisitionData) => requisitionData.items.length),
-			);
-
-			// Generate the dynamic item headers based on the maximum number of items
-			const item_headers = Array.from({ length: max_items }, (_, index) => ({
-				label: `Item ${index + 1}`,
-				key: `items.${index}`,
-			}));
-
-			// Generate the CSV data
-			const csv_data = requisitions.map((requisition) => {
-				const row = {
-					serialNumber: requisition.serialNumber,
-					approvalNumber: requisition.approvalNumber,
-					date: getDateYearMonthDay(requisition.approvedDate),
-					title: requisition.title || "N/A",
-					total: requisition.total || "N/A",
-					type: requisition.type || "N/A",
-					"approvedBy.name": requisition.approvedBy?.name || "N/A",
-					"checkedBy.name": requisition.checkedBy?.name || "N/A",
-					"holderCheck.name": requisition.holderCheck?.name || "N/A",
-					"projectChargedTo.projectName":
-						requisition.projectChargedTo?.projectName || "N/A",
-					"reviewedBy.name": requisition.reviewedBy?.name || "N/A",
-					"user.name": requisition.user?.name || "N/A",
-					accountName: requisition.accountName || "N/A",
-					accountNumber: requisition.accountNumber || "N/A",
-					amountInWords: requisition.amountInWords || "N/A",
-					approvedDate: requisition.approvedDate || "N/A",
-					bankName: requisition.bankName || "N/A",
-					currency: requisition.currency || "N/A",
-					sourceAccountNumber: requisition.sourceAccountNumber || "N/A",
-					sourceBankName: requisition.sourceBankName || "N/A",
-				};
-
-				// Populate the row with item data
-				if (requisition.items.length) {
-					requisition.items.forEach((item, index) => {
-						row[
-							`items.${index}`
-						] = `${item.title}-${item.amount}${requisition.currency}`;
-					});
-				}
-
-				// Fill remaining item headers with blank if there are no items for this row
-				for (let i = requisition.items.length; i < max_items; i++) {
-					row[`items.${i}`] = "";
-				}
-
-				return row;
-			});
-
-			// Combine the dynamic item headers with the rest of the headers
-			const csv_headers = [
-				{ label: "S/N", key: "serialNumber" },
-				{ label: "Approval/N", key: "approvalNumber" },
-				{ label: "Date approved", key: "date" },
-				{ label: "Title", key: "title" },
-				{ label: "Total", key: "total" },
-				{ label: "Type", key: "type" },
-				{ label: "Holder Check", key: "holderCheck.name" },
-				{ label: "Checked By", key: "checkedBy.name" },
-				{ label: "Reviewed By", key: "reviewedBy.name" },
-				{ label: "Approved By", key: "approvedBy.name" },
-				{
-					label: "Project Charged To",
-					key: "projectChargedTo.projectName",
-				},
-				{ label: "User", key: "user.name" },
-				{ label: "Account Name", key: "accountName" },
-				{ label: "Account Number", key: "accountNumber" },
-				{ label: "Amount in Words", key: "amountInWords" },
-				{ label: "Approved Date", key: "approvedDate" },
-				{ label: "Bank Name", key: "bankName" },
-				{ label: "Currency", key: "currency" },
-				{ label: "Source Account Number", key: "sourceAccountNumber" },
-				{ label: "Source Bank Name", key: "sourceBankName" },
-				...item_headers,
-			];
-
-			setCsvData(csv_data);
-			setCsvHeaders(csv_headers);
-
-			csvLinkRef.current?.link.click();
 		} catch (error) {
 			toast.error("An error occurred. Please try again.");
 			setDownloadingCSV(false);

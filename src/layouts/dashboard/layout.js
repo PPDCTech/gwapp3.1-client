@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
+import io from "socket.io-client";
 import { withAuthGuard } from "../../hocs/with-auth-guard";
 import { SideNav } from "./side-nav";
 import { TopNav } from "./top-nav";
 import { useLocation } from "react-router-dom";
+import { SOCKET_API } from "../../services/base-url";
 
 const SIDE_NAV_WIDTH = 280;
 
@@ -27,6 +29,17 @@ export const Layout = withAuthGuard((props) => {
 	const { children } = props;
 	const location = useLocation();
 	const [openNav, setOpenNav] = useState(false);
+
+	useEffect(() => {
+		const socket = io(SOCKET_API);
+		socket.on("ping", (data) => {
+			console.log(`Received ping: ${data}`);
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, []);
 
 	const handlePathnameChange = useCallback(() => {
 		if (openNav) {

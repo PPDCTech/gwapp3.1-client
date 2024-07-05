@@ -1,3 +1,5 @@
+import React, { useEffect } from "react";
+import io from "socket.io-client";
 import { CacheProvider } from "@emotion/react";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -14,13 +16,23 @@ import "./styles/common.css";
 import "./styles/gwapploading.css";
 import Router from "./Router";
 import GwappLoading from "./components/gwappload/GwappLoading";
+import { SOCKET_API } from "./services/base-url";
 
 const clientSideEmotionCache = createEmotionCache();
 
 const App = (props) => {
 	const { emotionCache = clientSideEmotionCache } = props;
-	
 	const theme = createTheme();
+	useEffect(() => {
+		const socket = io(SOCKET_API);
+		socket.on("ping", (data) => {
+			console.log(`Received ping: ${data}`);
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, []);
 
 	return (
 		<CacheProvider value={emotionCache}>

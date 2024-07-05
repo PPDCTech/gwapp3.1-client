@@ -4,6 +4,7 @@ import {
     putData,
     patchData,
     deleteData,
+    fetchBlob,
 } from "./api-helper";
 
 const REQUISITION_API = "requisitions";
@@ -47,7 +48,7 @@ export const getApprovedForPrint = async (params = {}) => {
         : "";
     const endpointWithQuery = `print/approved${query}`;
 
-    return fetchData(endpointWithQuery);
+    return fetchBlob(endpointWithQuery);
 };
 
 export const getUserRequisitions = (userId, page, limit) => {
