@@ -150,7 +150,7 @@ export const FilterRequisitions = ({
 			// Create a temporary anchor element
 			const link = document.createElement("a");
 			link.href = url;
-			link.setAttribute("download", "approved_requisitions.csv");
+			link.setAttribute("download", `approved_requisitions-${currentDate}.csv`);
 
 			// Append the anchor element to the body
 			document.body.appendChild(link);
