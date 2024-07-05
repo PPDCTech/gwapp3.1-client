@@ -31,7 +31,7 @@ export const Layout = withAuthGuard((props) => {
 	const [openNav, setOpenNav] = useState(false);
 
 	useEffect(() => {
-		const socket = io(SOCKET_API);
+		const socket = io(SOCKET_API, { withCredentials: true });
 		socket.on("ping", (data) => {
 			console.log(`Received ping: ${data}`);
 		});

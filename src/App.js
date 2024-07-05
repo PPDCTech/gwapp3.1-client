@@ -24,7 +24,7 @@ const App = (props) => {
 	const { emotionCache = clientSideEmotionCache } = props;
 	const theme = createTheme();
 	useEffect(() => {
-		const socket = io(SOCKET_API);
+		const socket = io(SOCKET_API, {withCredentials: true});
 		socket.on("ping", (data) => {
 			console.log(`Received ping: ${data}`);
 		});

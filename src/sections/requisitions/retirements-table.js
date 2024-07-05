@@ -11,6 +11,7 @@ import {
 	Paper,
 	Box,
 	Typography,
+	CircularProgress,
 } from "@mui/material";
 import { DocumentDuplicateIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { getCurrencySign } from "../../utils/format-currency";
@@ -20,7 +21,7 @@ import RequisitionDetailsModal from "../../components/req-details-modal";
 import CreateReqModal from "../../components/create-req";
 import { STATUS_COLOR_TYPE } from "../../services/constants";
 
-const RetirementsTable = ({ data = [], reloadData }) => {
+const RetirementsTable = ({ data = [], reloadData, loading }) => {
 	const [isReqDetailsOpen, setIsReqDetailsOpen] = useState(false);
 	const [selectedId, setSelectedId] = useState(null);
 	const [selectedRequisition, setSelectedRequisition] = useState(null);
@@ -132,7 +133,7 @@ const RetirementsTable = ({ data = [], reloadData }) => {
 	return (
 		<>
 			<TableContainer component={Paper}>
-				{data.length === 0 ? (
+				{loading ? (
 					<Box
 						sx={{
 							display: "flex",
@@ -142,29 +143,46 @@ const RetirementsTable = ({ data = [], reloadData }) => {
 							height: "100%",
 						}}
 					>
-						<Box sx={{ mt: 2 }}>You have no pending retirements 😃!</Box>
+						<CircularProgress color="success" />
+						<Box sx={{ mt: 2 }}>Relax while we load your data...</Box>
 					</Box>
 				) : (
-					<Table>
-						<TableHead>
-							<TableRow>
-								<TableCell sx={{ width: "40%" }}>Title</TableCell>
-								<TableCell sx={{ width: "20%" }}>Amount</TableCell>
-								<TableCell sx={{ width: "20%" }}>Status</TableCell>
-								<TableCell sx={{ width: "20%" }}>Action</TableCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{data.map((row) => (
-								<TableRow key={row?._id}>
-									<TableCell>{renderTableCell(row, "title")}</TableCell>
-									<TableCell>{renderTableCell(row, "amount")}</TableCell>
-									<TableCell>{renderTableCell(row, "status")}</TableCell>
-									<TableCell>{renderTableCell(row, "action")}</TableCell>
-								</TableRow>
-							))}
-						</TableBody>
-					</Table>
+					<>
+						{data.length === 0 ? (
+							<Box
+								sx={{
+									display: "flex",
+									flexDirection: "column",
+									justifyContent: "center",
+									alignItems: "center",
+									height: "100%",
+								}}
+							>
+								<Box sx={{ mt: 2 }}>You have no pending retirements 😃!</Box>
+							</Box>
+						) : (
+							<Table>
+								<TableHead>
+									<TableRow>
+										<TableCell sx={{ width: "40%" }}>Title</TableCell>
+										<TableCell sx={{ width: "20%" }}>Amount</TableCell>
+										<TableCell sx={{ width: "20%" }}>Status</TableCell>
+										<TableCell sx={{ width: "20%" }}>Action</TableCell>
+									</TableRow>
+								</TableHead>
+								<TableBody>
+									{data.map((row) => (
+										<TableRow key={row?._id}>
+											<TableCell>{renderTableCell(row, "title")}</TableCell>
+											<TableCell>{renderTableCell(row, "amount")}</TableCell>
+											<TableCell>{renderTableCell(row, "status")}</TableCell>
+											<TableCell>{renderTableCell(row, "action")}</TableCell>
+										</TableRow>
+									))}
+								</TableBody>
+							</Table>
+						)}
+					</>
 				)}
 			</TableContainer>
 			<RequisitionDetailsModal

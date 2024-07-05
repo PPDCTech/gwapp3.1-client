@@ -10,7 +10,7 @@ export const Layout = (props) => {
 	const { children } = props;
 
 	useEffect(() => {
-		const socket = io(SOCKET_API);
+		const socket = io(SOCKET_API, { withCredentials: true });
 		socket.on("ping", (data) => {
 			console.log(`Received ping: ${data}`);
 		});
