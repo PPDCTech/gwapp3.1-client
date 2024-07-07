@@ -6,6 +6,7 @@ import { SideNav } from "./side-nav";
 import { TopNav } from "./top-nav";
 import { useLocation } from "react-router-dom";
 import { SOCKET_API } from "../../services/base-url";
+import ReloginModal from "../../components/re-login-modal";
 
 const SIDE_NAV_WIDTH = 280;
 
@@ -62,6 +63,7 @@ export const Layout = withAuthGuard((props) => {
 			<LayoutRoot>
 				<LayoutContainer>{children}</LayoutContainer>
 			</LayoutRoot>
+			<ReloginModal />
 		</>
 	);
 });

@@ -1,208 +1,202 @@
 import {
-    createContext,
-    useContext,
-    useEffect,
-    useReducer,
-    useRef,
+	createContext,
+	useContext,
+	useEffect,
+	useReducer,
+	useRef,
 } from "react";
 import PropTypes from "prop-types";
+import { jwtDecode } from "jwt-decode";
 
 import { fetchSingleUser } from "../services/api/users.api";
 import { verifyLogin } from "../services/api/auth.api";
 
 const HANDLERS = {
-    INITIALIZE: "INITIALIZE",
-    SIGN_IN: "SIGN_IN",
-    SIGN_OUT: "SIGN_OUT",
-    SET_USER: "SET_USER",
+	INITIALIZE: "INITIALIZE",
+	SIGN_IN: "SIGN_IN",
+	SIGN_OUT: "SIGN_OUT",
+	SET_USER: "SET_USER",
 };
 
 const initialState = {
-    isAuthenticated: false,
-    isLoading: true,
-    user: null,
+	isAuthenticated: false,
+	isLoading: true,
+	user: null,
 };
 
 const handlers = {
-    [HANDLERS.INITIALIZE]: (state, action) => {
-        const user = action.payload;
+	[HANDLERS.INITIALIZE]: (state, action) => {
+		const user = action.payload;
 
-        return {
-            ...state,
-            ...(user // if payload (user) is provided, then is authenticated
-                ? {
-                      isAuthenticated: true,
-                      isLoading: false,
-                      user,
-                  }
-                : {
-                      isLoading: false,
-                  }),
-        };
-    },
-    [HANDLERS.SIGN_IN]: (state, action) => {
-        const user = action.payload;
+		return {
+			...state,
+			...(user // if payload (user) is provided, then is authenticated
+				? {
+						isAuthenticated: true,
+						isLoading: false,
+						user,
+				  }
+				: {
+						isLoading: false,
+				  }),
+		};
+	},
+	[HANDLERS.SIGN_IN]: (state, action) => {
+		const user = action.payload;
 
-        return {
-            ...state,
-            isAuthenticated: true,
-            user,
-        };
-    },
-    [HANDLERS.SIGN_OUT]: (state) => {
-        return {
-            ...state,
-            isAuthenticated: false,
-            user: null,
-        };
-    },
-    [HANDLERS.SET_USER]: (state, action) => ({
-        ...state,
-        isAuthenticated: true,
-        user: action.payload,
-    }),
+		return {
+			...state,
+			isAuthenticated: true,
+			user,
+		};
+	},
+	[HANDLERS.SIGN_OUT]: (state) => {
+		return {
+			...state,
+			isAuthenticated: false,
+			user: null,
+		};
+	},
+	[HANDLERS.SET_USER]: (state, action) => ({
+		...state,
+		isAuthenticated: true,
+		user: action.payload,
+	}),
 };
 
 const reducer = (state, action) =>
-    handlers[action.type] ? handlers[action.type](state, action) : state;
+	handlers[action.type] ? handlers[action.type](state, action) : state;
 
 // This context is to propagate authentication state through the App tree.
 export const AuthContext = createContext({ undefined });
 
 export const AuthProvider = (props) => {
-    const { children } = props;
-    const [state, dispatch] = useReducer(reducer, initialState);
-    const initialized = useRef(false);
+	const { children } = props;
+	const [state, dispatch] = useReducer(reducer, initialState);
+	const initialized = useRef(false);
 
-    const setUser = (user) => {
-        dispatch({
-            type: HANDLERS.SET_USER,
-            payload: user,
-        });
-    };
+	const setUser = (user) => {
+		dispatch({
+			type: HANDLERS.SET_USER,
+			payload: user,
+		});
+	};
 
-    const isTokenExpired = () => {
-        const expirationTime = parseInt(
-            window.localStorage.getItem("tokenExpiration"),
-            10
-        );
-        const currentTime = new Date().getTime();
+	const isTokenExpired = () => {
+		const token = window.localStorage.getItem("token");
 
-        return currentTime > expirationTime;
-    };
+		if (token) {
+			const decodedToken = jwtDecode(token);
+			const expirationTime = decodedToken.exp * 1000;
+			const isExpired = Date.now() > expirationTime;
 
-    const initialize = async () => {
-        // Prevent from calling twice in development mode with React.StrictMode enabled
-        if (initialized.current) {
-            return;
-        }
+			return isExpired; // return true if token is expired
+		}
+	};
 
-        initialized.current = true;
+	const initialize = async () => {
+		// Prevent from calling twice in development mode with React.StrictMode enabled
+		if (initialized.current) {
+			return;
+		}
 
-        let isAuthenticated = false;
+		initialized.current = true;
 
-        try {
-            isAuthenticated =
-                window.localStorage.getItem("authenticated") === "true";
-        } catch (err) {
-            console.error(err);
-        }
+		let isAuthenticated = false;
 
-        if (isAuthenticated) {
-            const userId = window.localStorage.getItem("gwapp_userId");
+		try {
+			isAuthenticated = window.localStorage.getItem("authenticated") === "true";
+		} catch (err) {
+			console.error(err);
+		}
 
-            if (userId) {
-                const response = await fetchSingleUser(userId);
-                const user = response?.data;
+		if (isAuthenticated) {
+			const userId = window.localStorage.getItem("gwapp_userId");
 
-                dispatch({
-                    type: HANDLERS.INITIALIZE,
-                    payload: user,
-                });
-            }
-        } else {
-            dispatch({
-                type: HANDLERS.INITIALIZE,
-            });
+			if (userId) {
+				const response = await fetchSingleUser(userId);
+				const user = response?.data;
 
-            if (isTokenExpired()) {
-                window.localStorage.removeItem("token");
-                window.localStorage.removeItem("authenticated");
-                window.localStorage.removeItem("gwapp_userId");
-                window.localStorage.removeItem("tokenExpiration");
-                window.localStorage.clear();
-                window.location.href = "/user/login";
-            }
-        }
-    };
+				dispatch({
+					type: HANDLERS.INITIALIZE,
+					payload: user,
+				});
+			}
+		} else {
+			dispatch({
+				type: HANDLERS.INITIALIZE,
+			});
 
-    useEffect(
-        () => {
-            initialize();
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        []
-    );
+			if (isTokenExpired()) {
+				window.localStorage.removeItem("token");
+				window.localStorage.removeItem("authenticated");
+				window.localStorage.removeItem("gwapp_userId");
+				window.localStorage.clear();
+				window.location.href = "/user/login";
+			}
+		}
+	};
 
-    const signIn = async (password) => {
-        try {
-            const response = await verifyLogin(password);
+	useEffect(
+		() => {
+			initialize();
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[],
+	);
 
-            const { userData } = response.data;
-            const { status, token } = userData;
+	const signIn = async (password) => {
+		try {
+			const response = await verifyLogin(password);
 
-            if (status === "inactive") {
-                return;
-            }
+			const { userData } = response.data;
+			const { status, token } = userData;
 
-            const expiresIn = 48 * 60 * 60;
-            const expirationTime = new Date().getTime() + expiresIn * 1000;
+			if (status === "inactive") {
+				throw new Error("User account is suspended.");
+			}
 
-            window.localStorage.setItem(
-                "tokenExpiration",
-                expirationTime.toString()
-            );
-            window.localStorage.setItem("gwapp_userId", userData._id);
-            window.localStorage.setItem("authenticated", "true");
-            window.localStorage.setItem("token", token);
+			window.localStorage.setItem("gwapp_userId", userData._id);
+			window.localStorage.setItem("authenticated", "true");
+			window.localStorage.setItem("token", token);
 
-            dispatch({
-                type: HANDLERS.SIGN_IN,
-                payload: userData,
-            });
-            return response;
-        } catch (error) {
-            throw new Error(error.message);
-        }
-    };
+			dispatch({
+				type: HANDLERS.SIGN_IN,
+				payload: userData,
+			});
+			return response;
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	};
 
-    const signOut = () => {
-        window.localStorage.removeItem("token");
-        window.localStorage.removeItem("authenticated");
-        window.localStorage.removeItem("gwapp_userId");
-        window.localStorage.clear();
+	const signOut = () => {
+		window.localStorage.removeItem("token");
+		window.localStorage.removeItem("authenticated");
+		window.localStorage.removeItem("gwapp_userId");
+		window.localStorage.clear();
 
-        dispatch({
-            type: HANDLERS.SIGN_OUT,
-        });
-    };
+		dispatch({
+			type: HANDLERS.SIGN_OUT,
+		});
+	};
 
-    return (
-        <AuthContext.Provider
-            value={{
-                ...state,
-                setUser,
-                signIn,
-                signOut,
-            }}
-        >
-            {children}
-        </AuthContext.Provider>
-    );
+	return (
+		<AuthContext.Provider
+			value={{
+				...state,
+				setUser,
+				signIn,
+				signOut,
+			}}
+		>
+			{children}
+		</AuthContext.Provider>
+	);
 };
 
 AuthProvider.propTypes = {
-    children: PropTypes.node,
+	children: PropTypes.node,
 };
 
 export const AuthConsumer = AuthContext.Consumer;
