@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
 	Typography,
 	MenuItem,
@@ -26,8 +26,7 @@ import {
 	getApprovedForPrint,
 	searchFilterRequisitions,
 } from "../../services/api/requisition.api";
-import { currentDate, getDateYearMonthDay } from "../../services/helpers";
-import { CSVLink } from "react-csv";
+import { currentDate } from "../../services/helpers";
 import { useAuth } from "../../hooks/use-auth";
 
 export const FilterRequisitions = ({
@@ -39,10 +38,7 @@ export const FilterRequisitions = ({
 }) => {
 	const [users, setUsers] = useState([]);
 	const [downloadingCSV, setDownloadingCSV] = useState(false);
-	const [csvData, setCsvData] = useState([]);
-	const [csvHeaders, setCsvHeaders] = useState([]);
 	const [fetchingForDownload, setFetchingForDownload] = useState(false);
-	const csvLinkRef = useRef(null);
 	const { user } = useAuth();
 
 	const [filters, setFilters] = useState({
@@ -55,7 +51,7 @@ export const FilterRequisitions = ({
 		serialNumber: "",
 	});
 
-	const handleSubmitFilter = async () => {
+	const handleSubmitFilter = useCallback(async () => {
 		setLoading(true);
 		const {
 			user_email,
@@ -88,7 +84,7 @@ export const FilterRequisitions = ({
 			setFilteredRequisitions([]);
 			setLoading(false);
 		}
-	};
+	}, [filters, filteredPage, filteredLimit, setFilteredRequisitions, setFilteredTotalCount, setLoading]);
 
 	useEffect(() => {
 		const usersList = async () => {
@@ -121,10 +117,8 @@ export const FilterRequisitions = ({
 	};
 
 	useEffect(() => {
-		if (filteredPage || filteredLimit) {
-			handleSubmitFilter();
-		}
-	}, [filteredPage, filteredLimit]);
+		handleSubmitFilter();
+	}, [handleSubmitFilter]);
 
 	const handleCSVDownload = async () => {
 		try {
@@ -332,14 +326,6 @@ export const FilterRequisitions = ({
 							</Button>
 						</Tooltip>
 					</Grid>
-					<CSVLink
-						data={csvData}
-						headers={csvHeaders}
-						filename={`approved_requisitions-${currentDate}.csv`}
-						className="hidden"
-						ref={csvLinkRef}
-						target="_blank"
-					/>
 				</Grid>
 			</AccordionDetails>
 		</Accordion>

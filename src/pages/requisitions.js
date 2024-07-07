@@ -86,20 +86,24 @@ const Requisitions = () => {
 			switch (selectedTab) {
 				case "myRequisitions":
 					fetchedRequisitions = [];
-					const myReqs = await getUserRequisitions(user?._id, filteredPage, filteredLimit)
+					const myReqs = await getUserRequisitions(user?._id, page, limit);
 					fetchedRequisitions = myReqs.data.requisitions;
 					count = myReqs.data.totalCount;
 					break;
 				case "forMyAttention":
 					fetchedRequisitions = [];
-					const myAttentionReqs = await getAttentionedToRequisitions(user?.email, filteredPage, filteredLimit)
+					const myAttentionReqs = await getAttentionedToRequisitions(
+						user?.email,
+						page,
+						limit,
+					);
 
 					fetchedRequisitions = myAttentionReqs.data.requisitions;
 					count = myAttentionReqs.data.totalCount;
 					break;
 				case "allRequisitions":
 					fetchedRequisitions = [];
-					const allReqs = await getAllRequisitions(filteredPage, filteredLimit)
+					const allReqs = await getAllRequisitions(page, limit);
 					fetchedRequisitions = allReqs.data.requisitions;
 					count = allReqs.data.totalCount;
 					break;
@@ -148,9 +152,8 @@ const Requisitions = () => {
 	};
 
 	const handleFilteredPageChange = (event, newPage) => {
-		setFilteredPage(newPage + 1);
+		setFilteredPage(newPage);
 	};
-
 
 	const handleFilteredLimitChange = (event) => {
 		setFilteredLimit(parseInt(event.target.value, 10));
@@ -306,7 +309,7 @@ const Requisitions = () => {
 								reqId={reqId}
 								action={action}
 								tab={tab}
-								page={filteredRequisitions.length > 0 ? filteredPage - 1 : page} // Convert to 0-based index
+								page={filteredRequisitions.length > 0 ? filteredPage : page}
 								limit={filteredRequisitions.length > 0 ? filteredLimit : limit}
 								onPageChange={
 									filteredRequisitions.length > 0
