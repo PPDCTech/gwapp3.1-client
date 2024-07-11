@@ -599,11 +599,9 @@ const RequisitionDetailsModal = ({
 								{/* Action/Check section */}
 								<Container>
 									{/* Buttons based on requisition status and user access level */}
-									{(requisition.status === "pending" &&
-										user.accessLevel === "budgetHolder") ||
-									(requisition.status === "pending" &&
-										user.accessLevel === "finance" &&
-										requisition.attentionTo.includes(user?.email)) ? (
+									{requisition.status === "pending" &&
+									user.accessLevel === "budgetHolder" &&
+									requisition.attentionTo.includes(user?.email) ? (
 										<>
 											<Button
 												variant="contained"
