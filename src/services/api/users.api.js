@@ -26,9 +26,9 @@ export const fetchAllUsers = async () => {
   }
 };
 
-export const fetchUsers = async (page = 0, rowsPerPage = 25) => {
+export const fetchUsers = async (page = 0, rowsPerPage = 25, keyword) => {
   try {
-    const response = await fetchData(`${USERS_API}?page=${page}&rowsPerPage=${rowsPerPage}`);
+    const response = await fetchData(`${USERS_API}?page=${page}&rowsPerPage=${rowsPerPage}&keyword=${keyword}`);
     return response;
   } catch (error) {
     throw new Error(error.message);
@@ -45,9 +45,9 @@ export const fetchSingleUser = async (userId) => {
   }
 };
 
-export const fetchAlumni = async (page = 0, rowsPerPage = 25) => {
+export const fetchAlumni = async (page = 0, rowsPerPage = 25, keyword) => {
   try {
-    const response = await fetchData(`${USERS_API}/alumni?page=${page}&rowsPerPage=${rowsPerPage}`);
+    const response = await fetchData(`${USERS_API}/alumni?page=${page}&rowsPerPage=${rowsPerPage}&keyword=${keyword}`);
     return response;
   } catch (error) {
     throw new Error(error.message);

@@ -12,6 +12,7 @@ import {
 	Box,
 	Typography,
 	CircularProgress,
+	TablePagination,
 } from "@mui/material";
 import { DocumentDuplicateIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { getCurrencySign } from "../../utils/format-currency";
@@ -21,7 +22,16 @@ import RequisitionDetailsModal from "../../components/req-details-modal";
 import CreateReqModal from "../../components/create-req";
 import { STATUS_COLOR_TYPE } from "../../services/constants";
 
-const RetirementsTable = ({ data = [], reloadData, loading }) => {
+const RetirementsTable = ({
+	data = [],
+	reloadData,
+	loading,
+	page,
+	limit,
+	totalCount,
+	onPageChange,
+	onLimitChange,
+}) => {
 	const [isReqDetailsOpen, setIsReqDetailsOpen] = useState(false);
 	const [selectedId, setSelectedId] = useState(null);
 	const [selectedRequisition, setSelectedRequisition] = useState(null);
@@ -39,6 +49,7 @@ const RetirementsTable = ({ data = [], reloadData, loading }) => {
 			setSelectedRequisition(req.data);
 			setRetireMode(true);
 			setRetireReqModalOpen(true);
+			await reloadData();
 		} catch (error) {
 			console.error("Error getting single requisition:", error.message);
 		}
@@ -47,6 +58,7 @@ const RetirementsTable = ({ data = [], reloadData, loading }) => {
 	const handleCloseRetireModal = () => {
 		setRetireMode(false);
 		setRetireReqModalOpen(false);
+		reloadData();
 	};
 
 	const handleOpenReqDetails = useCallback((id) => {
@@ -185,6 +197,15 @@ const RetirementsTable = ({ data = [], reloadData, loading }) => {
 					</>
 				)}
 			</TableContainer>
+			<TablePagination
+				rowsPerPageOptions={[5, 10, 25]}
+				component="div"
+				count={Number(totalCount)}
+				rowsPerPage={limit}
+				page={page}
+				onPageChange={onPageChange}
+				onRowsPerPageChange={onLimitChange}
+			/>
 			<RequisitionDetailsModal
 				isOpen={isReqDetailsOpen}
 				requisitionId={selectedId}

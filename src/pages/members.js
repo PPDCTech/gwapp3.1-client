@@ -48,7 +48,7 @@ const Members = () => {
 
 	const fetchActiveMembers = async (page, rowsPerPage) => {
 		try {
-			const result = await fetchUsers(page, rowsPerPage);
+			const result = await fetchUsers(page, rowsPerPage, searchQuery);
 			const { totalCount } = result.data;
 
 			setFilteredActiveMembers(result.data.users);
@@ -62,7 +62,7 @@ const Members = () => {
 
 	const fetchAlumniMembers = async (page, rowsPerPage) => {
 		try {
-			const result = await fetchAlumni(page, rowsPerPage);
+			const result = await fetchAlumni(page, rowsPerPage, searchQuery);
 			const { users, totalCount } = result.data;
 
 			setFilteredAlumniMembers(users);
@@ -78,7 +78,7 @@ const Members = () => {
 		async (event, value) => {
 			setActivePage(value);
 			try {
-				const result = await fetchUsers(value, rowsPerPage);
+				const result = await fetchUsers(value, rowsPerPage, searchQuery);
 				const { users, totalCount } = result.data;
 				console.log(users);
 				setFilteredActiveMembers(users);
@@ -87,14 +87,14 @@ const Members = () => {
 				setErrorActive(error.message);
 			}
 		},
-		[rowsPerPage],
+		[rowsPerPage, searchQuery],
 	);
 
 	const handleAlumniPageChange = useCallback(
 		async (event, value) => {
 			setAlumniPage(value);
 			try {
-				const result = await fetchAlumni(value, rowsPerPage);
+				const result = await fetchAlumni(value, rowsPerPage, searchQuery);
 				const { users, totalCount } = result.data;
 				setFilteredAlumniMembers(users);
 				setTotalAlumni(totalCount);
@@ -102,7 +102,7 @@ const Members = () => {
 				setErrorAlumni(error.message);
 			}
 		},
-		[rowsPerPage],
+		[rowsPerPage, searchQuery],
 	);
 
 	const handleRowsPerPageChange = useCallback((event) => {
@@ -112,7 +112,7 @@ const Members = () => {
 	const handleSearchInputChange = useCallback(
 		(event) => {
 			const query = event.target.value;
-			setSearchQuery(query);
+			setSearchQuery(query.toLowerCase());
 
 			if (tabValue === 0) {
 				const filteredMembers = activeMembers.filter((member) =>
@@ -197,7 +197,7 @@ const Members = () => {
 						>
 							<Typography variant="h6">Staff Members</Typography>
 							<Box>
-								{["tech"].includes(user.accessLevel) && (
+								{["tech", "userManager"].includes(user.accessLevel) && (
 									<>
 										<Button
 											size="small"

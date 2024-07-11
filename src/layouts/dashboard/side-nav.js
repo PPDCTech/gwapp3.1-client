@@ -27,14 +27,13 @@ export const SideNav = (props) => {
 		const filteredItems = items.filter((item) => {
 			switch (user?.accessLevel) {
 				case "tech":
+				case "finance":
+				case "financeReviewer":
 					return true;
 				case "superUser":
 					return item.path !== "/retirements";
 				case "budgetHolder":
 					return item.path !== "/retirements" && item.path !== "/accounts";
-				case "finance":
-				case "financeReviewer":
-					return item.path !== "/retirements";
 				case "user":
 					return (
 						item.path !== "/accounts" &&

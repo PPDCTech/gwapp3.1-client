@@ -69,6 +69,13 @@ export const getUserUnretiredRequisitions = (email, page, limit) => {
     return fetchData(`user-requisitions/unretired/${email}`);
 };
 
+export const getAllRequestedRetirements = (page, limit) => {
+	if (page && limit) {
+		return fetchData(`finance-requested/retirements?page=${page}&limit=${limit}`);
+	}
+	return fetchData("finance-requested/retirements");
+};
+
 export const updateRequisition = (id, data) =>
     putData(`${REQUISITION_API}/${id}`, data);
 
