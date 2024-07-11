@@ -200,11 +200,11 @@ export const FinanceRetirementTable = ({
 													<TableCell>{getDateMDY(requisition?.date)}</TableCell>
 													<TableCell>
 														<SeverityPill
-															color={STATUS_COLOR_TYPE[requisition?.status || "pending"]}
+															color={
+																STATUS_COLOR_TYPE[requisition?.retiredStatus || "controlled"]
+															}
 														>
-															{requisition?.status === "checked"
-																? "financeCheck"
-																: requisition?.status}
+															{requisition?.retiredStatus}
 														</SeverityPill>
 													</TableCell>
 
@@ -291,7 +291,7 @@ export const FinanceRetirementTable = ({
 
 																<Tooltip placement="left-start" title="Sign">
 																	<MenuItem
-																		value="Sign as Retired"
+																		value="Mark as Retired"
 																		onClick={() => {
 																			setItemId(requisition?._id);
 																			setRlertModalOpen(true);
