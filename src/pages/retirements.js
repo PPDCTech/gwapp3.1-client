@@ -23,24 +23,27 @@ const Retirements = () => {
 	const [data, setData] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [requisitions, setRequisitions] = useState([]);
-	const [totalCount, setTotalCount] = useState(0);
 	const [fetching, setFetching] = useState(false);
 	const [page, setPage] = useState(0);
 	const [limit, setLimit] = useState(10);
+	const [totalCount, setTotalCount] = useState(0);
+	const [_page, _setPage] = useState(0);
+	const [_limit, _setLimit] = useState(10);
+	const [_totalCount, _setTotalCount] = useState(0);
 
 	const fetchRequisitions = useCallback(async () => {
 		setFetching(true);
 		try {
-			const response = await getAllRequestedRetirements(page, limit);
+			const response = await getAllRequestedRetirements(_page, _limit);
 			const { requisitions, totalCount } = response.data;
 			setRequisitions(requisitions);
-			setTotalCount(totalCount);
+			_setTotalCount(totalCount);
 			setFetching(false);
 		} catch (error) {
 			setFetching(false);
 			console.error("Error fetching retirements:", error.message);
 		}
-	}, [page, limit]);
+	}, [_page, _limit]);
 
 	const fetchData = useCallback(async () => {
 		setLoading(true);
@@ -68,6 +71,14 @@ const Retirements = () => {
 		fetchRequisitions();
 	}, [fetchRequisitions]);
 
+	const _handlePageChange = (event, newPage) => {
+		_setPage(newPage);
+	};
+
+	const _handleLimitChange = (event) => {
+		_setLimit(parseInt(event.target.value, 10));
+		_setPage(0);
+	};
 	const handlePageChange = (event, newPage) => {
 		setPage(newPage);
 	};
@@ -95,11 +106,11 @@ const Retirements = () => {
 									requisitions={requisitions}
 									updateTableData={fetchRequisitions}
 									loading={fetching}
-									page={page}
-									limit={limit}
-									onLimitChange={handleLimitChange}
-									onPageChange={handlePageChange}
-									totalCount={totalCount}
+									page={_page}
+									limit={_limit}
+									onLimitChange={_handleLimitChange}
+									onPageChange={_handlePageChange}
+									totalCount={_totalCount}
 									reqId={reqId}
 									action={action}
 								/>
