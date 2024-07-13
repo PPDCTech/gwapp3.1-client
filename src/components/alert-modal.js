@@ -35,10 +35,11 @@ function AlertModal({ open, onClose, title, content, onConfirm, onCancel }) {
 						color="primary"
 						onClick={()=> handlerFunc()}
 						disabled={Loading}
+						sx={{mx: 1}}
 					>
 						{Loading ? "Loading..." : "Yes"}
 					</Button>
-					<Button variant="contained" color="secondary" onClick={() => onClose()}>
+					<Button variant="contained" color="secondary" onClick={() => onClose()} sx={{mx: 1}}>
 						No
 					</Button>
 				</Box>

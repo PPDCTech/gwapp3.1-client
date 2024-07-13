@@ -21,7 +21,7 @@ import {
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
 	ChatBubbleOvalLeftEllipsisIcon,
-	PencilSquareIcon,
+	CheckIcon,
 	EyeIcon,
 } from "@heroicons/react/24/outline";
 import { STATUS_COLOR_TYPE } from "../../services/constants";
@@ -57,15 +57,18 @@ export const FinanceRetirementTable = ({
 
 	const [rlertModalOpen, setRlertModalOpen] = useState(false);
 
+	useEffect(() => {
+		updateTableData();
+		// eslint-disable-next-line
+	}, []);
+
 	const openChatModal = (reqId) => {
 		setSelectedId(reqId);
 		setIsChatModalOpen(true);
-		updateTableData();
 	};
 	const closeChatModal = () => {
 		setSelectedId("");
 		setIsChatModalOpen(false);
-		updateTableData();
 	};
 
 	const openReqDetails = () => setIsReqDetailsOpen(true);
@@ -73,14 +76,7 @@ export const FinanceRetirementTable = ({
 	const closeReqDetails = () => {
 		setIsReqDetailsOpen(false);
 		setSelectedId("");
-		updateTableData();
 	};
-
-	useEffect(() => {
-		if (!isReqDetailsOpen) {
-			setRequisitions((prevRequisitions) => [...prevRequisitions]);
-		}
-	}, [isReqDetailsOpen, setRequisitions]);
 
 	const handleOpenReqDetails = useCallback((id) => {
 		setSelectedId(id);
@@ -303,13 +299,13 @@ export const FinanceRetirementTable = ({
 																				height: "16px",
 																			}}
 																		>
-																			<PencilSquareIcon />
+																			<CheckIcon />
 																		</ListItemIcon>
 																		<ListItemText
 																			primaryTypographyProps={{
 																				fontSize: "small",
 																			}}
-																			primary="Edit"
+																			primary="Mark as Retired"
 																		/>
 																	</MenuItem>
 																</Tooltip>
@@ -353,6 +349,8 @@ export const FinanceRetirementTable = ({
 				isOpen={isReqDetailsOpen}
 				requisitionId={selectedId}
 				onClose={closeReqDetails}
+				isRetirement={true}
+				updateTableData={updateTableData}
 			/>
 		</>
 	);

@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useCallback } from "react";
 import {
 	Modal,
 	Grid,
@@ -20,6 +20,7 @@ import {
 	Autocomplete,
 	CircularProgress,
 } from "@mui/material";
+import LibraryAddCheckIcon from "@mui/icons-material/LibraryAddCheck";
 import {
 	capitalizeFirstLetter,
 	currencyCodes,
@@ -46,12 +47,16 @@ import { indigo, info, success } from "../theme/colors";
 import { addMessage } from "../services/api/message-chat.api";
 import ChatModal from "./chat-modal";
 import { getAllAccountCodes } from "../services/api/account-codes.api";
+import { markAsRetired } from "../services/api/requisition.api";
+import AlertModal from "../components/alert-modal";
 
 const RequisitionDetailsModal = ({
 	isOpen,
 	onClose,
 	requisitionId,
 	triggerUpdateRequisition,
+	isRetirement,
+	updateTableData,
 }) => {
 	const { user } = useAuth();
 	const [loading, setLoading] = useState(false);
@@ -61,17 +66,22 @@ const RequisitionDetailsModal = ({
 	const [accountCodes, setAccountCodes] = useState([]);
 	const [newAccountCode, setNewAccountCode] = useState(null);
 
-	const getAccountCodes = async () => {
+	const getAccountCodes = useCallback(async () => {
 		const response = await getAllAccountCodes();
 		setAccountCodes(response.data);
-	};
+	}, []);
+
+	const tableDataUpdate = useCallback(() => {
+		updateTableData();
+	}, []);
 
 	useEffect(() => {
 		getAccountCodes();
-	}, [isOpen]);
+		tableDataUpdate();
+	}, [isOpen, requisitionId, getAccountCodes, tableDataUpdate]);
 
-	const openChatModal = () => setIsChatModalOpen(true);
-	const closeChatModal = () => setIsChatModalOpen(false);
+	const openChatModal = () => setIsChatModalOpen(true)
+	const closeChatModal = () => setIsChatModalOpen(false)
 
 	useEffect(() => {
 		const fetchRequisitionDetails = async () => {
@@ -197,6 +207,22 @@ const RequisitionDetailsModal = ({
 	const isValidRequisition =
 		requisition && requisition?.title && requisition?.status;
 
+	const [rlertModalOpen, setRlertModalOpen] = useState(false);
+
+	const markAsRetiredHandler = async () => {
+		try {
+			const res = await markAsRetired(requisitionId);
+			if (res.status === 200) {
+				tableDataUpdate();
+				toast.success("Requisition marked as retired.");
+				setRlertModalOpen(false);
+			}
+		} catch (error) {
+			console.log("Error marking requisition as retired:", error.message);
+			toast.error("An error occurred. Please try again.");
+		}
+	};
+
 	return (
 		<>
 			<Modal open={isOpen} onClose={onClose}>
@@ -220,7 +246,7 @@ const RequisitionDetailsModal = ({
 							}}
 						>
 							Fetching...
-							<CircularProgress color="success" />
+							{/* <CircularProgress color="success" /> */}
 						</Box>
 					)}
 
@@ -687,9 +713,21 @@ const RequisitionDetailsModal = ({
 									) : requisition.status === "approved" &&
 									  (user?.accessLevel === "finance" ||
 											user?.accessLevel === "financeReviewer") ? (
-										<Button size="small" onClick={handleCancelPayment}>
-											Cancel Payment
-										</Button>
+										<>
+											{isRetirement ? (
+												<Button
+													size="small"
+													onClick={()=> setRlertModalOpen(true)}
+													startIcon={<LibraryAddCheckIcon />}
+												>
+													Mark as Retired
+												</Button>
+											) : (
+												<Button size="small" onClick={handleCancelPayment}>
+													Cancel Payment
+												</Button>
+											)}
+										</>
 									) : null}
 
 									{requisition.status === "approved" && (
@@ -788,6 +826,15 @@ const RequisitionDetailsModal = ({
 					/>
 				</Suspense>
 			)}
+			<Suspense fallback={null}>
+				<AlertModal
+					open={rlertModalOpen}
+					onClose={() => setRlertModalOpen(false)}
+					title="Mark Requisition as Retired"
+					content="Are you sure you want to mark this requisition as retired?"
+					onConfirm={markAsRetiredHandler}
+				/>
+			</Suspense>
 		</>
 	);
 };
