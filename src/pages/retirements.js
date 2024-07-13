@@ -124,6 +124,7 @@ const Retirements = () => {
 									onLimitChange={handleLimitChange}
 									onPageChange={handlePageChange}
 									totalCount={totalCount}
+									updateTableData={fetchRequisitions}
 								/>
 							)}
 						</>

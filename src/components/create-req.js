@@ -211,15 +211,33 @@ const CreateReqModal = ({
 		setBudgetCodes([]);
 	};
 
+	const selectedProject = projects.find(
+		(project) => project.projectName === projectName,
+	);
+
+	const [beingChargedTo, setBeingChargedTo] = useState({});
+
+	useEffect(() => {
+		if (projectName && selectedProject) {
+			setBeingChargedTo({
+				account: {
+					accountName: selectedProject ? selectedProject.account.accountName : "",
+					accountNumber: selectedProject
+						? selectedProject.account.accountNumber
+						: "",
+					bankName: selectedProject ? selectedProject.account.bankName : "",
+				},
+				funder: selectedProject ? selectedProject.funder : "",
+				projectName: projectName,
+			});
+		}
+	}, [projectName, selectedProject]);
 
 	const handleSubmitRequisition = async (event) => {
 		event.preventDefault();
 
 		try {
 			setLoadingSubmit(true);
-			const selectedProject = projects.find(
-				(project) => project.projectName === projectName,
-			);
 			const attentionToUser = budgetHolders.find(
 				(holder) => holder.name === attentionTo,
 			);
@@ -237,17 +255,7 @@ const CreateReqModal = ({
 				accountNumber: beneficiary?.accountNumber || newAccountNumber || "Nil",
 				bankName: beneficiary?.bankName || newBankName || "Nil",
 				attentionTo: attentionToUser?.email || "",
-				projectChargedTo: {
-					account: {
-						accountName: selectedProject ? selectedProject.account.accountName : "",
-						accountNumber: selectedProject
-							? selectedProject.account.accountNumber
-							: "",
-						bankName: selectedProject ? selectedProject.account.bankName : "",
-					},
-					funder: selectedProject ? selectedProject.funder : "",
-					projectName: projectName,
-				},
+				projectChargedTo: beingChargedTo,
 				budgetLineItems,
 				date: getCurrentDateTimeString(),
 			};
@@ -293,9 +301,7 @@ const CreateReqModal = ({
 		event.preventDefault();
 		try {
 			setLoadingSaveEdit(true);
-			const selectedProject = projects.find(
-				(project) => project.projectName === projectName,
-			);
+
 			const attentionToUser = budgetHolders.find(
 				(holder) => holder.name === attentionTo,
 			);
@@ -314,10 +320,7 @@ const CreateReqModal = ({
 				userId: user._id,
 				type: type ? type : requisitionData.type,
 				title: title ? title : requisitionData.title,
-				invoices: [
-					...requisitionData.invoices,
-					...newInvoices, 
-				],
+				invoices: [...requisitionData.invoices, ...newInvoices],
 				items: itemsArray ? itemsArray : requisitionData.itemsArray,
 				currency: currency ? currency : requisitionData.currency,
 				amountInWords: "",
@@ -337,31 +340,7 @@ const CreateReqModal = ({
 				attentionTo: attentionToUser?.email
 					? attentionToUser.email
 					: requisitionData.attentionTo,
-				projectChargedTo: {
-					account: {
-						accountName: selectedProject
-							? selectedProject?.account?.accountName || ""
-							: requisitionData?.selectedProject
-							? requisitionData?.selectedProject?.accountName
-							: "",
-						accountNumber: selectedProject
-							? selectedProject?.account?.accountNumber || ""
-							: requisitionData?.selectedProject
-							? requisitionData?.selectedProject?.accountNumber
-							: "",
-						bankName: selectedProject
-							? selectedProject?.account?.bankName || ""
-							: requisitionData?.selectedProject
-							? requisitionData?.selectedProject?.bankName
-							: "",
-					},
-					funder: selectedProject
-						? selectedProject.funder
-						: requisitionData?.selectedProject?.funder || "",
-					projectName: projectName
-						? projectName
-						: requisitionData?.projectName || "",
-				},
+				projectChargedTo: beingChargedTo,
 				date: getCurrentDateTimeString(),
 			};
 
@@ -792,7 +771,8 @@ const CreateReqModal = ({
 								<Typography variant="body2" sx={{ color: "text.secondary", mt: 1 }}>
 									Please for multiple files, hold down the Ctrl/cmd key and select a
 									maximum of 5 files.
-									<br />Don't forget to press the Upload button after selecting file(s).
+									<br />
+									Don't forget to press the Upload button after selecting file(s).
 								</Typography>{" "}
 							</Grid>
 							<Grid item xs={12} md={6}>

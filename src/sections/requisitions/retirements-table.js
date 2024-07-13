@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
 	Button,
@@ -31,12 +31,18 @@ const RetirementsTable = ({
 	totalCount,
 	onPageChange,
 	onLimitChange,
+	updateTableData
 }) => {
 	const [isReqDetailsOpen, setIsReqDetailsOpen] = useState(false);
 	const [selectedId, setSelectedId] = useState(null);
 	const [selectedRequisition, setSelectedRequisition] = useState(null);
 	const [isRetireReqModalOpen, setRetireReqModalOpen] = useState(false);
 	const [retireMode, setRetireMode] = useState(false);
+
+	useEffect(() => {
+		updateTableData();
+		// eslint-disable-next-line
+	}, []);
 
 	const closeReqDetails = () => {
 		setIsReqDetailsOpen(false);
@@ -49,7 +55,8 @@ const RetirementsTable = ({
 			setSelectedRequisition(req.data);
 			setRetireMode(true);
 			setRetireReqModalOpen(true);
-			await reloadData();
+			reloadData();
+			updateTableData();
 		} catch (error) {
 			console.error("Error getting single requisition:", error.message);
 		}
@@ -210,6 +217,7 @@ const RetirementsTable = ({
 				isOpen={isReqDetailsOpen}
 				requisitionId={selectedId}
 				onClose={closeReqDetails}
+				updateTableData={updateTableData}
 			/>
 			<CreateReqModal
 				open={isRetireReqModalOpen}
