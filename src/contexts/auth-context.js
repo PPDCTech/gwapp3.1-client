@@ -174,7 +174,9 @@ export const AuthProvider = (props) => {
 		window.localStorage.removeItem("token");
 		window.localStorage.removeItem("authenticated");
 		window.localStorage.removeItem("gwapp_userId");
+		window.localStorage.removeItem("tokenExpiration");
 		window.localStorage.clear();
+		window.location.href = "/user/login";
 
 		dispatch({
 			type: HANDLERS.SIGN_OUT,
