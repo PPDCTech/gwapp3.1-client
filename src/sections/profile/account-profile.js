@@ -138,7 +138,7 @@ export const AccountProfile = () => {
 						Upload picture
 					</Button>
 					<input
-						accept="image/*"
+						accept="png jpg jpeg"
 						style={{ display: "none" }}
 						id="upload-button"
 						type="file"
@@ -196,7 +196,7 @@ export const AccountProfile = () => {
 						Upload Signature
 					</Button>
 					<input
-						accept="image/*"
+						accept="png jpg jpeg"
 						style={{ display: "none" }}
 						id="upload-sig-button"
 						type="file"
