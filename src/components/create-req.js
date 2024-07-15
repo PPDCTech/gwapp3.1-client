@@ -33,6 +33,7 @@ import TrashIcon from "@heroicons/react/24/outline/TrashIcon";
 import EyeIcon from "@heroicons/react/24/outline/EyeIcon";
 import XCircleIcon from "@heroicons/react/24/outline/XCircleIcon";
 import { SvgIcon } from "@mui/material";
+import BlockIcon from "@mui/icons-material/Block";
 import { useAuth } from "../hooks/use-auth";
 import { toast } from "react-toastify";
 import { getCurrentDateTimeString } from "../services/helpers";
@@ -48,11 +49,7 @@ import { getAllProjects } from "../services/api/projects.api";
 import { getAllBudgetCodes } from "../services/api/budget-codes.api";
 import { CheckCircleOutline } from "@mui/icons-material";
 import { removeFileAPI, uploadFileAPI } from "../services/api/uploads.api";
-import {
-	addVendor,
-	getAllVendors,
-	getUserVendors,
-} from "../services/api/vendors.api";
+import { addVendor, getUserVendors } from "../services/api/vendors.api";
 
 const CreateReqModal = ({
 	open,
@@ -86,6 +83,7 @@ const CreateReqModal = ({
 
 	const [selectedFiles, setSelectedFiles] = useState([]);
 	const [invoiceArray, setInvoiceArray] = useState([]);
+	const [retirementFiles, setRetirementFiles] = useState([]);
 
 	const [budgetHolders, setBudgetHolders] = useState([]);
 	const [attentionTo, setAttentionTo] = useState("");
@@ -393,8 +391,8 @@ const CreateReqModal = ({
 				userId: user._id,
 				invoices:
 					requisitionData.invoices.length > 0
-						? [...requisitionData.invoices, ...invoiceArray]
-						: invoiceArray,
+						? [...requisitionData.invoices, ...retirementFiles]
+						: retirementFiles,
 				date: getCurrentDateTimeString(),
 			};
 
@@ -474,34 +472,65 @@ const CreateReqModal = ({
 		event.preventDefault();
 
 		try {
-			setLoadingFileUpload(true);
+			if (!retireMode) {
+				setLoadingFileUpload(true);
 
-			const formData = new FormData();
-			const newInvoices = [];
+				const formData = new FormData();
+				const newInvoices = [];
 
-			formData.append("destination", "invoices");
+				formData.append("destination", "invoices");
 
-			for (let i = 0; i < selectedFiles.length; i++) {
-				formData.append("files", selectedFiles[i]);
-				newInvoices.push({ name: selectedFiles[i].name });
+				for (let i = 0; i < selectedFiles.length; i++) {
+					formData.append("files", selectedFiles[i]);
+					newInvoices.push({ name: selectedFiles[i].name });
+				}
+
+				const response = await uploadFileAPI(formData);
+				const { imageUrls } = await response.data;
+
+				for (let i = 0; i < imageUrls.length; i++) {
+					newInvoices[i].url = imageUrls[i].imageUrl;
+					newInvoices[i].id = imageUrls[i].public_id;
+				}
+
+				setInvoiceArray([...invoiceArray, ...newInvoices]);
+				setSelectedFiles([]); // Clear selected files
+
+				setFileUploadSuccess(true);
+
+				setTimeout(() => {
+					setFileUploadSuccess(false);
+				}, 3000);
+			} else {
+				setLoadingFileUpload(true);
+
+				const formData = new FormData();
+				const newInvoices = [];
+
+				formData.append("destination", "invoices");
+
+				for (let i = 0; i < selectedFiles.length; i++) {
+					formData.append("files", selectedFiles[i]);
+					newInvoices.push({ name: selectedFiles[i].name });
+				}
+
+				const response = await uploadFileAPI(formData);
+				const { imageUrls } = await response.data;
+
+				for (let i = 0; i < imageUrls.length; i++) {
+					newInvoices[i].url = imageUrls[i].imageUrl;
+					newInvoices[i].id = imageUrls[i].public_id;
+				}
+
+				setRetirementFiles([...retirementFiles, ...newInvoices]);
+				setSelectedFiles([]); // Clear selected files
+
+				setFileUploadSuccess(true);
+
+				setTimeout(() => {
+					setFileUploadSuccess(false);
+				}, 3000);
 			}
-
-			const response = await uploadFileAPI(formData);
-			const { imageUrls } = await response.data;
-
-			for (let i = 0; i < imageUrls.length; i++) {
-				newInvoices[i].url = imageUrls[i].imageUrl;
-				newInvoices[i].id = imageUrls[i].public_id;
-			}
-
-			setInvoiceArray([...invoiceArray, ...newInvoices]);
-			setSelectedFiles([]); // Clear selected files
-
-			setFileUploadSuccess(true);
-
-			setTimeout(() => {
-				setFileUploadSuccess(false);
-			}, 3000);
 		} catch (error) {
 			toast.error("Error uploading files");
 			console.log("Error uploading files:", error.message);
@@ -520,7 +549,11 @@ const CreateReqModal = ({
 		try {
 			const response = await removeFileAPI(id);
 			if (response.status === 204) {
-				setInvoiceArray((prevArray) => prevArray.filter((_, i) => i !== index));
+				if (!retireMode) {
+					setInvoiceArray((prevArray) => prevArray.filter((_, i) => i !== index));
+				} else {
+					setRetirementFiles((prevArray) => prevArray.filter((_, i) => i !== index));
+				}
 			}
 		} catch (error) {
 			toast.error(`Error deleting file: ${error.message}`);
@@ -723,7 +756,7 @@ const CreateReqModal = ({
 														<TableCell>{item.title}</TableCell>
 														<TableCell>{item.amount}</TableCell>
 														<TableCell>{item.code}</TableCell>
-														{!retireMode && (
+														{!retireMode ? (
 															<TableCell>
 																<IconButton
 																	onClick={() => handleRemoveItem(index)}
@@ -733,6 +766,19 @@ const CreateReqModal = ({
 																>
 																	<SvgIcon fontSize="small">
 																		<TrashIcon />
+																	</SvgIcon>
+																</IconButton>
+															</TableCell>
+														) : (
+															<TableCell>
+																<IconButton
+																	aria-label="Preview"
+																	color="error"
+																	disabled={true}
+																	sx={{ fontSize: "1rem" }}
+																>
+																	<SvgIcon fontSize="small">
+																		<BlockIcon />
 																	</SvgIcon>
 																</IconButton>
 															</TableCell>
@@ -866,6 +912,38 @@ const CreateReqModal = ({
 										Uploaded Files
 									</Typography>
 								)}
+								{retireMode && (
+									<List>
+										{retirementFiles.map((file, index) => (
+											<ListItem key={index} sx={{ mt: -1 }}>
+												<ListItemText primary={file.name} />
+												<ListItemSecondaryAction>
+													<IconButton
+														onClick={() => handleOpenInvoice(file)}
+														aria-label="Preview"
+														color="primary"
+														sx={{ fontSize: "10px" }}
+													>
+														<SvgIcon fontSize="small">
+															<EyeIcon />
+														</SvgIcon>
+													</IconButton>
+													<IconButton
+														onClick={() => handleRemoveFile(index, file.id)}
+														aria-label="Delete"
+														color="error"
+														sx={{ fontSize: "10px" }}
+													>
+														<SvgIcon fontSize="small">
+															<TrashIcon />
+														</SvgIcon>
+													</IconButton>
+												</ListItemSecondaryAction>
+											</ListItem>
+										))}
+									</List>
+								)}
+								{retireMode && <Divider sx={{ borderColor: "neutral.300" }} />}
 								<List>
 									{invoiceArray.map((file, index) => (
 										<ListItem key={index} sx={{ mt: -1 }}>
@@ -881,16 +959,29 @@ const CreateReqModal = ({
 														<EyeIcon />
 													</SvgIcon>
 												</IconButton>
-												<IconButton
-													onClick={() => handleRemoveFile(index, file.id)}
-													aria-label="Delete"
-													color="error"
-													sx={{ fontSize: "10px" }}
-												>
-													<SvgIcon fontSize="small">
-														<TrashIcon />
-													</SvgIcon>
-												</IconButton>
+												{!retireMode ? (
+													<IconButton
+														onClick={() => handleRemoveFile(index, file.id)}
+														aria-label="Delete"
+														color="error"
+														sx={{ fontSize: "10px" }}
+													>
+														<SvgIcon fontSize="small">
+															<TrashIcon />
+														</SvgIcon>
+													</IconButton>
+												) : (
+													<IconButton
+														disabled={true}
+														aria-label="Cannot Delete"
+														color="error"
+														sx={{ fontSize: "10px" }}
+													>
+														<SvgIcon fontSize="small">
+															<BlockIcon />
+														</SvgIcon>
+													</IconButton>
+												)}
 											</ListItemSecondaryAction>
 										</ListItem>
 									))}

@@ -80,8 +80,8 @@ const RequisitionDetailsModal = ({
 		tableDataUpdate();
 	}, [isOpen, requisitionId, getAccountCodes, tableDataUpdate]);
 
-	const openChatModal = () => setIsChatModalOpen(true)
-	const closeChatModal = () => setIsChatModalOpen(false)
+	const openChatModal = () => setIsChatModalOpen(true);
+	const closeChatModal = () => setIsChatModalOpen(false);
 
 	useEffect(() => {
 		const fetchRequisitionDetails = async () => {
@@ -654,6 +654,7 @@ const RequisitionDetailsModal = ({
 											Request Awaiting Budget Holder Check
 										</Typography>
 									) : (requisition.status === "holderCheck" ||
+											requisition.status === "sentBack" ||
 											requisition.status === "holderChecked") &&
 									  user.accessLevel === "finance" ? (
 										<>
@@ -717,7 +718,7 @@ const RequisitionDetailsModal = ({
 											{isRetirement ? (
 												<Button
 													size="small"
-													onClick={()=> setRlertModalOpen(true)}
+													onClick={() => setRlertModalOpen(true)}
 													startIcon={<LibraryAddCheckIcon />}
 												>
 													Mark as Retired
