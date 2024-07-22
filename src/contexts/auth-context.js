@@ -91,18 +91,18 @@ export const AuthProvider = (props) => {
 			const expirationTime = decodedToken.exp * 1000;
 			const isExpired = Date.now() > expirationTime;
 
-            // if (isExpired) {
-            //     window.localStorage.clear();
-			// 	window.location.href = "/user/login";
-            // }
+            if (isExpired) {
+                window.localStorage.clear();
+				window.location.href = "/user/login";
+            }
             
 			return isExpired;
 		}
 	};
 
-    // useEffect(() => {
-    //     isTokenExpired();
-    // }, []);
+    useEffect(() => {
+        isTokenExpired();
+    }, []);
 
 	const initialize = async () => {
 		// Prevent from calling twice in development mode with React.StrictMode enabled
