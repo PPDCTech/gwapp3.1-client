@@ -83,7 +83,7 @@ export const AuthProvider = (props) => {
 	};
 
 	const isTokenExpired = () => {
-        console.log('Checking token')
+        console.log('Checking token');
 		const token = window.localStorage.getItem("token");
 
 		if (token) {
@@ -136,14 +136,16 @@ export const AuthProvider = (props) => {
 			dispatch({
 				type: HANDLERS.INITIALIZE,
 			});
+            
+            isTokenExpired();
 
-			if (isTokenExpired()) {
-				window.localStorage.removeItem("token");
-				window.localStorage.removeItem("authenticated");
-				window.localStorage.removeItem("gwapp_userId");
-				window.localStorage.clear();
-				window.location.href = "/user/login";
-			}
+			// if (isTokenExpired()) {
+			// 	window.localStorage.removeItem("token");
+			// 	window.localStorage.removeItem("authenticated");
+			// 	window.localStorage.removeItem("gwapp_userId");
+			// 	window.localStorage.clear();
+			// 	window.location.href = "/user/login";
+			// }
 		}
 	};
 
