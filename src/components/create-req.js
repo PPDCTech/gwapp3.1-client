@@ -285,6 +285,11 @@ const CreateReqModal = ({
 				toast.success("Request created successfully");
 				onClose();
 				resetForm();
+
+				// reload window after 10 seconds
+				setTimeout(() => {
+					window.location.reload();
+				}, 10000);
 			}
 		} catch (error) {
 			toast.error(`Error creating request\n${error.message}`);
@@ -816,7 +821,7 @@ const CreateReqModal = ({
 								</Typography>
 								<Typography variant="body2" sx={{ color: "text.secondary", mt: 1 }}>
 									Please for multiple files, hold down the Ctrl/cmd key and select a
-									maximum of 5 files.
+									maximum of 5 files. (We now support excel and csv files)
 									<br />
 									Don't forget to press the Upload button after selecting file(s).
 								</Typography>{" "}

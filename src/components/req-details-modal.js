@@ -110,12 +110,6 @@ const RequisitionDetailsModal = ({
 		);
 	};
 
-	const isImage = (url) => {
-		const imageExtensions = ["jpg", "jpeg", "png", "gif"];
-		const extension = url.split(".").pop().toLowerCase();
-		return imageExtensions.includes(extension);
-	};
-
 	const checker_info = {
 		name: user?.name,
 		email: user?.email,
@@ -221,6 +215,33 @@ const RequisitionDetailsModal = ({
 			console.log("Error marking requisition as retired:", error.message);
 			toast.error("An error occurred. Please try again.");
 		}
+	};
+
+	const isImage = (url) => {
+		const imageExtensions = ["jpg", "jpeg", "png", "gif"];
+		const extension = url.split(".").pop().toLowerCase();
+		return imageExtensions.includes(extension);
+	};
+
+	const downloadFile = (url, name) => {
+		fetch(url)
+			.then((response) => response.blob())
+			.then((blob) => {
+				const link = document.createElement("a");
+				link.href = URL.createObjectURL(blob);
+				link.setAttribute("download", name);
+
+				// Append the anchor element to the body
+				document.body.appendChild(link);
+
+				// Programmatically click the anchor to trigger the download
+				link.click();
+
+				// Clean up: remove the anchor from the DOM
+				document.body.removeChild(link);
+				URL.revokeObjectURL(link.href); // Revoke the object URL to free up memory
+			})
+			.catch((error) => console.error("Error downloading file:", error));
 	};
 
 	return (
@@ -511,7 +532,16 @@ const RequisitionDetailsModal = ({
 															borderRadius: "5px",
 															transition: "background-color 0.3s ease",
 														}}
-														onClick={() => window.open(document.url, "_blank")}
+														onClick={() => {
+															if (
+																document.name.endsWith(".xlsx") ||
+																document.name.endsWith(".csv")
+															) {
+																downloadFile(document.url, document.name);
+															} else {
+																window.open(document.url, "_blank");
+															}
+														}}
 														onMouseEnter={(e) =>
 															(e.currentTarget.style.backgroundColor = "#D2D6DB")
 														}
