@@ -7,7 +7,6 @@ import {
 } from "react";
 import PropTypes from "prop-types";
 import { jwtDecode } from "jwt-decode";
-
 import { fetchSingleUser } from "../services/api/users.api";
 import { verifyLogin } from "../services/api/auth.api";
 
@@ -27,36 +26,23 @@ const initialState = {
 const handlers = {
 	[HANDLERS.INITIALIZE]: (state, action) => {
 		const user = action.payload;
-
 		return {
 			...state,
-			...(user // if payload (user) is provided, then is authenticated
-				? {
-						isAuthenticated: true,
-						isLoading: false,
-						user,
-				  }
-				: {
-						isLoading: false,
-				  }),
+			...(user
+				? { isAuthenticated: true, isLoading: false, user }
+				: { isLoading: false }),
 		};
 	},
-	[HANDLERS.SIGN_IN]: (state, action) => {
-		const user = action.payload;
-
-		return {
-			...state,
-			isAuthenticated: true,
-			user,
-		};
-	},
-	[HANDLERS.SIGN_OUT]: (state) => {
-		return {
-			...state,
-			isAuthenticated: false,
-			user: null,
-		};
-	},
+	[HANDLERS.SIGN_IN]: (state, action) => ({
+		...state,
+		isAuthenticated: true,
+		user: action.payload,
+	}),
+	[HANDLERS.SIGN_OUT]: (state) => ({
+		...state,
+		isAuthenticated: false,
+		user: null,
+	}),
 	[HANDLERS.SET_USER]: (state, action) => ({
 		...state,
 		isAuthenticated: true,
@@ -67,11 +53,9 @@ const handlers = {
 const reducer = (state, action) =>
 	handlers[action.type] ? handlers[action.type](state, action) : state;
 
-// This context is to propagate authentication state through the App tree.
 export const AuthContext = createContext({ undefined });
 
-export const AuthProvider = (props) => {
-	const { children } = props;
+export const AuthProvider = ({ children }) => {
 	const [state, dispatch] = useReducer(reducer, initialState);
 	const initialized = useRef(false);
 
@@ -83,7 +67,6 @@ export const AuthProvider = (props) => {
 	};
 
 	const isTokenExpired = () => {
-        console.log('Checking token');
 		const token = window.localStorage.getItem("token");
 
 		if (token) {
@@ -91,24 +74,18 @@ export const AuthProvider = (props) => {
 			const expirationTime = decodedToken.exp * 1000;
 			const isExpired = Date.now() > expirationTime;
 
-            if (isExpired) {
-                window.localStorage.clear();
+			if (isExpired) {
+				window.localStorage.clear();
 				window.location.href = "/user/login";
-            }
-            
+			}
+
 			return isExpired;
 		}
+		return true;
 	};
 
-    useEffect(() => {
-        isTokenExpired();
-    }, []);
-
 	const initialize = async () => {
-		// Prevent from calling twice in development mode with React.StrictMode enabled
-		if (initialized.current) {
-			return;
-		}
+		if (initialized.current) return;
 
 		initialized.current = true;
 
@@ -121,8 +98,10 @@ export const AuthProvider = (props) => {
 		}
 
 		if (isAuthenticated) {
-			const userId = window.localStorage.getItem("gwapp_userId");
+			const tokenExpired = isTokenExpired();
+			if (tokenExpired) return;
 
+			const userId = window.localStorage.getItem("gwapp_userId");
 			if (userId) {
 				const response = await fetchSingleUser(userId);
 				const user = response?.data;
@@ -133,34 +112,20 @@ export const AuthProvider = (props) => {
 				});
 			}
 		} else {
+			isTokenExpired();
 			dispatch({
 				type: HANDLERS.INITIALIZE,
 			});
-            
-            isTokenExpired();
-
-			// if (isTokenExpired()) {
-			// 	window.localStorage.removeItem("token");
-			// 	window.localStorage.removeItem("authenticated");
-			// 	window.localStorage.removeItem("gwapp_userId");
-			// 	window.localStorage.clear();
-			// 	window.location.href = "/user/login";
-			// }
 		}
 	};
 
-	useEffect(
-		() => {
-			initialize();
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[],
-	);
+	useEffect(() => {
+		initialize();
+	}, []);
 
 	const signIn = async (password) => {
 		try {
 			const response = await verifyLogin(password);
-
 			const { userData } = response.data;
 			const { status, token } = userData;
 
@@ -183,10 +148,9 @@ export const AuthProvider = (props) => {
 	};
 
 	const signOut = () => {
-		window.localStorage.removeItem("token");
-		window.localStorage.removeItem("authenticated");
-		window.localStorage.removeItem("gwapp_userId");
-		window.localStorage.removeItem("tokenExpiration");
+		["token", "authenticated", "gwapp_userId"].forEach((item) =>
+			window.localStorage.removeItem(item),
+		);
 		window.localStorage.clear();
 		window.location.href = "/user/login";
 
@@ -196,21 +160,14 @@ export const AuthProvider = (props) => {
 	};
 
 	return (
-		<AuthContext.Provider
-			value={{
-				...state,
-				setUser,
-				signIn,
-				signOut,
-			}}
-		>
+		<AuthContext.Provider value={{ ...state, setUser, signIn, signOut }}>
 			{children}
 		</AuthContext.Provider>
 	);
 };
 
 AuthProvider.propTypes = {
-	children: PropTypes.node,
+	children: PropTypes.node.isRequired,
 };
 
 export const AuthConsumer = AuthContext.Consumer;
