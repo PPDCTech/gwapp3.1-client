@@ -286,10 +286,7 @@ const CreateReqModal = ({
 				onClose();
 				resetForm();
 
-				// reload window after 10 seconds
-				setTimeout(() => {
-					window.location.reload();
-				}, 10000);
+				window.location.reload();
 			}
 		} catch (error) {
 			toast.error(`Error creating request\n${error.message}`);
@@ -380,6 +377,8 @@ const CreateReqModal = ({
 				setPart(1);
 				onClose();
 				resetForm();
+
+				window.location.reload();
 			}
 		} catch (error) {
 			console.log("Failed to save changes", error.message);
