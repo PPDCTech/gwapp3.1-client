@@ -31,7 +31,7 @@ export const TopNav = (props) => {
 	const accountPopover = usePopover();
 	const notificationDropdown = usePopover();
 	const [greeting, setGreeting] = useState(getGreeting());
-	const [unreadCount, setUnreadCount] = useState(0);
+	const [unreadCount, setUnreadCount] = useState("0");
 
 	const getUnreadNotifications = useCallback(async () => {
 		if (!user?._id) return;
@@ -44,7 +44,7 @@ export const TopNav = (props) => {
 			// Count unread messages where user_id matches logged-in user
 			const count = allMessages.filter(
 				(message) => !message.read && message.user_id === user._id,
-			).length;
+			).length.toString();
 
 			setUnreadCount(count);
 		} catch (error) {
@@ -96,7 +96,13 @@ export const TopNav = (props) => {
 						{`${greeting}, ${getFirstName(user?.name)}`}
 					</Stack>
 					<Stack alignItems="center" direction="row" spacing={2}>
-						<Tooltip title="Notifications">
+						<Tooltip 
+							title={
+								unreadCount === "0"
+									? "No new message"
+									: "You have new message, click to view"
+							}
+						>
 							<IconButton
 								ref={notificationDropdown.anchorRef}
 								onClick={notificationDropdown.handleOpen}

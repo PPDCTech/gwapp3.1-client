@@ -420,9 +420,38 @@ export const RequisitionTable = ({
 																{requisition?.status === "approved" &&
 																(requisition?.user?.name === user?.name ||
 																	requisition?.user?.email === user?.email ||
-																	["tech", "finance", "financeReviewer"].includes(
-																		user?.accessLevel,
-																	)) ? (
+																	["tech"].includes(user?.accessLevel)) ? (
+																	<Tooltip placement="left-start" title="Print">
+																		<MenuItem
+																			value="print"
+																			onClick={() => handlePrint(requisition?._id)}
+																		>
+																			<ListItemIcon
+																				sx={{
+																					width: "16px",
+																					height: "16px",
+																				}}
+																			>
+																				{printLoading[requisition?._id] ? (
+																					<CircularProgress size={20} />
+																				) : (
+																					<PrinterIcon />
+																				)}
+																			</ListItemIcon>
+																			<ListItemText
+																				primaryTypographyProps={{
+																					fontSize: "small",
+																				}}
+																				primary="Print"
+																			/>
+																		</MenuItem>
+																	</Tooltip>
+																) : null}
+																{/* Conditions for Printing for finance*/}
+																{(requisition?.status === "approved" ||
+																	requisition?.status === "reviewed" ||
+																	requisition?.status === "checked") &&
+																["finance", "financeReviewer"].includes(user?.accessLevel) ? (
 																	<Tooltip placement="left-start" title="Print">
 																		<MenuItem
 																			value="print"
@@ -453,7 +482,7 @@ export const RequisitionTable = ({
 																{requisition?.status !== "approved" &&
 																requisition?.status !== "reviewed" &&
 																requisition?.status !== "deleted" &&
-																requisition?.status !== "retired" &&
+																requisition?.retiredStatus !== "retired" &&
 																(requisition?.user?.name === user?.name ||
 																	requisition?.user?.email === user?.email) ? (
 																	<Tooltip placement="top-start" title="Delete">

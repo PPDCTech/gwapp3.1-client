@@ -10,6 +10,8 @@ import {
 	TextField,
 	ListItemAvatar,
 	Avatar,
+	Badge,
+	Tooltip,
 } from "@mui/material";
 import XCircleIcon from "@heroicons/react/24/outline/XCircleIcon";
 import PaperAirplaneIcon from "@heroicons/react/24/outline/PaperAirplaneIcon";
@@ -18,7 +20,7 @@ import { fetchSingleUser } from "../services/api/users.api";
 import { addMessage, fetchMessages } from "../services/api/message-chat.api";
 import { useAuth } from "../hooks/use-auth";
 
-function ChatModal({ open, onClose, reqId }) {
+function ChatModal({ open, onClose, reqId, setMessageCounter }) {
 	const [messages, setMessages] = useState([]);
 	const [message, setMessage] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -47,6 +49,14 @@ function ChatModal({ open, onClose, reqId }) {
 			fontSize: "14px",
 		},
 	};
+
+	useEffect(() => {
+		if (messages.length > 0) {
+			// turn the number to string and pass it to the parent component
+			setMessageCounter(messages.length.toString()); 
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [messages]);
 
 	useEffect(() => {
 		const getMessages = async () => {

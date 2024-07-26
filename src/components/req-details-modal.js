@@ -19,7 +19,10 @@ import {
 	Container,
 	Autocomplete,
 	CircularProgress,
+	Tooltip,
+	Badge,
 } from "@mui/material";
+import BellIcon from "@heroicons/react/24/solid/BellIcon";
 import LibraryAddCheckIcon from "@mui/icons-material/LibraryAddCheck";
 import {
 	capitalizeFirstLetter,
@@ -65,6 +68,7 @@ const RequisitionDetailsModal = ({
 	const [isChatModalOpen, setIsChatModalOpen] = useState(false);
 	const [accountCodes, setAccountCodes] = useState([]);
 	const [newAccountCode, setNewAccountCode] = useState(null);
+	const [messageCounter, setMessageCounter] = useState("0");
 
 	const getAccountCodes = useCallback(async () => {
 		const response = await getAllAccountCodes();
@@ -80,8 +84,8 @@ const RequisitionDetailsModal = ({
 		tableDataUpdate();
 	}, [isOpen, requisitionId, getAccountCodes, tableDataUpdate]);
 
-	const openChatModal = () => setIsChatModalOpen(true)
-	const closeChatModal = () => setIsChatModalOpen(false)
+	const openChatModal = () => setIsChatModalOpen(true);
+	const closeChatModal = () => setIsChatModalOpen(false);
 
 	useEffect(() => {
 		const fetchRequisitionDetails = async () => {
@@ -110,12 +114,6 @@ const RequisitionDetailsModal = ({
 		);
 	};
 
-	const isImage = (url) => {
-		const imageExtensions = ["jpg", "jpeg", "png", "gif"];
-		const extension = url.split(".").pop().toLowerCase();
-		return imageExtensions.includes(extension);
-	};
-
 	const checker_info = {
 		name: user?.name,
 		email: user?.email,
@@ -140,29 +138,32 @@ const RequisitionDetailsModal = ({
 	};
 
 	const handleFinanceChecked = async () => {
+		setLoadingCheckBtn(true);
 		if (!newAccountCode) {
 			return toast.warning("Please select account code!");
 		}
-		const formValues = {
-			code: `${newAccountCode?._id ?? ""}-${newAccountCode?.value ?? ""}-${
+
+		const payload = {
+			...checker_info,
+			accountCode: `${newAccountCode?._id ?? ""}-${newAccountCode?.value ?? ""}-${
 				newAccountCode?.description ?? ""
 			}`,
 		};
-
-		await updateRequisition(requisitionId, formValues);
-		await financeCheckRequisition(requisitionId, checker_info);
+		await financeCheckRequisition(requisitionId, payload);
 		reqIsUpdated();
 		onClose();
 		setLoadingCheckBtn(false);
 	};
 
 	const handleFinanceReviewed = async () => {
+		setLoadingCheckBtn(true);
 		await financeReviewRequisition(requisitionId, checker_info);
 		reqIsUpdated();
 		onClose();
 		setLoadingCheckBtn(false);
 	};
 	const handleApprove = async () => {
+		setLoadingCheckBtn(true);
 		await approveRequisition(requisitionId, checker_info);
 		reqIsUpdated();
 		onClose();
@@ -223,6 +224,33 @@ const RequisitionDetailsModal = ({
 		}
 	};
 
+	const isImage = (url) => {
+		const imageExtensions = ["jpg", "jpeg", "png", "gif"];
+		const extension = url.split(".").pop().toLowerCase();
+		return imageExtensions.includes(extension);
+	};
+
+	const downloadFile = (url, name) => {
+		fetch(url)
+			.then((response) => response.blob())
+			.then((blob) => {
+				const link = document.createElement("a");
+				link.href = URL.createObjectURL(blob);
+				link.setAttribute("download", name);
+
+				// Append the anchor element to the body
+				document.body.appendChild(link);
+
+				// Programmatically click the anchor to trigger the download
+				link.click();
+
+				// Clean up: remove the anchor from the DOM
+				document.body.removeChild(link);
+				URL.revokeObjectURL(link.href); // Revoke the object URL to free up memory
+			})
+			.catch((error) => console.error("Error downloading file:", error));
+	};
+
 	return (
 		<>
 			<Modal open={isOpen} onClose={onClose}>
@@ -268,14 +296,29 @@ const RequisitionDetailsModal = ({
 
 								<Box>
 									{/* Chat button */}
-									<Button
-										size="small"
-										variant="contained"
-										color="info"
-										onClick={openChatModal}
+									<Tooltip
+										title={
+											messageCounter === "0"
+												? "No new message"
+												: "You have new message, click to view"
+										}
 									>
-										Chat
-									</Button>
+										{/* <Button
+											size="small"
+											variant="contained"
+											color="info"
+											onClick={openChatModal}
+										>
+											Chat
+										</Button> */}
+										<IconButton onClick={openChatModal}>
+											<Badge badgeContent={messageCounter} color="success">
+												<SvgIcon fontSize="small">
+													<BellIcon />
+												</SvgIcon>
+											</Badge>
+										</IconButton>
+									</Tooltip>
 
 									{/* Close details button */}
 									<IconButton color="error" onClick={onClose} sx={{ ml: 2 }}>
@@ -511,7 +554,16 @@ const RequisitionDetailsModal = ({
 															borderRadius: "5px",
 															transition: "background-color 0.3s ease",
 														}}
-														onClick={() => window.open(document.url, "_blank")}
+														onClick={() => {
+															if (
+																document.name.endsWith(".xlsx") ||
+																document.name.endsWith(".csv")
+															) {
+																downloadFile(document.url, document.name);
+															} else {
+																window.open(document.url, "_blank");
+															}
+														}}
 														onMouseEnter={(e) =>
 															(e.currentTarget.style.backgroundColor = "#D2D6DB")
 														}
@@ -633,7 +685,7 @@ const RequisitionDetailsModal = ({
 												variant="contained"
 												color="secondary"
 												size="small"
-												onClick={handleBudgetHolderChecked}
+												onClick={() => handleBudgetHolderChecked()}
 												disabled={loadingCheckBtn}
 											>
 												{loadingCheckBtn ? "Loading..." : "Check as Budget Holder"}
@@ -643,7 +695,7 @@ const RequisitionDetailsModal = ({
 												sx={{ ml: 2 }}
 												variant="outlined"
 												color="error"
-												onClick={handleSendBack}
+												onClick={() => handleSendBack()}
 												disabled={loadingCheckBtn}
 											>
 												{loadingCheckBtn ? "Loading..." : "Send Back"}
@@ -654,6 +706,7 @@ const RequisitionDetailsModal = ({
 											Request Awaiting Budget Holder Check
 										</Typography>
 									) : (requisition.status === "holderCheck" ||
+											requisition.status === "sentBack" ||
 											requisition.status === "holderChecked") &&
 									  user.accessLevel === "finance" ? (
 										<>
@@ -662,11 +715,11 @@ const RequisitionDetailsModal = ({
 												color="primary"
 												disabled={loadingCheckBtn}
 												size="small"
-												onClick={handleFinanceChecked}
+												onClick={() => handleFinanceChecked()}
 											>
 												{loadingCheckBtn ? "Loading..." : "Finance Check"}
 											</Button>
-											<Button size="small" onClick={handleSendBack}>
+											<Button size="small" onClick={() => handleSendBack()}>
 												Send Back
 											</Button>
 										</>
@@ -677,9 +730,9 @@ const RequisitionDetailsModal = ({
 										</Typography>
 									) : requisition.status === "checked" &&
 									  user.accessLevel === "financeReviewer" ? (
-										<>
+										<Box sx={{ display: "flex" }}>
 											<Button
-												onClick={handleFinanceReviewed}
+												onClick={() => handleFinanceReviewed()}
 												variant="contained"
 												color="info"
 												disabled={loadingCheckBtn}
@@ -687,25 +740,36 @@ const RequisitionDetailsModal = ({
 											>
 												{loadingCheckBtn ? "Loading..." : "Finance Review"}
 											</Button>
-											<Button size="small" onClick={() => onClose}>
+											<Button size="small" onClick={() => handleSendBack()} sx={{ ml: 2 }}>
+												Send Back
+											</Button>
+											<Button size="small" onClick={() => onClose()} sx={{ ml: 2 }}>
 												Cancel
 											</Button>
-										</>
+										</Box>
 									) : requisition.status === "checked" ? (
 										<Typography sx={{ color: success.main }}>
 											Request Awaiting Finance Review
 										</Typography>
 									) : requisition.status === "reviewed" &&
 									  user.accessLevel === "superUser" ? (
-										<Button
-											size="small"
-											onClick={handleApprove}
-											variant="contained"
-											color="success"
-											disabled={loadingCheckBtn}
-										>
-											{loadingCheckBtn ? "Loading..." : "Approve"}
-										</Button>
+										<Box sx={{ display: "flex" }}>
+											<Button
+												size="small"
+												onClick={() => handleApprove()}
+												variant="contained"
+												color="success"
+												disabled={loadingCheckBtn}
+											>
+												{loadingCheckBtn ? "Loading..." : "Approve"}
+											</Button>
+											<Button size="small" onClick={() => handleSendBack()} sx={{ ml: 2 }}>
+												Send Back
+											</Button>
+											<Button size="small" onClick={() => onClose()} sx={{ ml: 2 }}>
+												Cancel
+											</Button>
+										</Box>
 									) : requisition.status === "reviewed" ? (
 										<Typography sx={{ color: success.ppdc }}>
 											Request Awaiting Approval
@@ -717,13 +781,13 @@ const RequisitionDetailsModal = ({
 											{isRetirement ? (
 												<Button
 													size="small"
-													onClick={()=> setRlertModalOpen(true)}
+													onClick={() => setRlertModalOpen(true)}
 													startIcon={<LibraryAddCheckIcon />}
 												>
 													Mark as Retired
 												</Button>
 											) : (
-												<Button size="small" onClick={handleCancelPayment}>
+												<Button size="small" onClick={() => handleCancelPayment()}>
 													Cancel Payment
 												</Button>
 											)}
@@ -823,6 +887,7 @@ const RequisitionDetailsModal = ({
 						open={isChatModalOpen}
 						onClose={closeChatModal}
 						reqId={requisitionId}
+						setMessageCounter={setMessageCounter}
 					/>
 				</Suspense>
 			)}
