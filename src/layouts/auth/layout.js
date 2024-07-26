@@ -4,21 +4,21 @@ import PropTypes from "prop-types";
 import { Box, Typography, Unstable_Grid2 as Grid } from "@mui/material";
 import { Logo } from "../../components/logo";
 import { Link } from "react-router-dom";
-import { SOCKET_API } from "../../services/base-url";
+// import { SOCKET_API } from "../../services/base-url";
 
 export const Layout = (props) => {
 	const { children } = props;
 
-	useEffect(() => {
-		const socket = io(SOCKET_API, { withCredentials: true });
-		socket.on("ping", (data) => {
-			console.log(`Received ping: ${data}`);
-		});
+	// useEffect(() => {
+	// 	const socket = io(SOCKET_API, { withCredentials: true });
+	// 	socket.on("ping", (data) => {
+	// 		console.log(`Received ping: ${data}`);
+	// 	});
 
-		return () => {
-			socket.disconnect();
-		};
-	}, []);
+	// 	return () => {
+	// 		socket.disconnect();
+	// 	};
+	// }, []);
 
 	return (
 		<Box

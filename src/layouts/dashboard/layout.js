@@ -5,7 +5,7 @@ import { withAuthGuard } from "../../hocs/with-auth-guard";
 import { SideNav } from "./side-nav";
 import { TopNav } from "./top-nav";
 import { useLocation } from "react-router-dom";
-import { SOCKET_API } from "../../services/base-url";
+// import { SOCKET_API } from "../../services/base-url";
 import ReloginModal from "../../components/re-login-modal";
 import { useAuthContext } from "../../contexts/auth-context";
 import { jwtDecode } from "jwt-decode";
@@ -36,16 +36,16 @@ export const Layout = withAuthGuard((props) => {
 	const { signOut } = useAuthContext();
 	const [isSessionExpired, setIsSessionExpired] = useState(false);
 
-	useEffect(() => {
-		const socket = io(SOCKET_API, { withCredentials: true });
-		socket.on("ping", (data) => {
-			console.log(`Received ping: ${data}`);
-		});
+	// useEffect(() => {
+	// 	const socket = io(SOCKET_API, { withCredentials: true });
+	// 	socket.on("ping", (data) => {
+	// 		console.log(`Received ping: ${data}`);
+	// 	});
 
-		return () => {
-			socket.disconnect();
-		};
-	}, []);
+	// 	return () => {
+	// 		socket.disconnect();
+	// 	};
+	// }, []);
 
 	useEffect(() => {
 		const checkAuthStatus = () => {
