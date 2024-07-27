@@ -47,7 +47,7 @@ import {
 } from "../services/api/requisition.api";
 import { toast } from "react-toastify";
 import { indigo, info, success } from "../theme/colors";
-import { addMessage } from "../services/api/message-chat.api";
+import { addMessage, fetchMessages } from "../services/api/message-chat.api";
 import ChatModal from "./chat-modal";
 import { getAllAccountCodes } from "../services/api/account-codes.api";
 import { markAsRetired } from "../services/api/requisition.api";
@@ -71,9 +71,26 @@ const RequisitionDetailsModal = ({
 	const [messageCounter, setMessageCounter] = useState("0");
 
 	const getAccountCodes = useCallback(async () => {
-		const response = await getAllAccountCodes();
-		setAccountCodes(response.data);
-	}, []);
+		try {
+			// Run both async calls concurrently
+			const [accountCodesResponse, messagesResponse] = await Promise.all([
+				getAllAccountCodes(),
+				fetchMessages(requisitionId),
+			]);
+
+			// Update account codes if there is a change
+			if (accountCodesResponse.data) {
+				setAccountCodes(accountCodesResponse.data);
+			}
+
+			// Update message counter if there is a change
+			if (messagesResponse.data) {
+				setMessageCounter(messagesResponse.data.length.toString());
+			}
+		} catch (error) {
+			console.error("Error fetching data:", error);
+		}
+	}, [requisitionId]);
 
 	const tableDataUpdate = useCallback(() => {
 		updateTableData();
@@ -887,7 +904,6 @@ const RequisitionDetailsModal = ({
 						open={isChatModalOpen}
 						onClose={closeChatModal}
 						reqId={requisitionId}
-						setMessageCounter={setMessageCounter}
 					/>
 				</Suspense>
 			)}

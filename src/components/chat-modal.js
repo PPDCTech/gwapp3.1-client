@@ -20,7 +20,7 @@ import { fetchSingleUser } from "../services/api/users.api";
 import { addMessage, fetchMessages } from "../services/api/message-chat.api";
 import { useAuth } from "../hooks/use-auth";
 
-function ChatModal({ open, onClose, reqId, setMessageCounter }) {
+function ChatModal({ open, onClose, reqId }) {
 	const [messages, setMessages] = useState([]);
 	const [message, setMessage] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -49,14 +49,6 @@ function ChatModal({ open, onClose, reqId, setMessageCounter }) {
 			fontSize: "14px",
 		},
 	};
-
-	useEffect(() => {
-		if (messages.length > 0) {
-			// turn the number to string and pass it to the parent component
-			setMessageCounter(messages.length.toString()); 
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [messages]);
 
 	useEffect(() => {
 		const getMessages = async () => {
