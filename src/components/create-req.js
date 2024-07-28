@@ -632,8 +632,9 @@ const CreateReqModal = ({
 												onChange={(e) => setType(e.target.value)}
 											>
 												<MenuItem value="Advance">Advance</MenuItem>
-												<MenuItem value="Petty">Petty</MenuItem>
+												<MenuItem value="Requisition">Requisition</MenuItem>
 												<MenuItem value="Reimbursement">Reimbursement</MenuItem>
+												<MenuItem value="Petty">Petty</MenuItem>
 											</Select>
 										</>
 									)}

@@ -11,13 +11,7 @@ import {
 import { toast } from "react-toastify";
 import { addNewUser } from "../services/api/users.api";
 
-const AddMemberModal = ({
-	open,
-	onClose,
-	fetchActiveMembers,
-	activePage,
-	rowsPerPage,
-}) => {
+const AddMemberModal = ({ open, onClose, updateHandler }) => {
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -48,7 +42,7 @@ const AddMemberModal = ({
 			const response = await addNewUser(formValues);
 			if (response.status === 201) {
 				toast.success("User added successfully");
-				fetchActiveMembers(activePage, rowsPerPage);
+				updateHandler();
 				onClose();
 			}
 		} catch (error) {

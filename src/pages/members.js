@@ -1,6 +1,15 @@
 import { useCallback, useState, useEffect } from "react";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import { Box,Button, Container, Grid, Stack, Typography, Tabs, Tab } from "@mui/material";
+import {
+	Box,
+	Button,
+	Container,
+	Grid,
+	Stack,
+	Typography,
+	Tabs,
+	Tab,
+} from "@mui/material";
 import { MembersTable } from "../sections/members/members-table";
 import { MembersSearch } from "../sections/members/members-search";
 import {
@@ -166,6 +175,7 @@ const Members = () => {
 			setActiveMembers((prevMembers) =>
 				prevMembers.map((member) => (member._id === id ? updatedUserData : member)),
 			);
+			updateHandler();
 
 			toast.success(`User access changed to: ${newRole}`);
 		} catch (error) {
@@ -175,9 +185,9 @@ const Members = () => {
 	};
 
 	const updateHandler = async () => {
-		fetchActiveMembers(activePage, rowsPerPage)
-		fetchAlumniMembers(alumniPage, rowsPerPage)
-	}
+		fetchActiveMembers(activePage, rowsPerPage);
+		fetchAlumniMembers(alumniPage, rowsPerPage);
+	};
 
 	return (
 		<>
@@ -212,9 +222,7 @@ const Members = () => {
 									</>
 								)}
 								<AddMemberModal
-									fetchActiveMembers={fetchActiveMembers}
-									activePage={activePage}
-									rowsPerPage={rowsPerPage}
+									updateHandler={updateHandler}
 									open={isAddModalOpen}
 									onClose={() => setIsAddModalOpen(!isAddModalOpen)}
 								/>
