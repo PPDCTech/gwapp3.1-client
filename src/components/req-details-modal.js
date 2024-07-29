@@ -23,6 +23,8 @@ import {
 	Badge,
 } from "@mui/material";
 import BellIcon from "@heroicons/react/24/solid/BellIcon";
+import { ChatBubbleLeftEllipsisIcon } from "@heroicons/react/24/solid";
+
 import LibraryAddCheckIcon from "@mui/icons-material/LibraryAddCheck";
 import {
 	capitalizeFirstLetter,
@@ -313,6 +315,13 @@ const RequisitionDetailsModal = ({
 
 								<Box>
 									{/* Chat button */}
+									<Tooltip title="Drop a message to the requester">
+										<IconButton onClick={openChatModal} color="info">
+											<SvgIcon fontSize="small">
+												<ChatBubbleLeftEllipsisIcon />
+											</SvgIcon>
+										</IconButton>
+									</Tooltip>
 									<Tooltip
 										title={
 											messageCounter === "0"
@@ -320,14 +329,6 @@ const RequisitionDetailsModal = ({
 												: "You have new message, click to view"
 										}
 									>
-										{/* <Button
-											size="small"
-											variant="contained"
-											color="info"
-											onClick={openChatModal}
-										>
-											Chat
-										</Button> */}
 										<IconButton onClick={openChatModal}>
 											<Badge badgeContent={messageCounter} color="success">
 												<SvgIcon fontSize="small">
