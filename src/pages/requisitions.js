@@ -236,7 +236,7 @@ const Requisitions = () => {
 										label="My Requisitions"
 									/>
 								)}
-								{user.accessLevel !== "user" && user.accessLevel !== "superUser" && (
+								{user.accessLevel !== "user" && (
 									<CustomTab
 										isActive={selectedTab === "forMyAttention"}
 										value="forMyAttention"
