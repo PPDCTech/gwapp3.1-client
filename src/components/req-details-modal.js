@@ -74,34 +74,49 @@ const RequisitionDetailsModal = ({
 
 	const getAccountCodes = useCallback(async () => {
 		try {
-			// Run both async calls concurrently
-			const [accountCodesResponse, messagesResponse] = await Promise.all([
-				getAllAccountCodes(),
-				fetchMessages(requisitionId),
-			]);
-
+			// Fetch account codes
+			const accountCodesResponse = await getAllAccountCodes();
 			// Update account codes if there is a change
 			if (accountCodesResponse.data) {
 				setAccountCodes(accountCodesResponse.data);
 			}
-
-			// Update message counter if there is a change
-			if (messagesResponse.data) {
-				setMessageCounter(messagesResponse.data.length.toString());
-			}
 		} catch (error) {
 			console.error("Error fetching data:", error);
 		}
-	}, [requisitionId]);
-
-	const tableDataUpdate = useCallback(() => {
-		updateTableData();
 	}, []);
 
 	useEffect(() => {
-		getAccountCodes();
+		async function fetchData() {
+			try {
+				// Check if requisitionId is defined before fetching messages
+				if (requisitionId) {
+					const messagesResponse = await fetchMessages(requisitionId);
+
+					// Update message counter if there is a change
+					if (messagesResponse.data) {
+						setMessageCounter(messagesResponse.data.length.toString());
+					}
+				}
+			} catch (error) {
+				console.error("Error fetching data:", error);
+			}
+		}
+
+		fetchData();
+	}, [requisitionId]);
+
+	const tableDataUpdate = useCallback(
+		() => updateTableData(),
+		[updateTableData],
+	);
+
+	useEffect(() => {
 		tableDataUpdate();
-	}, [isOpen, requisitionId, getAccountCodes, tableDataUpdate]);
+	}, [tableDataUpdate]);
+
+	useEffect(() => {
+		getAccountCodes();
+	}, [isOpen, getAccountCodes]);
 
 	const openChatModal = () => setIsChatModalOpen(true);
 	const closeChatModal = () => setIsChatModalOpen(false);
