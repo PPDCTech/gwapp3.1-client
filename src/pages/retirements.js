@@ -101,7 +101,9 @@ const Retirements = () => {
 					<Stack spacing={3}>
 						<Typography variant="h5">Retirements</Typography>
 						<>
-							{["financeReviewer", "finance"].includes(user.accessLevel) ? (
+							{user?.position.some((role) =>
+								["financeUser", "financeReviewer", "finance"].includes(role),
+							) ? (
 								<FinanceRetirementTable
 									requisitions={requisitions}
 									updateTableData={fetchRequisitions}

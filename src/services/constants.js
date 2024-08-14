@@ -66,6 +66,7 @@ export const USER_ACCESS_LABELS = {
 	userManager: "User Mgmt.",
 	budgetHolder: "Budget Holder",
 	finance: "Finance",
+	financeUser: "Finance User",
 	financeReviewer: "Reviewer",
 	tech: "Tech",
 };

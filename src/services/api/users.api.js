@@ -3,6 +3,7 @@ import { fetchData, patchData, postData } from "./api-helper";
 const USERS_API = "users";
 const DEACTIVATE_USER_API = "deactivate-user";
 const CHANGE_ACCESS_API = "change-user-access";
+const CHANGE_ROLES_API = "change-user-roles"; 
 const ALL_USERS = "all-users";
 const ADD_USER = "users/create";
 const CHANGE_PROFILE_PIC = "update-user-photo";
@@ -66,6 +67,15 @@ export const deactivateUser = async (userId) => {
 export const changeUserAccess = async (userId, accessLevel) => {
   try {
     const response = await patchData(CHANGE_ACCESS_API, { userId, accessLevel });
+    return response;
+  } catch (error) {
+   throw new Error(error.message);
+  }
+};
+
+export const changeUserRoles = async (userId, roles) => {
+  try {
+    const response = await patchData(CHANGE_ROLES_API, { userId, roles });
     return response;
   } catch (error) {
    throw new Error(error.message);

@@ -16,8 +16,8 @@ import {
 	fetchAlumni,
 	fetchUsers,
 	deactivateUser,
-	changeUserAccess,
 	fetchSingleUser,
+	changeUserRoles,
 } from "../services/api/users.api";
 import { toast } from "react-toastify";
 import { useNProgress } from "../hooks/use-nprogress";
@@ -45,19 +45,9 @@ const Members = () => {
 	const [tabValue, setTabValue] = useState(0);
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-	useEffect(() => {
-		setIsLoadingActive(true);
-		setIsLoadingAlumni(true);
-		setErrorActive(null);
-		setErrorAlumni(null);
-
-		fetchActiveMembers(activePage, rowsPerPage);
-		fetchAlumniMembers(alumniPage, rowsPerPage);
-	}, [activePage, alumniPage, rowsPerPage]);
-
-	const fetchActiveMembers = async (page, rowsPerPage) => {
+	const fetchActiveMembers = useCallback(async () => {
 		try {
-			const result = await fetchUsers(page, rowsPerPage, searchQuery);
+			const result = await fetchUsers(activePage, rowsPerPage, searchQuery);
 			const { totalCount } = result.data;
 
 			setFilteredActiveMembers(result.data.users);
@@ -67,11 +57,11 @@ const Members = () => {
 		} finally {
 			setIsLoadingActive(false);
 		}
-	};
+	}, [activePage, rowsPerPage, searchQuery]);
 
-	const fetchAlumniMembers = async (page, rowsPerPage) => {
+	const fetchAlumniMembers = useCallback(async () => {
 		try {
-			const result = await fetchAlumni(page, rowsPerPage, searchQuery);
+			const result = await fetchAlumni(alumniPage, rowsPerPage, searchQuery);
 			const { users, totalCount } = result.data;
 
 			setFilteredAlumniMembers(users);
@@ -81,7 +71,7 @@ const Members = () => {
 		} finally {
 			setIsLoadingAlumni(false);
 		}
-	};
+	}, [alumniPage, rowsPerPage, searchQuery]);
 
 	const handleActivePageChange = useCallback(
 		async (event, value) => {
@@ -98,6 +88,16 @@ const Members = () => {
 		},
 		[rowsPerPage, searchQuery],
 	);
+
+	useEffect(() => {
+		setIsLoadingActive(true);
+		setIsLoadingAlumni(true);
+		setErrorActive(null);
+		setErrorAlumni(null);
+
+		fetchActiveMembers();
+		fetchAlumniMembers();
+	}, [fetchActiveMembers, fetchAlumniMembers]);
 
 	const handleAlumniPageChange = useCallback(
 		async (event, value) => {
@@ -145,19 +145,20 @@ const Members = () => {
 	const handleDeactivate = async (id) => {
 		try {
 			await deactivateUser(id);
-			fetchActiveMembers(activePage, rowsPerPage);
-			fetchAlumniMembers(alumniPage, rowsPerPage);
+			fetchActiveMembers();
+			fetchAlumniMembers();
 			toast.info("User has been deactivated");
 		} catch (error) {
 			console.error(error);
 			toast.error("Failed to deactivate user");
 		}
 	};
+
 	const handleActivate = async (id) => {
 		try {
 			await deactivateUser(id);
-			fetchActiveMembers(activePage, rowsPerPage);
-			fetchAlumniMembers(alumniPage, rowsPerPage);
+			fetchActiveMembers();
+			fetchAlumniMembers();
 			toast.info("User has been activated");
 		} catch (error) {
 			console.error(error);
@@ -165,9 +166,9 @@ const Members = () => {
 		}
 	};
 
-	const handleChangeRole = async (id, newRole) => {
+	const handleChangeUserRoles = async (id, newRoles) => {
 		try {
-			await changeUserAccess(id, newRole);
+			await changeUserRoles(id, newRoles);
 
 			const user = await fetchSingleUser(id);
 			const updatedUserData = user.data;
@@ -177,16 +178,17 @@ const Members = () => {
 			);
 			updateHandler();
 
-			toast.success(`User access changed to: ${newRole}`);
+			const userRoles = newRoles.join(", ");
+			toast.success(`User access changed to: ${userRoles}`);
 		} catch (error) {
 			console.error(error.message);
 			toast.error("Failed to change user access");
 		}
 	};
 
-	const updateHandler = async () => {
-		fetchActiveMembers(activePage, rowsPerPage);
-		fetchAlumniMembers(alumniPage, rowsPerPage);
+	const updateHandler = () => {
+		fetchActiveMembers();
+		fetchAlumniMembers();
 	};
 
 	return (
@@ -207,7 +209,7 @@ const Members = () => {
 						>
 							<Typography variant="h6">Staff Members</Typography>
 							<Box>
-								{["tech", "userManager"].includes(user.accessLevel) && (
+								{user?.position.some((role) => ["tech", "userManager"].includes(role)) && (
 									<>
 										<Button
 											size="small"
@@ -247,7 +249,7 @@ const Members = () => {
 								count={totalActive}
 								onDeactivate={handleDeactivate}
 								setActiveMembers={setActiveMembers}
-								onChangeRole={handleChangeRole}
+								onChangeUserRoles={handleChangeUserRoles}
 								updateHandler={updateHandler}
 							/>
 						)}

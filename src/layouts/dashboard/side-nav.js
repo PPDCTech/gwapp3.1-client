@@ -25,27 +25,34 @@ export const SideNav = (props) => {
 
 	useEffect(() => {
 		const filteredItems = items.filter((item) => {
-			switch (user?.accessLevel) {
-				case "tech":
-				case "finance":
-				case "financeReviewer":
-					return true;
-				case "superUser":
-					return item.path !== "/retirements";
-				case "budgetHolder":
-					return item.path !== "/retirements" && item.path !== "/accounts";
-				case "user":
-					return (
-						item.path !== "/accounts" &&
-						item.path !== "/projects" &&
-						item.path !== "/bin"
-					);
-				default:
-					return false;
+			if (
+				user?.position?.some((role) =>
+					["tech", "finance", "financeReviewer"].includes(role),
+				)
+			) {
+				return true;
 			}
+			if (user?.position.includes("financeUser")) {
+				return item.path !== "/bin";
+			}
+			if (user?.position.includes("superUser")) {
+				return item.path !== "/retirements";
+			}
+			if (user?.position.includes("budgetHolder")) {
+				return item.path !== "/retirements" && item.path !== "/accounts";
+			}
+
+			if (user?.position?.some((role) => ["user", "userManager"].includes(role))) {
+				return (
+					item.path !== "/accounts" &&
+					item.path !== "/projects" &&
+					item.path !== "/bin"
+				);
+			}
+			return false;
 		});
 		setSidebarItems(filteredItems);
-	}, [user]); // Removed pathname from the dependency array
+	}, [user?.position]);
 
 	const content = (
 		<Scrollbar>

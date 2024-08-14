@@ -683,7 +683,7 @@ const RequisitionDetailsModal = ({
 								{/* Select account codes (for finance) */}
 								{(requisition.status === "holderCheck" ||
 									requisition.status === "holderChecked") &&
-									user.accessLevel === "finance" && (
+									user?.position.includes("finance") && (
 										<Grid container spacing={3} sx={{ pl: 2 }}>
 											<Grid item xs={4}>
 												<Typography variant="body1" sx={{ my: 1 }}>
@@ -711,7 +711,7 @@ const RequisitionDetailsModal = ({
 								<Container>
 									{/* Buttons based on requisition status and user access level */}
 									{requisition.status === "pending" &&
-									user.accessLevel === "budgetHolder" &&
+									user?.position.includes("budgetHolder") &&
 									requisition.attentionTo.includes(user?.email) ? (
 										<>
 											<Button
@@ -738,10 +738,9 @@ const RequisitionDetailsModal = ({
 										<Typography style={{ color: info.main }}>
 											Request Awaiting Budget Holder Check
 										</Typography>
-									) : (requisition.status === "holderCheck" ||
-											requisition.status === "sentBack" ||
-											requisition.status === "holderChecked") &&
-									  user.accessLevel === "finance" ? (
+									) : ["checked", "holderCheck", "holderChecked"].includes(
+											requisition.status,
+									  ) && user?.position.includes("finance") ? (
 										<>
 											<Button
 												variant="contained"
@@ -756,13 +755,15 @@ const RequisitionDetailsModal = ({
 												Send Back
 											</Button>
 										</>
-									) : requisition.status === "holderCheck" ||
-									  requisition.status === "holderChecked" ? (
+									) : ["checked", "holderCheck", "holderChecked"].includes(
+											requisition.status,
+									  ) ? (
 										<Typography sx={{ color: indigo.main }}>
 											Request Awaiting Finance Check
 										</Typography>
-									) : requisition.status === "checked" &&
-									  user.accessLevel === "financeReviewer" ? (
+									) : ["checked", "holderCheck", "holderChecked"].includes(
+											requisition.status,
+									  ) && user?.position.includes("financeReviewer") ? (
 										<Box sx={{ display: "flex" }}>
 											<Button
 												onClick={() => handleFinanceReviewed()}
@@ -785,7 +786,7 @@ const RequisitionDetailsModal = ({
 											Request Awaiting Finance Review
 										</Typography>
 									) : requisition.status === "reviewed" &&
-									  user.accessLevel === "superUser" ? (
+									  user?.position.includes("superUser") ? (
 										<Box sx={{ display: "flex" }}>
 											<Button
 												size="small"
@@ -808,8 +809,9 @@ const RequisitionDetailsModal = ({
 											Request Awaiting Approval
 										</Typography>
 									) : requisition.status === "approved" &&
-									  (user?.accessLevel === "finance" ||
-											user?.accessLevel === "financeReviewer") ? (
+									  user?.position.some((role) =>
+											["financeReviewer", "finance"].includes(role),
+									  ) ? (
 										<>
 											{isRetirement ? (
 												<Button
@@ -880,7 +882,7 @@ const RequisitionDetailsModal = ({
 										{!showReasonInput && (
 											<>
 												{requisition.status === "approved" &&
-													user.accessLevel === "financeReviewer" && (
+													user?.position.includes("financeReviewer") && (
 														<Button
 															variant="contained"
 															size="small"

@@ -360,8 +360,9 @@ export const RequisitionTable = ({
 																{/* Send back icon conditions */}
 																{requisition?.status !== "reviewed" &&
 																requisition?.status !== "approved" &&
-																user?.accessLevel !== "user" &&
-																user?.accessLevel !== "userManager" &&
+																user?.position.some(
+																	(role) => !["user", "userManager"].includes(role),
+																) &&
 																requisition?.attentionTo.includes(user?.email) ? (
 																	<Tooltip placement="left-start" title="Send Back">
 																		<MenuItem
@@ -420,7 +421,7 @@ export const RequisitionTable = ({
 																{requisition?.status === "approved" &&
 																(requisition?.user?.name === user?.name ||
 																	requisition?.user?.email === user?.email ||
-																	["tech"].includes(user?.accessLevel)) ? (
+																	user?.position.some((role) => ["tech"].includes(role))) ? (
 																	<Tooltip placement="left-start" title="Print">
 																		<MenuItem
 																			value="print"
@@ -451,7 +452,9 @@ export const RequisitionTable = ({
 																{(requisition?.status === "approved" ||
 																	requisition?.status === "reviewed" ||
 																	requisition?.status === "checked") &&
-																["finance", "financeReviewer"].includes(user?.accessLevel) ? (
+																user?.position.some((role) =>
+																	["financeReviewer", "finance", "financeUser"].includes(role),
+																) ? (
 																	<Tooltip placement="left-start" title="Print">
 																		<MenuItem
 																			value="print"
@@ -479,9 +482,9 @@ export const RequisitionTable = ({
 																	</Tooltip>
 																) : null}
 																{/* Delete condition */}
-																{requisition?.status !== "approved" &&
-																requisition?.status !== "reviewed" &&
-																requisition?.status !== "deleted" &&
+																{!["approved", "reviewed", "deleted"].includes( // Delete condition, only if requisition is not approved or reviewed or deleted then show delete option
+																	requisition?.status,
+																) &&
 																requisition?.retiredStatus !== "retired" &&
 																(requisition?.user?.name === user?.name ||
 																	requisition?.user?.email === user?.email) ? (

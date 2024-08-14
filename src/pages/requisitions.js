@@ -67,9 +67,13 @@ const Requisitions = () => {
 	};
 
 	useEffect(() => {
-		if (["user", "staff", "tech"].includes(user.accessLevel)) {
+		if (
+			user?.position.some(
+				(role) => ["user", "staff", "financeUser", "tech"].includes(role),
+			)
+		) {
 			setSelectedTab("myRequisitions");
-		} else if (user.accessLevel === "superUser") {
+		} else if (user?.position.includes("superUser")) {
 			setSelectedTab("allRequisitions");
 		} else {
 			setSelectedTab("forMyAttention");
@@ -183,7 +187,9 @@ const Requisitions = () => {
 								Requisitions
 							</Typography>
 							<Box>
-								{["user", "staff", "tech"].includes(user.accessLevel) && (
+								{user?.position?.some((userRole) =>
+									["user", "staff", "userManager", "financeUser", "tech"].includes(userRole),
+								) && (
 									<>
 										{user?.signatureUrl ? (
 											<Button
@@ -228,7 +234,9 @@ const Requisitions = () => {
 
 						<Grid item xs={12}>
 							<div style={{ display: "flex" }}>
-								{["user", "staff", "tech"].includes(user.accessLevel) && (
+								{user?.position.some((role) =>
+									[("user", "staff", "financeUser", "tech")].includes(role),
+								) && (
 									<CustomTab
 										isActive={selectedTab === "myRequisitions"}
 										value="myRequisitions"
@@ -236,7 +244,9 @@ const Requisitions = () => {
 										label="My Requisitions"
 									/>
 								)}
-								{user.accessLevel !== "user" && (
+								{user?.position.some((role) =>
+									["tech", "finance", "financeReviewer", "superUser"].includes(role),
+								) && (
 									<CustomTab
 										isActive={selectedTab === "forMyAttention"}
 										value="forMyAttention"
@@ -244,7 +254,9 @@ const Requisitions = () => {
 										label="Requisitions for my attention"
 									/>
 								)}
-								{user.accessLevel !== "user" && user.accessLevel !== "budgetHolder" && (
+								{user?.position.some((role) =>
+									["tech", "financeUser", "finance", "financeReviewer", "superUser"].includes(role),
+								) && (
 									<CustomTab
 										isActive={selectedTab === "allRequisitions"}
 										value="allRequisitions"
@@ -256,7 +268,7 @@ const Requisitions = () => {
 
 							{selectedTab === "allRequisitions" && (
 								<>
-									{user.accessLevel === "finance" && (
+									{user.position.includes("finance") && (
 										<Alert severity="info" onClose={() => {}}>
 											<AlertTitle>Hint</AlertTitle>
 											<div>
@@ -267,7 +279,7 @@ const Requisitions = () => {
 											<small>You are seeing this because you have Finance access</small>
 										</Alert>
 									)}
-									{user.accessLevel === "financeReviewer" && (
+									{user.position.includes("financeReviewer") && (
 										<Alert severity="info" onClose={() => {}}>
 											<AlertTitle>Hint</AlertTitle>
 											<div>
@@ -280,7 +292,7 @@ const Requisitions = () => {
 											</small>
 										</Alert>
 									)}
-									{user.accessLevel === "superUser" && (
+									{user.position.includes("superUser") && (
 										<Alert severity="info" onClose={() => {}}>
 											<AlertTitle>Hint</AlertTitle>
 											<div>

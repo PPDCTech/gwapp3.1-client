@@ -120,6 +120,15 @@ const CreateReqModal = ({
 		}
 	}, [requisitionData]);
 
+	const fetchBenificiaries = async () => {
+		try {
+			const beneficiariesResponse = await getUserVendors(user._id);
+			setBeneficiaryList(beneficiariesResponse.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	const handleAddNewAccount = async () => {
 		try {
 			setSavingNewBeneficiary(true);
@@ -131,7 +140,8 @@ const CreateReqModal = ({
 			};
 			const response = await addVendor(new_account);
 			if (response.status === 201) {
-				toast.success("Saved account");
+				fetchBenificiaries();
+				toast.success("Beneficiary added success, you can now select it");
 				setBeneficiary({
 					bankName: response.data.bankName,
 					accountNumber: response.data.accountNumber,
@@ -174,6 +184,7 @@ const CreateReqModal = ({
 		};
 
 		fetchData();
+		// eslint-disable-next-line
 	}, []);
 
 	useEffect(() => {

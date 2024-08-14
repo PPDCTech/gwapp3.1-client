@@ -84,7 +84,14 @@ export const FilterRequisitions = ({
 			setFilteredRequisitions([]);
 			setLoading(false);
 		}
-	}, [filters, filteredPage, filteredLimit, setFilteredRequisitions, setFilteredTotalCount, setLoading]);
+	}, [
+		filters,
+		filteredPage,
+		filteredLimit,
+		setFilteredRequisitions,
+		setFilteredTotalCount,
+		setLoading,
+	]);
 
 	useEffect(() => {
 		const usersList = async () => {
@@ -219,7 +226,9 @@ export const FilterRequisitions = ({
 							</Select>
 						</FormControl>
 					</Grid>
-					{user.accessLevel !== "user" && user.accessLevel !== "userManager" && (
+					{user?.position.some(
+						(role) => !["user", "userManager"].includes(role),
+					) && (
 						<Grid item xs={6} md={4}>
 							<Autocomplete
 								options={users.map((user) => user.name)}
