@@ -235,7 +235,7 @@ const Requisitions = () => {
 						<Grid item xs={12}>
 							<div style={{ display: "flex" }}>
 								{user?.position.some((role) =>
-									[("user", "staff", "financeUser", "tech")].includes(role),
+									["user", "staff", "financeUser", "tech"].includes(role),
 								) && (
 									<CustomTab
 										isActive={selectedTab === "myRequisitions"}
