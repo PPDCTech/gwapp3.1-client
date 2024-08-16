@@ -32,13 +32,13 @@ export const SideNav = (props) => {
 			) {
 				return true;
 			}
-			if (user?.position.includes("financeUser")) {
+			if (user?.position?.some((role) => ["financeUser"].includes(role))) {
 				return item.path !== "/bin";
 			}
-			if (user?.position.includes("superUser")) {
+			if (user?.position?.some((role) => ["superUser"].includes(role))) {
 				return item.path !== "/retirements";
 			}
-			if (user?.position.includes("budgetHolder")) {
+			if (user?.position?.some((role) => ["budgetHolder"].includes(role))) {
 				return item.path !== "/retirements" && item.path !== "/accounts";
 			}
 

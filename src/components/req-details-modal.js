@@ -711,7 +711,7 @@ const RequisitionDetailsModal = ({
 								<Container>
 									{/* Buttons based on requisition status and user access level */}
 									{requisition.status === "pending" &&
-									user?.position.includes("budgetHolder") &&
+									user?.position?.some((role) => ["budgetHolder"].includes(role)) &&
 									requisition.attentionTo.includes(user?.email) ? (
 										<>
 											<Button
@@ -738,9 +738,9 @@ const RequisitionDetailsModal = ({
 										<Typography style={{ color: info.main }}>
 											Request Awaiting Budget Holder Check
 										</Typography>
-									) : ["checked", "holderCheck", "holderChecked"].includes(
-											requisition.status,
-									  ) && user?.position.includes("finance") ? (
+									) : ["checked", "holderCheck", "holderChecked", "sentBack"].includes(
+											requisition?.status,
+									  ) && user?.position?.some((role) => ["finance"].includes(role)) ? (
 										<>
 											<Button
 												variant="contained"
@@ -755,15 +755,15 @@ const RequisitionDetailsModal = ({
 												Send Back
 											</Button>
 										</>
-									) : ["checked", "holderCheck", "holderChecked"].includes(
-											requisition.status,
-									  ) ? (
+									) : requisition.status === "holderChecked" ||
+									  requisition.status === "holderChecke" ? (
 										<Typography sx={{ color: indigo.main }}>
 											Request Awaiting Finance Check
 										</Typography>
-									) : ["checked", "holderCheck", "holderChecked"].includes(
-											requisition.status,
-									  ) && user?.position.includes("financeReviewer") ? (
+									) : ["checked", "sentBack"].includes(requisition?.status) &&
+									  user?.position?.some((role) =>
+											["financeReviewer"].includes(role),
+									  ) ? (
 										<Box sx={{ display: "flex" }}>
 											<Button
 												onClick={() => handleFinanceReviewed()}
@@ -786,7 +786,7 @@ const RequisitionDetailsModal = ({
 											Request Awaiting Finance Review
 										</Typography>
 									) : requisition.status === "reviewed" &&
-									  user?.position.includes("superUser") ? (
+									  user?.position?.some((role) => ["superUser"].includes(role)) ? (
 										<Box sx={{ display: "flex" }}>
 											<Button
 												size="small"
