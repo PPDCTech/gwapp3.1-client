@@ -114,7 +114,7 @@ export const SideNav = (props) => {
 							m: 0,
 						}}
 					>
-						{sidebarItems.map((item) => (
+						{sidebarItems?.map((item) => (
 							<SideNavItem
 								active={location.pathname === item.path}
 								disabled={item.disabled}
