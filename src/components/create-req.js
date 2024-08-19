@@ -147,8 +147,7 @@ const CreateReqModal = ({
 					accountName: response.data.accountName,
 				});
 		} catch (error) {
-			console.error("Error adding new account:", error);
-			toast.error(`Error adding new account: ${error.message}`);
+			toast.error(`Error: ${error.message}`);
 		} finally {
 			setSavingNewBeneficiary(false);
 		}
