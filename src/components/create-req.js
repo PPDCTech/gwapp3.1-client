@@ -139,17 +139,16 @@ const CreateReqModal = ({
 				userId: user._id,
 			};
 			const response = await addVendor(new_account);
-			if (response.status === 201) {
 				fetchBenificiaries();
-				toast.success("Beneficiary added success, you can now select it");
+				toast.success("Beneficiary added, you can now select it");
 				setBeneficiary({
 					bankName: response.data.bankName,
 					accountNumber: response.data.accountNumber,
 					accountName: response.data.accountName,
 				});
-			}
 		} catch (error) {
-			console.error("Error adding new account:", error.message);
+			console.error("Error adding new account:", error);
+			toast.error(`Error adding new account: ${error.message}`);
 		} finally {
 			setSavingNewBeneficiary(false);
 		}
