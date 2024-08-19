@@ -22,37 +22,43 @@ export const SideNav = (props) => {
 	const { user } = useAuth();
 
 	const [sidebarItems, setSidebarItems] = useState([]);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		const filteredItems = items.filter((item) => {
-			if (
-				user?.position?.some((role) =>
-					["tech", "finance", "financeReviewer"].includes(role),
-				)
-			) {
-				return true;
-			}
-			if (user?.position?.some((role) => ["financeUser"].includes(role))) {
-				return item.path !== "/bin";
-			}
-			if (user?.position?.some((role) => ["superUser"].includes(role))) {
-				return item.path !== "/retirements";
-			}
-			if (user?.position?.some((role) => ["budgetHolder"].includes(role))) {
-				return item.path !== "/retirements" && item.path !== "/accounts";
-			}
+		if (user) {
+			const filteredItems = items.filter((item) => {
+				if (
+					user?.position?.some((role) =>
+						["tech", "finance", "financeReviewer"].includes(role),
+					)
+				) {
+					return true;
+				}
+				if (user?.position?.some((role) => ["financeUser"].includes(role))) {
+					return item.path !== "/bin";
+				}
+				if (user?.position?.some((role) => ["superUser"].includes(role))) {
+					return item.path !== "/retirements";
+				}
+				if (user?.position?.some((role) => ["budgetHolder"].includes(role))) {
+					return item.path !== "/retirements" && item.path !== "/accounts";
+				}
 
-			if (user?.position?.some((role) => ["user", "userManager"].includes(role))) {
-				return (
-					item.path !== "/accounts" &&
-					item.path !== "/projects" &&
-					item.path !== "/bin"
-				);
-			}
-			return false;
-		});
-		setSidebarItems(filteredItems);
-	}, [user?.position]);
+				if (
+					user?.position?.some((role) => ["user", "userManager"].includes(role))
+				) {
+					return (
+						item.path !== "/accounts" &&
+						item.path !== "/projects" &&
+						item.path !== "/bin"
+					);
+				}
+				return false;
+			});
+			setSidebarItems(filteredItems);
+			setLoading(false);
+		}
+	}, [user]);
 
 	const content = (
 		<Scrollbar>
@@ -114,17 +120,18 @@ export const SideNav = (props) => {
 							m: 0,
 						}}
 					>
-						{sidebarItems?.map((item) => (
-							<SideNavItem
-								active={location.pathname === item.path}
-								disabled={item.disabled}
-								external={item.external}
-								icon={item.icon}
-								key={item.title}
-								path={item.path}
-								title={item.title}
-							/>
-						))}
+						{!loading &&
+							sidebarItems?.map((item) => (
+								<SideNavItem
+									active={location.pathname === item.path}
+									disabled={item.disabled}
+									external={item.external}
+									icon={item.icon}
+									key={item.title}
+									path={item.path}
+									title={item.title}
+								/>
+							))}
 					</Stack>
 				</Box>
 				<Divider sx={{ borderColor: "neutral.700" }} />

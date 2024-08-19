@@ -40,6 +40,8 @@ const AuthCodeInputModal = ({ openModal, setOpenModal, regToken }) => {
 	const closeAndNavigate = () => {
 		setOpenModal(!openModal);
 		navigate("/");
+		// reload the page to get the user data
+		window.location.reload();
 	};
 
 	return (

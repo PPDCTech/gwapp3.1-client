@@ -13,9 +13,12 @@ import {
 	Typography,
 	CircularProgress,
 	TablePagination,
+	Chip,
+	Tooltip
 } from "@mui/material";
 import { DocumentDuplicateIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { getCurrencySign } from "../../utils/format-currency";
+import { shortenString } from "../../utils/format-strings";
 import { formatAmount, capitalizeFirstLetter } from "../../services/helpers";
 import { getRequisitionById } from "../../services/api/requisition.api";
 import RequisitionDetailsModal from "../../components/req-details-modal";
@@ -76,7 +79,31 @@ const RetirementsTable = ({
 	const renderTableCell = (row, column) => {
 		switch (column) {
 			case "title":
-				return row?.title;
+				return (
+					<Typography variant="body2">
+						<div
+							style={{
+								position: "relative",
+								display: "inline-block",
+							}}
+						>
+							<Chip
+								label={row?.type}
+								style={{
+									position: "absolute",
+									top: "-20px",
+									left: "0",
+									fontSize: "10px",
+									height: "18px",
+									lineHeight: "18px",
+								}}
+							/>
+							<Tooltip placement="left-start" title={row?.title}>
+								<span>{shortenString(row?.title, 50)}</span>
+							</Tooltip>
+						</div>
+					</Typography>
+				);
 			case "amount":
 				return `${getCurrencySign(row?.currency)}${formatAmount(
 					Number(row?.total),
@@ -192,7 +219,19 @@ const RetirementsTable = ({
 								<TableBody>
 									{data.map((row) => (
 										<TableRow key={row?._id}>
-											<TableCell>{renderTableCell(row, "title")}</TableCell>
+											<TableCell
+												sx={{
+													cursor: "pointer",
+													"&:hover": {
+														backgroundColor: "#F3F4F6",
+														boxShadow: "inset 0 0 5px rgba(0,0,0,0.1)",
+													},
+													paddingTop: "2rem",
+												}}
+												onClick={() => handleOpenReqDetails(row?._id)}
+											>
+												{renderTableCell(row, "title")}
+											</TableCell>
 											<TableCell>{renderTableCell(row, "amount")}</TableCell>
 											<TableCell>{renderTableCell(row, "status")}</TableCell>
 											<TableCell>{renderTableCell(row, "action")}</TableCell>
