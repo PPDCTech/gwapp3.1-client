@@ -15,6 +15,7 @@ const HANDLERS = {
 	SIGN_IN: "SIGN_IN",
 	SIGN_OUT: "SIGN_OUT",
 	SET_USER: "SET_USER",
+	FETCH_USER_DATA: "FETCH_USER_DATA"
 };
 
 const initialState = {
@@ -159,8 +160,25 @@ export const AuthProvider = ({ children }) => {
 		});
 	};
 
+	const fetchUserData = async () => {
+		try {
+			const userId = window.localStorage.getItem("gwapp_userId");
+			if (userId) {
+				const response = await fetchSingleUser(userId);
+				const user = response?.data;
+
+				dispatch({
+					type: HANDLERS.FETCH_USER_DATA,
+					payload: user,
+				});
+			}
+		} catch (error) {
+			console.error("Failed to fetch user data:", error);
+		}
+	};
+
 	return (
-		<AuthContext.Provider value={{ ...state, setUser, signIn, signOut }}>
+		<AuthContext.Provider value={{ ...state, setUser, signIn, signOut, fetchUserData }}>
 			{children}
 		</AuthContext.Provider>
 	);

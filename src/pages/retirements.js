@@ -101,7 +101,7 @@ const Retirements = () => {
 					<Stack spacing={3}>
 						<Typography variant="h5">Retirements</Typography>
 						<>
-							{user?.position.some((role) =>
+							{user?.position?.some((role) =>
 								["financeUser", "financeReviewer", "finance"].includes(role),
 							) ? (
 								<FinanceRetirementTable

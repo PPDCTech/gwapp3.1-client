@@ -124,7 +124,7 @@ export const MembersTable = (props) => {
 									</>
 								)}
 								{user &&
-									user?.position.some((role) =>
+									user?.position?.some((role) =>
 										["tech", "userManager"].includes(role),
 									) && <TableCell>Action</TableCell>}
 							</TableRow>
@@ -154,7 +154,7 @@ export const MembersTable = (props) => {
 											</TableCell>
 
 											{user &&
-												user?.position.some((role) =>
+												user?.position?.some((role) =>
 													["tech", "userManager"].includes(role),
 												) && (
 													<TableCell>
@@ -196,7 +196,7 @@ export const MembersTable = (props) => {
 									{isAlumni && (
 										<>
 											{user &&
-												user?.position.some((role) =>
+												user?.position?.some((role) =>
 													["tech", "userManagaer"].includes(role),
 												) && (
 													<TableCell>

@@ -209,7 +209,9 @@ const Members = () => {
 						>
 							<Typography variant="h6">Staff Members</Typography>
 							<Box>
-								{user?.position.some((role) => ["tech", "userManager"].includes(role)) && (
+								{user?.position?.some((role) =>
+									["tech", "userManager"].includes(role),
+								) && (
 									<>
 										<Button
 											size="small"

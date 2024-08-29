@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
 	Button,
 	Dialog,
@@ -120,14 +120,14 @@ const CreateReqModal = ({
 		}
 	}, [requisitionData]);
 
-	const fetchBenificiaries = async () => {
+	const fetchBenificiaries = useCallback(async () => {
 		try {
 			const beneficiariesResponse = await getUserVendors(user._id);
 			setBeneficiaryList(beneficiariesResponse.data);
 		} catch (error) {
 			console.error(error);
 		}
-	};
+	}, [user]);
 
 	const handleAddNewAccount = async () => {
 		try {
@@ -139,13 +139,13 @@ const CreateReqModal = ({
 				userId: user._id,
 			};
 			const response = await addVendor(new_account);
-				fetchBenificiaries();
-				toast.success("Beneficiary added, you can now select it");
-				setBeneficiary({
-					bankName: response.data.bankName,
-					accountNumber: response.data.accountNumber,
-					accountName: response.data.accountName,
-				});
+			fetchBenificiaries();
+			toast.success("Beneficiary added, you can now select it");
+			setBeneficiary({
+				bankName: response.data.bankName,
+				accountNumber: response.data.accountNumber,
+				accountName: response.data.accountName,
+			});
 		} catch (error) {
 			toast.error(`Error: ${error.message}`);
 		} finally {
@@ -154,26 +154,24 @@ const CreateReqModal = ({
 	};
 
 	useEffect(() => {
+		fetchBenificiaries();
+	}, [fetchBenificiaries]);
+
+	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const [
-					budgetHoldersResponse,
-					beneficiariesResponse,
-					projectsResponse,
-					budgetCodesResponse,
-				] = await Promise.all([
-					fetchBudgetHolders(),
-					getUserVendors(user._id),
-					getAllProjects(),
-					getAllBudgetCodes(),
-				]);
+				const [budgetHoldersResponse, projectsResponse, budgetCodesResponse] =
+					await Promise.all([
+						fetchBudgetHolders(),
+						getAllProjects(),
+						getAllBudgetCodes(),
+					]);
 
 				if (budgetHoldersResponse && budgetHoldersResponse.data) {
 					const { budget_holders } = budgetHoldersResponse.data;
 					setBudgetHolders(budget_holders);
 				}
 
-				setBeneficiaryList(beneficiariesResponse.data);
 				setProjects(projectsResponse.data);
 				setBudgetCodes(budgetCodesResponse.data);
 			} catch (error) {
@@ -182,7 +180,6 @@ const CreateReqModal = ({
 		};
 
 		fetchData();
-		// eslint-disable-next-line
 	}, []);
 
 	useEffect(() => {
@@ -478,7 +475,20 @@ const CreateReqModal = ({
 
 	const handleFileUpload = (event) => {
 		const files = event.target.files;
-		setSelectedFiles([...selectedFiles, ...Array.from(files)]);
+		const maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+		const validFiles = [];
+
+		Array.from(files).forEach((file) => {
+			if (file.size > maxFileSize) {
+				alert(`The file "${file.name}" exceeds the 5MB size limit.`);
+			} else {
+				validFiles.push(file);
+			}
+		});
+
+		if (validFiles.length > 0) {
+			setSelectedFiles([...selectedFiles, ...validFiles]);
+		}
 	};
 
 	const uploadFiles = async (event) => {
@@ -613,8 +623,11 @@ const CreateReqModal = ({
 												value={projectName}
 												onChange={(e) => setProjectName(e.target.value)}
 											>
-												{projects.map((project) => (
-													<MenuItem key={project._id} value={project.projectName}>
+												{projects.map((project, index) => (
+													<MenuItem
+														key={`${project._id}-${project.projectName}-${index}`}
+														value={project.projectName}
+													>
 														{project.projectName}
 													</MenuItem>
 												))}
@@ -766,7 +779,7 @@ const CreateReqModal = ({
 											</TableHead>
 											<TableBody>
 												{itemsArray.map((item, index) => (
-													<TableRow key={index}>
+													<TableRow key={`${item.title}-${index}`}>
 														<TableCell>{item.title}</TableCell>
 														<TableCell>{item.amount}</TableCell>
 														<TableCell>{item.code}</TableCell>
@@ -892,7 +905,7 @@ const CreateReqModal = ({
 								)}
 								<List>
 									{selectedFiles.map((file, index) => (
-										<ListItem key={index} sx={{ mt: -1 }}>
+										<ListItem key={`${file.name}-${index}`} sx={{ mt: -1 }}>
 											<ListItemText primary={file.name} />
 											<ListItemSecondaryAction>
 												<IconButton
@@ -929,7 +942,7 @@ const CreateReqModal = ({
 								{retireMode && (
 									<List>
 										{retirementFiles.map((file, index) => (
-											<ListItem key={index} sx={{ mt: -1 }}>
+											<ListItem key={`${file.name}-${index}`} sx={{ mt: -1 }}>
 												<ListItemText primary={file.name} />
 												<ListItemSecondaryAction>
 													<IconButton
@@ -960,7 +973,7 @@ const CreateReqModal = ({
 								{retireMode && <Divider sx={{ borderColor: "neutral.300" }} />}
 								<List>
 									{invoiceArray.map((file, index) => (
-										<ListItem key={index} sx={{ mt: -1 }}>
+										<ListItem key={`${file.name}-${index}`} sx={{ mt: -1 }}>
 											<ListItemText primary={file.name} />
 											<ListItemSecondaryAction>
 												<IconButton
@@ -1009,37 +1022,42 @@ const CreateReqModal = ({
 							<Grid container spacing={2}>
 								<Grid item xs={12} sm={6} md={6}>
 									<Autocomplete
-										options={beneficiaryList.map((holder) => holder.accountName)}
+										options={beneficiaryList}
+										getOptionLabel={(option) =>
+											`${option.accountName} (${option.bankName})`
+										}
 										renderInput={(params) => (
 											<TextField
 												{...params}
 												name="beneficiary"
 												label="Select Beneficiary"
 												value={beneficiaryName}
-												// onSelect={(e, value) => {
-												//   setBeneficiaryName(value);
-												//   setBeneficiary(
-												//     beneficiaryList.find((account) => account.accountName === value) || {}
-												//   );
-												//   console.log("b::", beneficiary);
-												// }}
 												fullWidth
 												required
 												sx={{ marginBottom: "1rem" }}
 											/>
 										)}
 										onInputChange={(e, value) => {
-											setBeneficiaryName(e.target.value);
-											setBeneficiary(
-												beneficiaryList.find((account) => account.accountName === value) ||
-													{},
+											// Find the selected beneficiary based on the input value
+											const selectedBeneficiary = beneficiaryList.find(
+												(account) =>
+													`${account.accountName} (${account.bankName})` === value,
 											);
+
+											setBeneficiaryName(value);
+
+											if (selectedBeneficiary) {
+												setBeneficiary(selectedBeneficiary);
+											} else {
+												setBeneficiary({});
+											}
 										}}
 									/>
 								</Grid>
 								<Grid item xs={12} sm={6} md={6}>
 									<Autocomplete
-										options={budgetHolders.map((holder) => holder.name)}
+										options={budgetHolders}
+										getOptionLabel={(option) => option.name}
 										renderInput={(params) => (
 											<TextField
 												{...params}

@@ -68,12 +68,12 @@ const Requisitions = () => {
 
 	useEffect(() => {
 		if (
-			user?.position.some(
+			user?.position?.some(
 				(role) => ["user", "staff", "financeUser", "tech"].includes(role),
 			)
 		) {
 			setSelectedTab("myRequisitions");
-		} else if (user?.position.includes("superUser")) {
+		} else if (user?.position?.includes("superUser")) {
 			setSelectedTab("allRequisitions");
 		} else {
 			setSelectedTab("forMyAttention");
@@ -234,7 +234,7 @@ const Requisitions = () => {
 
 						<Grid item xs={12}>
 							<div style={{ display: "flex" }}>
-								{user?.position.some((role) =>
+								{user?.position?.some((role) =>
 									["user", "staff", "financeUser", "tech"].includes(role),
 								) && (
 									<CustomTab
@@ -244,7 +244,7 @@ const Requisitions = () => {
 										label="My Requisitions"
 									/>
 								)}
-								{user?.position.some((role) =>
+								{user?.position?.some((role) =>
 									["tech", "finance", "financeReviewer", "superUser"].includes(role),
 								) && (
 									<CustomTab
@@ -254,7 +254,7 @@ const Requisitions = () => {
 										label="Requisitions for my attention"
 									/>
 								)}
-								{user?.position.some((role) =>
+								{user?.position?.some((role) =>
 									["tech", "financeUser", "finance", "financeReviewer", "superUser"].includes(role),
 								) && (
 									<CustomTab

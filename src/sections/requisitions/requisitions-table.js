@@ -360,7 +360,7 @@ export const RequisitionTable = ({
 																{/* Send back icon conditions */}
 																{requisition?.status !== "reviewed" &&
 																requisition?.status !== "approved" &&
-																user?.position.some(
+																user?.position?.some(
 																	(role) => !["user", "userManager"].includes(role),
 																) &&
 																requisition?.attentionTo.includes(user?.email) ? (
@@ -421,7 +421,7 @@ export const RequisitionTable = ({
 																{requisition?.status === "approved" &&
 																(requisition?.user?.name === user?.name ||
 																	requisition?.user?.email === user?.email ||
-																	user?.position.some((role) => ["tech"].includes(role))) ? (
+																	user?.position?.some((role) => ["tech"].includes(role))) ? (
 																	<Tooltip placement="left-start" title="Print">
 																		<MenuItem
 																			value="print"
@@ -452,7 +452,7 @@ export const RequisitionTable = ({
 																{(requisition?.status === "approved" ||
 																	requisition?.status === "reviewed" ||
 																	requisition?.status === "checked") &&
-																user?.position.some((role) =>
+																user?.position?.some((role) =>
 																	["financeReviewer", "finance", "financeUser"].includes(role),
 																) ? (
 																	<Tooltip placement="left-start" title="Print">
@@ -482,7 +482,8 @@ export const RequisitionTable = ({
 																	</Tooltip>
 																) : null}
 																{/* Delete condition */}
-																{!["approved", "reviewed", "deleted"].includes( // Delete condition, only if requisition is not approved or reviewed or deleted then show delete option
+																{!["approved", "reviewed", "deleted"].includes(
+																	// Delete condition, only if requisition is not approved or reviewed or deleted then show delete option
 																	requisition?.status,
 																) &&
 																requisition?.retiredStatus !== "retired" &&

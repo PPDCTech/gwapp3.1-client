@@ -226,7 +226,7 @@ export const FilterRequisitions = ({
 							</Select>
 						</FormControl>
 					</Grid>
-					{user?.position.some(
+					{user?.position?.some(
 						(role) => !["user", "userManager"].includes(role),
 					) && (
 						<Grid item xs={6} md={4}>

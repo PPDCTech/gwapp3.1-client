@@ -38,7 +38,7 @@ export const AddAccountCodeModal = ({ onAddNew }) => {
 
 	return (
 		<>
-			{user?.position.some((role) =>
+			{user?.position?.some((role) =>
 				["finance", "financeReviewer", "tech"].includes(role),
 			) && (
 				<Button variant="outlined" sx={{ color: indigo.main }} onClick={handleOpen}>

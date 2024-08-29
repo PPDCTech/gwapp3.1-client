@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import {
@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { Logo } from "../../components/logo";
 import { Scrollbar } from "../../components/scrollbar";
+import { fetchSingleUser } from "../../services/api/users.api";
 import { items } from "./config";
 import { useAuth } from "../../hooks/use-auth";
 import { SideNavItem } from "./side-nav-item";
@@ -19,45 +20,58 @@ export const SideNav = (props) => {
 	const { open, onClose } = props;
 	const location = useLocation(); // Use useLocation to get the current pathname
 	const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
-	const { user } = useAuth();
-
+	const auth = useAuth();
+	const [user, setUser] = useState(auth?.user);
 	const [sidebarItems, setSidebarItems] = useState([]);
 	const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
-		if (user) {
-			const filteredItems = items.filter((item) => {
-				if (
-					user?.position?.some((role) =>
-						["tech", "finance", "financeReviewer"].includes(role),
-					)
-				) {
-					return true;
-				}
-				if (user?.position?.some((role) => ["financeUser"].includes(role))) {
-					return item.path !== "/bin";
-				}
-				if (user?.position?.some((role) => ["superUser"].includes(role))) {
-					return item.path !== "/retirements";
-				}
-				if (user?.position?.some((role) => ["budgetHolder"].includes(role))) {
-					return item.path !== "/retirements" && item.path !== "/accounts";
-				}
-
-				if (
-					user?.position?.some((role) => ["user", "userManager"].includes(role))
-				) {
-					return (
-						item.path !== "/accounts" &&
-						item.path !== "/projects" &&
-						item.path !== "/bin"
-					);
-				}
-				return false;
-			});
-			setSidebarItems(filteredItems);
-			setLoading(false);
+	const fetchUserData = useCallback(async () => {
+		try {
+			const userId = window.localStorage.getItem("gwapp_userId");
+			if (userId) {
+				const response = await fetchSingleUser(userId);
+				setUser(response?.data);
+				auth.fetchUserData();
+			}
+		} catch (error) {
+			console.error("Failed to fetch user data:", error);
 		}
+	}, [auth]);
+
+	useEffect(() => {
+		fetchUserData();
+	}, [fetchUserData]);
+
+	useEffect(() => {
+		const filteredItems = items.filter((item) => {
+			if (
+				user?.position?.some((role) =>
+					["tech", "finance", "financeReviewer"].includes(role),
+				)
+			) {
+				return true;
+			}
+			if (user?.position?.some((role) => ["financeUser"].includes(role))) {
+				return item.path !== "/bin";
+			}
+			if (user?.position?.some((role) => ["superUser"].includes(role))) {
+				return item.path !== "/retirements";
+			}
+			if (user?.position?.some((role) => ["budgetHolder"].includes(role))) {
+				return item.path !== "/retirements" && item.path !== "/accounts";
+			}
+
+			if (user?.position?.some((role) => ["user", "userManager"].includes(role))) {
+				return (
+					item.path !== "/accounts" &&
+					item.path !== "/projects" &&
+					item.path !== "/bin"
+				);
+			}
+			return false;
+		});
+		setSidebarItems(filteredItems);
+		setLoading(false);
 	}, [user]);
 
 	const content = (

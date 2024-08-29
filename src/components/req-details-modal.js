@@ -683,7 +683,7 @@ const RequisitionDetailsModal = ({
 								{/* Select account codes (for finance) */}
 								{(requisition.status === "holderCheck" ||
 									requisition.status === "holderChecked") &&
-									user?.position.includes("finance") && (
+									user?.position?.includes("finance") && (
 										<Grid container spacing={3} sx={{ pl: 2 }}>
 											<Grid item xs={4}>
 												<Typography variant="body1" sx={{ my: 1 }}>
@@ -809,7 +809,7 @@ const RequisitionDetailsModal = ({
 											Request Awaiting Approval
 										</Typography>
 									) : requisition.status === "approved" &&
-									  user?.position.some((role) =>
+									  user?.position?.some((role) =>
 											["financeReviewer", "finance"].includes(role),
 									  ) ? (
 										<>
@@ -882,7 +882,7 @@ const RequisitionDetailsModal = ({
 										{!showReasonInput && (
 											<>
 												{requisition.status === "approved" &&
-													user?.position.includes("financeReviewer") && (
+													user?.position?.includes("financeReviewer") && (
 														<Button
 															variant="contained"
 															size="small"

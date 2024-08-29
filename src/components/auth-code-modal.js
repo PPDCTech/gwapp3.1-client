@@ -37,11 +37,10 @@ const AuthCodeInputModal = ({ openModal, setOpenModal, regToken }) => {
 		}
 	};
 
-	const closeAndNavigate = () => {
+	const closeAndNavigate = async () => {
 		setOpenModal(!openModal);
+		await auth.fetchUserData();
 		navigate("/");
-		// reload the page to get the user data
-		window.location.reload();
 	};
 
 	return (
