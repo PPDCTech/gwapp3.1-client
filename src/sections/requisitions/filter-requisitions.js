@@ -49,12 +49,15 @@ export const FilterRequisitions = ({
 			if (userId) {
 				const response = await fetchSingleUser(userId);
 				setUser(response?.data);
-				auth.fetchUserData();
 			}
 		} catch (error) {
 			console.error("Failed to fetch user data:", error);
 		}
-	}, [auth]);
+	}, []);
+
+		useEffect(() => {
+			fetchUserData();
+		}, [fetchUserData]);
 
 	const [filters, setFilters] = useState({
 		user_email: "",

@@ -18,7 +18,6 @@ import {
 	TextField,
 	Container,
 	Autocomplete,
-	CircularProgress,
 	Tooltip,
 	Badge,
 } from "@mui/material";
@@ -45,7 +44,6 @@ import {
 	financeReviewRequisition,
 	getRequisitionById,
 	sendBackRequisition,
-	updateRequisition,
 } from "../services/api/requisition.api";
 import { fetchSingleUser } from "../services/api/users.api";
 import { toast } from "react-toastify";

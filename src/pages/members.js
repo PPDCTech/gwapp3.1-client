@@ -45,6 +45,7 @@ const Members = () => {
 	useEffect(() => {
 		fetchUserData();
 	}, [fetchUserData]);
+	
 	const [activeMembers, setActiveMembers] = useState([]);
 	const [totalActive, setTotalActive] = useState(0);
 	const [alumniMembers] = useState([]);
