@@ -26,7 +26,25 @@ import { useAuth } from "../hooks/use-auth";
 
 const Members = () => {
 	useNProgress();
-	const { user } = useAuth();
+	const auth = useAuth();
+	const [user, setUser] = useState(auth?.user);
+
+	const fetchUserData = useCallback(async () => {
+		try {
+			const userId = window.localStorage.getItem("gwapp_userId");
+			if (userId) {
+				const response = await fetchSingleUser(userId);
+				setUser(response?.data);
+				auth.fetchUserData();
+			}
+		} catch (error) {
+			console.error("Failed to fetch user data:", error);
+		}
+	}, [auth]);
+
+	useEffect(() => {
+		fetchUserData();
+	}, [fetchUserData]);
 	const [activeMembers, setActiveMembers] = useState([]);
 	const [totalActive, setTotalActive] = useState(0);
 	const [alumniMembers] = useState([]);

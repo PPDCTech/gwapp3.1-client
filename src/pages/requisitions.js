@@ -23,6 +23,7 @@ import {
 	getAttentionedToRequisitions,
 	getUserRequisitions,
 } from "../services/api/requisition.api";
+import { fetchSingleUser } from "../services/api/users.api";
 import { FilterRequisitions } from "../sections/requisitions/filter-requisitions";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import { Warning } from "@mui/icons-material";
@@ -40,6 +41,24 @@ const Requisitions = () => {
 	const reqId = queryParams.get("id");
 	const action = queryParams.get("action");
 	const tab = queryParams.get("selectedTab");
+
+	const [userData, setUserData] = useState("");
+
+	const fetchUserData = useCallback(async () => {
+		try {
+			const userId = window.localStorage.getItem("gwapp_userId");
+			if (userId) {
+				const response = await fetchSingleUser(userId);
+				setUserData(response?.data);
+			}
+		} catch (error) {
+			console.error("Failed to fetch user data:", error);
+		}
+	}, []);
+
+	useEffect(() => {
+		fetchUserData();
+	}, [fetchUserData]);
 
 	const [requisitions, setRequisitions] = useState([]);
 	const [filteredRequisitions, setFilteredRequisitions] = useState([]);
@@ -68,8 +87,8 @@ const Requisitions = () => {
 
 	useEffect(() => {
 		if (
-			user?.position?.some(
-				(role) => ["user", "staff", "financeUser", "tech"].includes(role),
+			user?.position?.some((role) =>
+				["user", "staff", "financeUser", "tech"].includes(role),
 			)
 		) {
 			setSelectedTab("myRequisitions");
@@ -188,7 +207,9 @@ const Requisitions = () => {
 							</Typography>
 							<Box>
 								{user?.position?.some((userRole) =>
-									["user", "staff", "userManager", "financeUser", "tech"].includes(userRole),
+									["user", "staff", "userManager", "financeUser", "tech"].includes(
+										userRole,
+									),
 								) && (
 									<>
 										{user?.signatureUrl ? (
@@ -234,7 +255,7 @@ const Requisitions = () => {
 
 						<Grid item xs={12}>
 							<div style={{ display: "flex" }}>
-								{user?.position?.some((role) =>
+								{userData?.position?.some((role) =>
 									["user", "staff", "financeUser", "tech"].includes(role),
 								) && (
 									<CustomTab
@@ -244,7 +265,7 @@ const Requisitions = () => {
 										label="My Requisitions"
 									/>
 								)}
-								{user?.position?.some((role) =>
+								{userData?.position?.some((role) =>
 									["tech", "finance", "financeReviewer", "superUser"].includes(role),
 								) && (
 									<CustomTab
@@ -254,8 +275,14 @@ const Requisitions = () => {
 										label="Requisitions for my attention"
 									/>
 								)}
-								{user?.position?.some((role) =>
-									["tech", "financeUser", "finance", "financeReviewer", "superUser"].includes(role),
+								{userData?.position?.some((role) =>
+									[
+										"tech",
+										"financeUser",
+										"finance",
+										"financeReviewer",
+										"superUser",
+									].includes(role),
 								) && (
 									<CustomTab
 										isActive={selectedTab === "allRequisitions"}
@@ -268,7 +295,7 @@ const Requisitions = () => {
 
 							{selectedTab === "allRequisitions" && (
 								<>
-									{user.position.includes("finance") && (
+									{user?.position?.includes("finance") && (
 										<Alert severity="info" onClose={() => {}}>
 											<AlertTitle>Hint</AlertTitle>
 											<div>
@@ -279,7 +306,7 @@ const Requisitions = () => {
 											<small>You are seeing this because you have Finance access</small>
 										</Alert>
 									)}
-									{user.position.includes("financeReviewer") && (
+									{user?.position?.includes("financeReviewer") && (
 										<Alert severity="info" onClose={() => {}}>
 											<AlertTitle>Hint</AlertTitle>
 											<div>
@@ -292,7 +319,7 @@ const Requisitions = () => {
 											</small>
 										</Alert>
 									)}
-									{user.position.includes("superUser") && (
+									{user?.position?.includes("superUser") && (
 										<Alert severity="info" onClose={() => {}}>
 											<AlertTitle>Hint</AlertTitle>
 											<div>

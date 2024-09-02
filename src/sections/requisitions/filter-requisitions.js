@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { toast } from "react-toastify";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { fetchAllUsers } from "../../services/api/users.api";
+import { fetchAllUsers, fetchSingleUser } from "../../services/api/users.api";
 import { success } from "../../theme/colors";
 import DownloadForOfflineOutlinedIcon from "@mui/icons-material/DownloadForOfflineOutlined";
 import DownloadingOutlinedIcon from "@mui/icons-material/DownloadingOutlined";
@@ -39,7 +39,22 @@ export const FilterRequisitions = ({
 	const [users, setUsers] = useState([]);
 	const [downloadingCSV, setDownloadingCSV] = useState(false);
 	const [fetchingForDownload, setFetchingForDownload] = useState(false);
-	const { user } = useAuth();
+	const auth = useAuth();
+
+	const [user, setUser] = useState(auth?.user);
+
+	const fetchUserData = useCallback(async () => {
+		try {
+			const userId = window.localStorage.getItem("gwapp_userId");
+			if (userId) {
+				const response = await fetchSingleUser(userId);
+				setUser(response?.data);
+				auth.fetchUserData();
+			}
+		} catch (error) {
+			console.error("Failed to fetch user data:", error);
+		}
+	}, [auth]);
 
 	const [filters, setFilters] = useState({
 		user_email: "",

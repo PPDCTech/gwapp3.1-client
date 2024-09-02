@@ -47,6 +47,7 @@ import {
 	sendBackRequisition,
 	updateRequisition,
 } from "../services/api/requisition.api";
+import { fetchSingleUser } from "../services/api/users.api";
 import { toast } from "react-toastify";
 import { indigo, info, success } from "../theme/colors";
 import { addMessage, fetchMessages } from "../services/api/message-chat.api";
@@ -63,7 +64,27 @@ const RequisitionDetailsModal = ({
 	isRetirement,
 	updateTableData,
 }) => {
-	const { user } = useAuth();
+	const auth = useAuth();
+
+	const [user, setUser] = useState(auth?.user);
+
+	const fetchUserData = useCallback(async () => {
+		try {
+			const userId = window.localStorage.getItem("gwapp_userId");
+			if (userId) {
+				const response = await fetchSingleUser(userId);
+				setUser(response?.data);
+				auth.fetchUserData();
+			}
+		} catch (error) {
+			console.error("Failed to fetch user data:", error);
+		}
+	}, [auth]);
+
+	useEffect(() => {
+		fetchUserData();
+	}, [fetchUserData]);
+
 	const [loading, setLoading] = useState(false);
 	const [requisition, setRequisition] = useState(EMPTY_REQ_VALUES);
 	const [loadingCheckBtn, setLoadingCheckBtn] = useState(false);
