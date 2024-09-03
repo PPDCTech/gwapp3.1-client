@@ -145,6 +145,7 @@ const RequisitionDetailsModal = ({
 			setLoading(true);
 			try {
 				const response = await getRequisitionById(requisitionId);
+				console.log("Requisition details:", response.data);
 				setRequisition(response.data);
 			} catch (error) {
 				console.error("Error fetching requisition details:", error);

@@ -22,6 +22,7 @@ import {
 	getAllRequisitions,
 	getAttentionedToRequisitions,
 	getUserRequisitions,
+	getAttentionedToRequisitionsNoPending,
 } from "../services/api/requisition.api";
 import { fetchSingleUser } from "../services/api/users.api";
 import { FilterRequisitions } from "../sections/requisitions/filter-requisitions";
@@ -70,7 +71,7 @@ const Requisitions = () => {
 	const [editMode, setEditMode] = useState(false);
 	const [page, setPage] = useState(0);
 	const [limit, setLimit] = useState(10);
-	const [filteredPage, setFilteredPage] = useState(1);
+	const [filteredPage, setFilteredPage] = useState(0);
 	const [filteredLimit, setFilteredLimit] = useState(10);
 	const [filteredTotalCount, setFilteredTotalCount] = useState(0);
 
@@ -92,9 +93,12 @@ const Requisitions = () => {
 			)
 		) {
 			setSelectedTab("myRequisitions");
-		} else if (user?.position?.includes("superUser")) {
-			setSelectedTab("allRequisitions");
-		} else {
+		}
+		if (
+			user?.position?.some((role) =>
+				["superUser", "finance", "financeReviewer", "budgetHolder"].includes(role),
+			)
+		) {
 			setSelectedTab("forMyAttention");
 		}
 	}, [user]);
@@ -123,6 +127,17 @@ const Requisitions = () => {
 
 					fetchedRequisitions = myAttentionReqs.data.requisitions;
 					count = myAttentionReqs.data.totalCount;
+					break;
+				case "allForMyAttention":
+					fetchedRequisitions = [];
+					const myAllAttentionReqs = await getAttentionedToRequisitionsNoPending(
+						user?.email,
+						page,
+						limit,
+					);
+
+					fetchedRequisitions = myAllAttentionReqs.data.requisitions;
+					count = myAllAttentionReqs.data.totalCount;
 					break;
 				case "allRequisitions":
 					fetchedRequisitions = [];
@@ -165,22 +180,124 @@ const Requisitions = () => {
 		setRequisitions(updatedRequisitions);
 	};
 
-	const handlePageChange = (event, newPage) => {
-		setPage(newPage);
-	};
+	const handlePageChange = useCallback(
+		async (event, pageVal) => {
+			setPage(pageVal);
+			try {
+				setFilteredRequisitions([]);
+				let fetchedRequisitions;
+				let count;
+
+				switch (selectedTab) {
+					case "myRequisitions":
+						fetchedRequisitions = [];
+						const myReqs = await getUserRequisitions(user?._id, pageVal, limit);
+						fetchedRequisitions = myReqs.data.requisitions;
+						count = myReqs.data.totalCount;
+						break;
+					case "forMyAttention":
+						fetchedRequisitions = [];
+						const myAttentionReqs = await getAttentionedToRequisitions(
+							user?.email,
+							pageVal,
+							limit,
+						);
+
+						fetchedRequisitions = myAttentionReqs.data.requisitions;
+						count = myAttentionReqs.data.totalCount;
+						break;
+					case "allForMyAttention":
+						fetchedRequisitions = [];
+						const myAllAttentionReqs = await getAttentionedToRequisitionsNoPending(
+							user?.email,
+							pageVal,
+							limit,
+						);
+
+						fetchedRequisitions = myAllAttentionReqs.data.requisitions;
+						count = myAllAttentionReqs.data.totalCount;
+						break;
+					case "allRequisitions":
+						fetchedRequisitions = [];
+						const allReqs = await getAllRequisitions(pageVal, limit);
+						fetchedRequisitions = allReqs.data.requisitions;
+						count = allReqs.data.totalCount;
+						break;
+					default:
+						fetchedRequisitions = [];
+						count = 0;
+				}
+				setRequisitions(fetchedRequisitions);
+				setTotalCount(count);
+			} catch (error) {
+				console.error("Error fetching requisitions:", error);
+			} 
+		},
+		[selectedTab, user, limit],
+	);
 
 	const handleLimitChange = (event) => {
 		setLimit(parseInt(event.target.value, 10));
-		setPage(0);
 	};
 
-	const handleFilteredPageChange = (event, newPage) => {
-		setFilteredPage(newPage);
-	};
+	const handleFilteredPageChange = useCallback(
+		async (event, pageVal) => {
+			setFilteredPage(pageVal);
+			try {
+				setFilteredRequisitions([]);
+				let fetchedRequisitions;
+				let count;
+
+				switch (selectedTab) {
+					case "myRequisitions":
+						fetchedRequisitions = [];
+						const myReqs = await getUserRequisitions(user?._id, pageVal, limit);
+						fetchedRequisitions = myReqs.data.requisitions;
+						count = myReqs.data.totalCount;
+						break;
+					case "forMyAttention":
+						fetchedRequisitions = [];
+						const myAttentionReqs = await getAttentionedToRequisitions(
+							user?.email,
+							pageVal,
+							limit,
+						);
+
+						fetchedRequisitions = myAttentionReqs.data.requisitions;
+						count = myAttentionReqs.data.totalCount;
+						break;
+					case "allForMyAttention":
+						fetchedRequisitions = [];
+						const myAllAttentionReqs = await getAttentionedToRequisitionsNoPending(
+							user?.email,
+							pageVal,
+							limit,
+						);
+
+						fetchedRequisitions = myAllAttentionReqs.data.requisitions;
+						count = myAllAttentionReqs.data.totalCount;
+						break;
+					case "allRequisitions":
+						fetchedRequisitions = [];
+						const allReqs = await getAllRequisitions(pageVal, limit);
+						fetchedRequisitions = allReqs.data.requisitions;
+						count = allReqs.data.totalCount;
+						break;
+					default:
+						fetchedRequisitions = [];
+						count = 0;
+				}
+				setRequisitions(fetchedRequisitions);
+				setTotalCount(count);
+			} catch (error) {
+				console.error("Error fetching requisitions:", error);
+			}
+		},
+		[selectedTab, user, limit],
+	);
 
 	const handleFilteredLimitChange = (event) => {
 		setFilteredLimit(parseInt(event.target.value, 10));
-		setFilteredPage(1);
 	};
 
 	return (
@@ -206,13 +323,13 @@ const Requisitions = () => {
 								Requisitions
 							</Typography>
 							<Box>
-								{user?.position?.some((userRole) =>
+								{userData?.position?.some((userRole) =>
 									["user", "staff", "userManager", "financeUser", "tech"].includes(
 										userRole,
 									),
 								) && (
 									<>
-										{user?.signatureUrl ? (
+										{userData?.signatureUrl ? (
 											<Button
 												size="small"
 												variant="outlined"
@@ -266,13 +383,29 @@ const Requisitions = () => {
 									/>
 								)}
 								{userData?.position?.some((role) =>
-									["tech", "finance", "financeReviewer", "superUser"].includes(role),
+									[
+										"tech",
+										"budgetHolder",
+										"finance",
+										"financeReviewer",
+										"superUser",
+									].includes(role),
 								) && (
 									<CustomTab
 										isActive={selectedTab === "forMyAttention"}
 										value="forMyAttention"
 										onClick={() => handleTabChange("forMyAttention")}
 										label="Requisitions for my attention"
+									/>
+								)}
+								{userData?.position?.some((role) =>
+									["budgetHolder"].includes(role),
+								) && (
+									<CustomTab
+										isActive={selectedTab === "allForMyAttention"}
+										value="allForMyAttention"
+										onClick={() => handleTabChange("allForMyAttention")}
+										label="Requisitions attented"
 									/>
 								)}
 								{userData?.position?.some((role) =>
@@ -293,9 +426,21 @@ const Requisitions = () => {
 								)}
 							</div>
 
-							{selectedTab === "allRequisitions" && (
+							{selectedTab === "forMyAttention" && (
 								<>
-									{user?.position?.includes("finance") && (
+									{user?.position?.some((role) => ["budgetHolder"].includes(role)) && (
+										<Alert severity="info" onClose={() => {}}>
+											<AlertTitle>Hint</AlertTitle>
+											<div>
+												Use the 'filter requisitions' section above to filter requests that
+												have status of pending (Pending), and attend to them
+											</div>
+											<small>
+												You are seeing this because you have Budget Holder access
+											</small>
+										</Alert>
+									)}
+									{user?.position?.some((role) => ["finance"].includes(role)) && (
 										<Alert severity="info" onClose={() => {}}>
 											<AlertTitle>Hint</AlertTitle>
 											<div>
@@ -306,7 +451,9 @@ const Requisitions = () => {
 											<small>You are seeing this because you have Finance access</small>
 										</Alert>
 									)}
-									{user?.position?.includes("financeReviewer") && (
+									{user?.position?.some((role) =>
+										["financeReviewer"].includes(role),
+									) && (
 										<Alert severity="info" onClose={() => {}}>
 											<AlertTitle>Hint</AlertTitle>
 											<div>
@@ -319,7 +466,65 @@ const Requisitions = () => {
 											</small>
 										</Alert>
 									)}
-									{user?.position?.includes("superUser") && (
+									{user?.position?.some((role) => ["superUser"].includes(role)) && (
+										<Alert severity="info" onClose={() => {}}>
+											<AlertTitle>Hint</AlertTitle>
+											<div>
+												Use the 'filter requisitions' section above to filter requests that
+												have been reviewed by the Finance (Finance Reviewed), now ready for
+												your approval
+											</div>
+											<small>You are seeing this because you are an Approver</small>
+										</Alert>
+									)}
+								</>
+							)}
+
+							{selectedTab === "allForMyAttention" && (
+								<>
+									{user?.position?.some((role) => ["budgetHolder"].includes(role)) && (
+										<Alert severity="info" onClose={() => {}}>
+											<AlertTitle>Hint</AlertTitle>
+											<div>
+												Use the 'filter requisitions' section above to filter requests that
+												have status of pending (Pending), and attend to them
+											</div>
+											<small>
+												You are seeing this because you have Budget Holder access
+											</small>
+										</Alert>
+									)}
+								</>
+							)}
+							{selectedTab === "allRequisitions" && (
+								<>
+									{user?.position?.some((role) => ["finance"].includes(role)) && (
+										<Alert severity="info" onClose={() => {}}>
+											<AlertTitle>Hint</AlertTitle>
+											<div>
+												Use the 'filter requisitions' section above to filter requests that
+												have been checked by the Budget Holder (Holder Checked), now ready
+												for your checking
+											</div>
+											<small>You are seeing this because you have Finance access</small>
+										</Alert>
+									)}
+									{user?.position?.some((role) =>
+										["financeReviewer"].includes(role),
+									) && (
+										<Alert severity="info" onClose={() => {}}>
+											<AlertTitle>Hint</AlertTitle>
+											<div>
+												Use the 'filter requisitions' section above to filter requests that
+												have been checked by the Finance (Finance Checked), now ready for
+												your final review
+											</div>
+											<small>
+												You are seeing this because you have Finance Reviewer access
+											</small>
+										</Alert>
+									)}
+									{user?.position?.some((role) => ["superUser"].includes(role)) && (
 										<Alert severity="info" onClose={() => {}}>
 											<AlertTitle>Hint</AlertTitle>
 											<div>

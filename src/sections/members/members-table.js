@@ -32,6 +32,7 @@ import { useAuth } from "../../hooks/use-auth";
 
 export const MembersTable = (props) => {
 	const {
+		isLoading,
 		count = 0,
 		members = [],
 		onPageChange = () => {},
@@ -106,12 +107,29 @@ export const MembersTable = (props) => {
 		handleClose();
 	};
 
-	console.log("MMM", members);
-
 	return (
 		<Card>
 			<Scrollbar>
 				<Box sx={{ minWidth: 800 }}>
+					{isLoading && (
+						<Typography sx={{ mt: 2 }}>
+							<CircularProgress size={10} />
+							<small>&nbsp;Loading...</small>
+						</Typography>
+					)}
+					{!isLoading && members.length === 0 && (
+						<Box
+							sx={{
+								display: "flex",
+								flexDirection: "column",
+								justifyContent: "center",
+								alignItems: "center",
+								height: "100%",
+							}}
+						>
+							<Box sx={{ mt: 2 }}>No members yet</Box>
+						</Box>
+					)}
 					<Table>
 						<TableHead>
 							<TableRow>

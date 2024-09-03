@@ -27,6 +27,13 @@ export const getAttentionedToRequisitions = (email, page, limit) => {
     return fetchData(`${REQUISITION_API}/attention/${email}`);
 };
 
+export const getAttentionedToRequisitionsNoPending = (email, page, limit) => {
+    if (page && limit) {
+        return fetchData(`attention-no-pending/${email}?page=${page}&limit=${limit}`);
+    }
+    return fetchData(`${REQUISITION_API}/attention-no-pending/${email}`);
+};
+
 export const getAllApprovedRequisitions = async (queryParams) => {
     try {
         const params = new URLSearchParams(queryParams).toString();

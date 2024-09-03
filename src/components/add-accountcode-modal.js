@@ -9,10 +9,8 @@ import {
 } from "@mui/material";
 // import { ACCOUNT_CODES_API } from "src/services/constants";
 import { indigo } from "../theme/colors";
-import { useAuth } from "../hooks/use-auth";
 
-export const AddAccountCodeModal = ({ onAddNew }) => {
-	const { user } = useAuth();
+export const AddAccountCodeModal = ({ onAddNew, user }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [codeValue, setCodeValue] = useState("");
 	const [description, setDescription] = useState("");

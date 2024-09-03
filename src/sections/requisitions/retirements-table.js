@@ -14,7 +14,7 @@ import {
 	CircularProgress,
 	TablePagination,
 	Chip,
-	Tooltip
+	Tooltip,
 } from "@mui/material";
 import { DocumentDuplicateIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { getCurrencySign } from "../../utils/format-currency";
@@ -34,7 +34,7 @@ const RetirementsTable = ({
 	totalCount,
 	onPageChange,
 	onLimitChange,
-	updateTableData
+	updateTableData,
 }) => {
 	const [isReqDetailsOpen, setIsReqDetailsOpen] = useState(false);
 	const [selectedId, setSelectedId] = useState(null);
@@ -179,7 +179,13 @@ const RetirementsTable = ({
 	return (
 		<>
 			<TableContainer component={Paper}>
-				{loading ? (
+				{loading && (
+					<Typography sx={{ mt: 2 }}>
+						<CircularProgress size={10} />
+						<small>&nbsp;Loading...</small>
+					</Typography>
+				)}
+				{!loading && data.length === 0 && (
 					<Box
 						sx={{
 							display: "flex",
@@ -189,58 +195,42 @@ const RetirementsTable = ({
 							height: "100%",
 						}}
 					>
-						<CircularProgress color="success" />
-						<Box sx={{ mt: 2 }}>Relax while we load your data...</Box>
+						<Box sx={{ mt: 2 }}>You have no pending retirements 😃!</Box>
 					</Box>
-				) : (
-					<>
-						{data.length === 0 ? (
-							<Box
-								sx={{
-									display: "flex",
-									flexDirection: "column",
-									justifyContent: "center",
-									alignItems: "center",
-									height: "100%",
-								}}
-							>
-								<Box sx={{ mt: 2 }}>You have no pending retirements 😃!</Box>
-							</Box>
-						) : (
-							<Table>
-								<TableHead>
-									<TableRow>
-										<TableCell sx={{ width: "40%" }}>Title</TableCell>
-										<TableCell sx={{ width: "20%" }}>Amount</TableCell>
-										<TableCell sx={{ width: "20%" }}>Status</TableCell>
-										<TableCell sx={{ width: "20%" }}>Action</TableCell>
-									</TableRow>
-								</TableHead>
-								<TableBody>
-									{data.map((row) => (
-										<TableRow key={row?._id}>
-											<TableCell
-												sx={{
-													cursor: "pointer",
-													"&:hover": {
-														backgroundColor: "#F3F4F6",
-														boxShadow: "inset 0 0 5px rgba(0,0,0,0.1)",
-													},
-													paddingTop: "2rem",
-												}}
-												onClick={() => handleOpenReqDetails(row?._id)}
-											>
-												{renderTableCell(row, "title")}
-											</TableCell>
-											<TableCell>{renderTableCell(row, "amount")}</TableCell>
-											<TableCell>{renderTableCell(row, "status")}</TableCell>
-											<TableCell>{renderTableCell(row, "action")}</TableCell>
-										</TableRow>
-									))}
-								</TableBody>
-							</Table>
-						)}
-					</>
+				)}
+				{data && data?.length > 0 && (
+					<Table>
+						<TableHead>
+							<TableRow>
+								<TableCell sx={{ width: "40%" }}>Title</TableCell>
+								<TableCell sx={{ width: "20%" }}>Amount</TableCell>
+								<TableCell sx={{ width: "20%" }}>Status</TableCell>
+								<TableCell sx={{ width: "20%" }}>Action</TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{data.map((row) => (
+								<TableRow key={row?._id}>
+									<TableCell
+										sx={{
+											cursor: "pointer",
+											"&:hover": {
+												backgroundColor: "#F3F4F6",
+												boxShadow: "inset 0 0 5px rgba(0,0,0,0.1)",
+											},
+											paddingTop: "2rem",
+										}}
+										onClick={() => handleOpenReqDetails(row?._id)}
+									>
+										{renderTableCell(row, "title")}
+									</TableCell>
+									<TableCell>{renderTableCell(row, "amount")}</TableCell>
+									<TableCell>{renderTableCell(row, "status")}</TableCell>
+									<TableCell>{renderTableCell(row, "action")}</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
 				)}
 			</TableContainer>
 			<TablePagination

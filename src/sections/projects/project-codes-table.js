@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
 	TextField,
 	Accordion,
@@ -14,12 +14,34 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { bankCodes } from "../../services/bankCodes";
+import { fetchSingleUser } from "../../services/api/users.api";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { PROJECT_CODES_API } from "../../services/constants";
 import { indigo } from "../../theme/colors";
+import { useAuth } from "../../hooks/use-auth";
 
 export const ProjectCodesTable = () => {
+	const auth = useAuth();
+	const [user, setUser] = useState(auth?.user);
+
+	const fetchUserData = useCallback(async () => {
+		try {
+			const userId = window.localStorage.getItem("gwapp_userId");
+			if (userId) {
+				const response = await fetchSingleUser(userId);
+				setUser(response?.data);
+				auth.fetchUserData();
+			}
+		} catch (error) {
+			console.error("Failed to fetch user data:", error);
+		}
+	}, [auth]);
+
+	useEffect(() => {
+		fetchUserData();
+	}, [fetchUserData]);
+
 	const [expanded, setExpanded] = useState(false);
 	const [projects, setProjects] = useState([]);
 	const [open, setOpen] = useState(false);
@@ -32,14 +54,14 @@ export const ProjectCodesTable = () => {
 
 	const [loading, setLoading] = useState(false);
 
-	const fetchInitialProjects = async () => {
+	const fetchInitialProjects = useCallback(async () => {
 		const response = await axios.get(PROJECT_CODES_API);
 		setProjects(response.data);
-	};
+	}, []);
 
 	useEffect(() => {
 		fetchInitialProjects();
-	}, [projects]);
+	}, [fetchInitialProjects]);
 
 	const handleOpen = () => {
 		setOpen(true);
@@ -106,16 +128,22 @@ export const ProjectCodesTable = () => {
 							Projects
 						</Typography>
 
-						<Box>
-							<Button
-								variant="outlined"
-								sx={{ color: indigo.main }}
-								onClick={handleOpen}
-								className="btn btn-type-info btn-md"
-							>
-								Add new Project
-							</Button>
-						</Box>
+						{user?.position?.some((role) =>
+							["tech", "finance", "financeReviewer"].includes(role),
+						) ? (
+							<Box>
+								<Button
+									variant="outlined"
+									sx={{ color: indigo.main }}
+									onClick={handleOpen}
+									className="btn btn-type-info btn-md"
+								>
+									Add new Project
+								</Button>
+							</Box>
+						) : (
+							<Box></Box>
+						)}
 					</Box>
 
 					<Modal open={open} onClose={handleClose}>

@@ -58,7 +58,11 @@ export const SideNav = (props) => {
 				return item.path !== "/retirements";
 			}
 			if (user?.position?.some((role) => ["budgetHolder"].includes(role))) {
-				return item.path !== "/retirements" && item.path !== "/accounts";
+				return (
+					item.path !== "/retirements" &&
+					item.path !== "/accounts" &&
+					item.path !== "/bin"
+				);
 			}
 
 			if (user?.position?.some((role) => ["user", "userManager"].includes(role))) {

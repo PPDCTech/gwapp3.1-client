@@ -98,7 +98,6 @@ const Members = () => {
 			try {
 				const result = await fetchUsers(value, rowsPerPage, searchQuery);
 				const { users, totalCount } = result.data;
-				console.log(users);
 				setFilteredActiveMembers(users);
 				setTotalActive(totalCount);
 			} catch (error) {
