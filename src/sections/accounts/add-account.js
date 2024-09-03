@@ -12,7 +12,7 @@ import { bankCodes } from "../../services/bankCodes";
 import { toast } from "react-toastify";
 import { addAccount } from "../../services/api/accounts.api";
 
-export const AddAccount = ({ updateAccounts }) => {
+export const AddAccount = ({ updateAccounts, user }) => {
 	const [open, setOpen] = useState(false);
 	const [bankName, setBankName] = useState("");
 	const [accountName, setAccountName] = useState("");
@@ -51,9 +51,13 @@ export const AddAccount = ({ updateAccounts }) => {
 
 	return (
 		<>
-			<Button color="info" size="small" variant="outlined" onClick={handleOpen}>
-				Add New Bank Account
-			</Button>
+			{user?.position?.some((role) =>
+				["finance", "financeReviewer", "tech"].includes(role),
+			) && (
+				<Button color="info" size="small" variant="outlined" onClick={handleOpen}>
+					Add New Bank Account
+				</Button>
+			)}
 			<Dialog open={open} onClose={handleClose}>
 				<DialogTitle>Add New Account</DialogTitle>
 				<DialogContent>
