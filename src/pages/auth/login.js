@@ -1,4 +1,5 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import {
@@ -9,17 +10,47 @@ import {
 	Tabs,
 	TextField,
 	Typography,
+	Container,
+	Link,
 } from "@mui/material";
 import { useNProgress } from "../../hooks/use-nprogress";
 import AuthCodeInputModal from "../../components/auth-code-modal";
 import { loginUser } from "../../services/api/auth.api";
+import { toast } from "react-toastify";
+import { useAuth } from "../../hooks/use-auth";
+import PasswordResetModal from "../../components/password-reset-modal";
+import ResetPasswordModal from "../../components/reset-password-modal";
 
 const Login = () => {
 	useNProgress();
+	const auth = useAuth();
+	const navigate = useNavigate();
+	const { token } = useParams();
+
 	const [openModal, setOpenModal] = useState(false);
+	const [openResetModal, setOpenResetModal] = useState(false);
 
 	const [loadingSubmit, setLoadingSubmit] = useState(false);
-	const [method, setMethod] = useState("email");
+	const [method, setMethod] = useState("staff");
+
+	useEffect(() => {
+		// search if vendor = true set method to vendor
+		const urlSearchParams = new URLSearchParams(window.location.search);
+		const vendor = urlSearchParams.get("vendor");
+		if (vendor === "true") {
+			setMethod("vendor");
+		}
+	}, []);
+
+	useEffect(() => {
+		// search if vendor = true set method to vendor
+		const urlSearchParams = new URLSearchParams(window.location.search);
+		const open = urlSearchParams.get("open");
+		if (open === "true" && token) {
+			setOpenResetModal(true);
+		}
+	}, [token]);
+
 	const formik = useFormik({
 		initialValues: {
 			email: "",
@@ -60,6 +91,42 @@ const Login = () => {
 		setMethod(value);
 	}, []);
 
+	const [formData, setFormData] = useState({
+		email: "",
+		password: "",
+	});
+
+	const [submiting, setSubmiting] = useState(false);
+
+	const [isForgotPassword, setIsForgotPassword] = useState(false);
+
+	const handleInputChange = (e) => {
+		setFormData({ ...formData, [e.target.name]: e.target.value });
+	};
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setSubmiting(true);
+		try {
+			// validate form
+			if (!formData.email || !formData.password) {
+				toast.error("All fields are required");
+				setSubmiting(false);
+				return;
+			}
+			 await auth.vendorSignIn(formData);
+			toast.success("Login successful");
+			navigate("/profile");
+			// reload window
+			window.location.reload();
+			setSubmiting(false);
+		} catch (error) {
+			console.log("Login failed! ", error.message);
+			toast.error("Login failed! " + error.message);
+			setSubmiting(false);
+		}
+	};
+
 	return (
 		<>
 			<Box
@@ -81,7 +148,7 @@ const Login = () => {
 				>
 					<div>
 						<Stack spacing={1} sx={{ mb: 3 }}>
-							<Typography variant="h4">Login</Typography>
+							<Typography variant="h6">Login</Typography>
 						</Stack>
 						<Tabs
 							onChange={handleMethodChange}
@@ -96,10 +163,10 @@ const Login = () => {
 							}}
 							value={method}
 						>
-							<Tab label="Login to your account" value="email" />
-							{/* <Tab label="Reset password" value="phoneNumber" /> */}
+							<Tab label="Staff" value="staff" />
+							<Tab label="Vendor" value="vendor" />
 						</Tabs>
-						{method === "email" && (
+						{method === "staff" && (
 							<form noValidate onSubmit={formik.handleSubmit}>
 								<Stack spacing={3}>
 									<TextField
@@ -140,15 +207,100 @@ const Login = () => {
 								</Button>
 							</form>
 						)}
-						{method === "phoneNumber" && (
-							<div>
-								<Typography color="text.secondary">Loading form...</Typography>
-							</div>
+						{method === "vendor" && (
+							<Container>
+								<Box component="form" onSubmit={handleSubmit}>
+									<TextField
+										label="Email"
+										name="email"
+										type="email"
+										value={formData.email}
+										onChange={handleInputChange}
+										fullWidth
+										margin="normal"
+										required
+									/>
+									<TextField
+										label="Password"
+										name="password"
+										type="password"
+										value={formData.password}
+										onChange={handleInputChange}
+										fullWidth
+										margin="normal"
+										required
+									/>
+									<Button
+										fullWidth
+										size="large"
+										sx={{
+											mt: 3,
+											backgroundColor: "success.darkest",
+											"&:hover": {
+												backgroundColor: "success.main",
+												transform: "scale(1.01)",
+												boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
+											},
+										}}
+										type="submit"
+										variant="contained"
+										disabled={submiting}
+									>
+										{submiting ? "Processing..." : "Login"}
+									</Button>
+								</Box>
+								<Box
+									sx={{
+										display: "flex",
+										justifyContent: "space-between",
+										mb: 2,
+										mt: 2,
+									}}
+								>
+									<Box>
+										<Typography color="text.secondary" variant="body2">
+											No vendor account yet?
+											<Link
+												component={Button}
+												onClick={() => navigate("/vendor/register")}
+												underline="hover"
+												variant="subtitle2"
+												sx={{ p: 1 }}
+											>
+												Register
+											</Link>
+										</Typography>
+									</Box>
+									<Box>
+										<Typography color="text.secondary" variant="body2">
+											Forgot Password?
+											<Link
+												component={Button}
+												onClick={() => setIsForgotPassword(true)}
+												underline="hover"
+												variant="subtitle2"
+												sx={{ p: 1 }}
+											>
+												Reset
+											</Link>
+										</Typography>
+									</Box>
+								</Box>
+							</Container>
 						)}
 					</div>
 				</Box>
 
-				<AuthCodeInputModal openModal={openModal} setOpenModal={setOpenModal}  />
+				<AuthCodeInputModal openModal={openModal} setOpenModal={setOpenModal} />
+				<PasswordResetModal
+					openModal={isForgotPassword}
+					setOpenModal={setIsForgotPassword}
+				/>
+				<ResetPasswordModal
+					openModal={openResetModal}
+					setOpenModal={setOpenResetModal}
+					token={token}
+				/>
 			</Box>
 		</>
 	);

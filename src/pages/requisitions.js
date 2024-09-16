@@ -65,7 +65,7 @@ const Requisitions = () => {
 	const [filteredRequisitions, setFilteredRequisitions] = useState([]);
 	const [totalCount, setTotalCount] = useState(0);
 	const [loading, setLoading] = useState(false);
-	const [selectedTab, setSelectedTab] = useState("");
+	const [selectedTab, setSelectedTab] = useState("myRequisitions");
 	const [isCreateReqModalOpen, setCreateReqModalOpen] = useState(false);
 	const [selectedRequisition] = useState(null);
 	const [editMode, setEditMode] = useState(false);
@@ -159,8 +159,13 @@ const Requisitions = () => {
 	}, [selectedTab, user, page, limit]);
 
 	useEffect(() => {
-		fetchRequisitions();
-	}, [selectedTab, user, fetchRequisitions, page, limit]);
+		if (user) {
+			fetchRequisitions();
+		}
+		if (selectedTab) {
+			fetchRequisitions();
+		}
+	}, [fetchRequisitions, selectedTab, user]);
 
 	const handleOpenCreateModal = () => {
 		setEditMode(false);
@@ -231,7 +236,7 @@ const Requisitions = () => {
 				setTotalCount(count);
 			} catch (error) {
 				console.error("Error fetching requisitions:", error);
-			} 
+			}
 		},
 		[selectedTab, user, limit],
 	);

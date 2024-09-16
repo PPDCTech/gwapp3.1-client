@@ -15,6 +15,7 @@ import { fetchSingleUser } from "../../services/api/users.api";
 import { items } from "./config";
 import { useAuth } from "../../hooks/use-auth";
 import { SideNavItem } from "./side-nav-item";
+import { viewAVendor } from "../../services/vendor-api-Services";
 
 export const SideNav = (props) => {
 	const { open, onClose } = props;
@@ -24,11 +25,16 @@ export const SideNav = (props) => {
 	const [user, setUser] = useState(auth?.user);
 	const [sidebarItems, setSidebarItems] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const isVendor = window.localStorage.getItem("isVendor") === "true";
+	const userId = window.localStorage.getItem("gwapp_userId");
 
 	const fetchUserData = useCallback(async () => {
 		try {
-			const userId = window.localStorage.getItem("gwapp_userId");
-			if (userId) {
+			if (isVendor === "true") {
+				const response = await viewAVendor(userId);
+				setUser(response?.data);
+				auth.fetchUserData();
+			} else {
 				const response = await fetchSingleUser(userId);
 				setUser(response?.data);
 				auth.fetchUserData();
@@ -36,7 +42,7 @@ export const SideNav = (props) => {
 		} catch (error) {
 			console.error("Failed to fetch user data:", error);
 		}
-	}, [auth]);
+	}, [auth, isVendor, userId]);
 
 	useEffect(() => {
 		fetchUserData();
@@ -72,11 +78,26 @@ export const SideNav = (props) => {
 					item.path !== "/bin"
 				);
 			}
+
+			if (isVendor) {
+				return (
+					item.path !== "/projects" &&
+					item.path !== "/requisitions" &&
+					item.path !== "/vendor-list" &&
+					item.path !== "/" &&
+					item.path !== "/members" &&
+					item.path !== "/accounts" &&
+					item.path !== "/retirements" &&
+					item.path !== "/accounts" &&
+					item.path !== "/bin"
+				);
+			}
+
 			return false;
 		});
 		setSidebarItems(filteredItems);
 		setLoading(false);
-	}, [user]);
+	}, [user, isVendor]);
 
 	const content = (
 		<Scrollbar>

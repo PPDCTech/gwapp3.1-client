@@ -1,12 +1,13 @@
-// import CogIcon from "@heroicons/react/24/solid/CogIcon";
+import CogIcon from "@heroicons/react/24/solid/CogIcon";
 // import LockClosedIcon from "@heroicons/react/24/solid/LockClosedIcon";
-// import ShoppingBagIcon from "@heroicons/react/24/solid/ShoppingBagIcon";
+import ShoppingBagIcon from "@heroicons/react/24/solid/ShoppingBagIcon";
 // import XCircleIcon from "@heroicons/react/24/solid/XCircleIcon";
 // import UserPlusIcon from "@heroicons/react/24/solid/UserPlusIcon";
 import ChartBarIcon from "@heroicons/react/24/solid/ChartBarIcon";
 import UserIcon from "@heroicons/react/24/solid/UserIcon";
 import UsersIcon from "@heroicons/react/24/solid/UsersIcon";
 import DocumentDuplicateIcon from "@heroicons/react/24/outline/DocumentDuplicateIcon";
+import DocumentTextIcon from "@heroicons/react/24/outline/DocumentTextIcon";
 import { SvgIcon } from "@mui/material";
 import { AccountTreeSharp, Analytics, Summarize } from "@mui/icons-material";
 import { TrashIcon } from "@heroicons/react/24/outline";
@@ -76,6 +77,24 @@ export const items = [
 		),
 	},
 	{
+		title: "Vendors",
+		path: "/vendor-list",
+		icon: (
+			<SvgIcon fontSize="small">
+				<ShoppingBagIcon />
+			</SvgIcon>
+		),
+	},
+	{
+		title: "Contracts",
+		path: "/contracts",
+		icon: (
+			<SvgIcon fontSize="small">
+				<DocumentTextIcon />
+			</SvgIcon>
+		),
+	},
+	{
 		title: "Bin",
 		path: "/bin",
 		icon: (
@@ -84,13 +103,4 @@ export const items = [
 			</SvgIcon>
 		),
 	},
-	// {
-	//   title: "Vendors",
-	//   path: "/vendors",
-	//   icon: (
-	//     <SvgIcon fontSize="small">
-	//       <ShoppingBagIcon />
-	//     </SvgIcon>
-	//   ),
-	// },
 ];

@@ -13,6 +13,7 @@ import { useAuth } from "../../hooks/use-auth";
 export const AccountPopover = (props) => {
 	const { anchorEl, onClose, open } = props;
 	const auth = useAuth();
+	const isVendor = window.localStorage.getItem("isVendor") === "true";
 
 	const handleSignOut = useCallback(() => {
 		auth.signOut();
@@ -37,10 +38,14 @@ export const AccountPopover = (props) => {
 			>
 				<Typography variant="overline">Account</Typography>
 				<Typography color="text.secondary" variant="body2">
-					{auth.user?.name}
+					{isVendor ? auth.user?.contactPerson?.name : auth.user?.name}
 				</Typography>
-				<Typography color="text.secondary" variant="body2">
-					<b>{auth.user?.email}</b>
+				<Typography
+					color="text.secondary"
+					variant="body2"
+					sx={{ fontSize: "0.75rem" }}
+				>
+					{isVendor ? auth.user?.contactPerson?.email : auth.user?.email}
 				</Typography>
 			</Box>
 			<Divider />

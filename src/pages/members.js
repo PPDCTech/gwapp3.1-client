@@ -230,7 +230,6 @@ const Members = () => {
 								{user?.position?.some((role) =>
 									["tech", "userManager"].includes(role),
 								) && (
-									<>
 										<Button
 											size="small"
 											variant="outlined"
@@ -241,7 +240,6 @@ const Members = () => {
 											<PersonAddIcon />
 											&nbsp; New Member
 										</Button>
-									</>
 								)}
 								<AddMemberModal
 									updateHandler={updateHandler}

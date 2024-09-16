@@ -8,6 +8,7 @@ import {
 import PropTypes from "prop-types";
 import { jwtDecode } from "jwt-decode";
 import { fetchSingleUser } from "../services/api/users.api";
+import { signin, viewAVendor } from "../services/vendor-api-Services";
 import { verifyLogin } from "../services/api/auth.api";
 
 const HANDLERS = {
@@ -15,7 +16,7 @@ const HANDLERS = {
 	SIGN_IN: "SIGN_IN",
 	SIGN_OUT: "SIGN_OUT",
 	SET_USER: "SET_USER",
-	FETCH_USER_DATA: "FETCH_USER_DATA"
+	FETCH_USER_DATA: "FETCH_USER_DATA",
 };
 
 const initialState = {
@@ -69,6 +70,7 @@ export const AuthProvider = ({ children }) => {
 
 	const isTokenExpired = () => {
 		const token = window.localStorage.getItem("token");
+		const isVendor = window.localStorage.getItem("isVendor") === "true";
 
 		if (token) {
 			const decodedToken = jwtDecode(token);
@@ -76,10 +78,14 @@ export const AuthProvider = ({ children }) => {
 			const isExpired = Date.now() > expirationTime;
 
 			if (isExpired) {
-				window.localStorage.clear();
-				window.location.href = "/user/login";
+				if (isVendor) {
+					window.localStorage.clear();
+					window.location.href = "/user/login?vendor=true";
+				} else {
+					window.localStorage.clear();
+					window.location.href = "/user/login";
+				}
 			}
-
 			return isExpired;
 		}
 		return true;
@@ -103,15 +109,21 @@ export const AuthProvider = ({ children }) => {
 			if (tokenExpired) return;
 
 			const userId = window.localStorage.getItem("gwapp_userId");
-			if (userId) {
-				const response = await fetchSingleUser(userId);
-				const user = response?.data;
+			const isVendor = window.localStorage.getItem("isVendor") === "true";
+			let response;
 
-				dispatch({
-					type: HANDLERS.INITIALIZE,
-					payload: user,
-				});
+			if (userId && isVendor) {
+				response = await viewAVendor(userId);
 			}
+			if (userId && !isVendor) {
+				response = await fetchSingleUser(userId);
+			}
+			const user = response?.data;
+
+			dispatch({
+				type: HANDLERS.INITIALIZE,
+				payload: user,
+			});
 		} else {
 			isTokenExpired();
 			dispatch({
@@ -148,11 +160,35 @@ export const AuthProvider = ({ children }) => {
 		}
 	};
 
+	const vendorSignIn = async (form) => {
+		try {
+			const response = await signin(form);
+			const { vendor } = response;
+
+			window.localStorage.setItem("gwapp_userId", vendor._id);
+			window.localStorage.setItem("authenticated", "true");
+			window.localStorage.setItem("isVendor", "true");
+			window.localStorage.setItem("token", vendor.token);
+
+			dispatch({
+				type: HANDLERS.SIGN_IN,
+				payload: vendor,
+			});
+			return response;
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	};
+
 	const signOut = () => {
 		["token", "authenticated", "gwapp_userId"].forEach((item) =>
 			window.localStorage.removeItem(item),
 		);
-		window.localStorage.clear();
+		const isVendor = window.localStorage.getItem("isVendor") === "true";
+		if (isVendor) {
+			window.localStorage.setItem("isVendor", "false");
+			window.location.href = "/user/login?vendor=true";
+		}
 		window.location.href = "/user/login";
 
 		dispatch({
@@ -163,7 +199,17 @@ export const AuthProvider = ({ children }) => {
 	const fetchUserData = async () => {
 		try {
 			const userId = window.localStorage.getItem("gwapp_userId");
-			if (userId) {
+
+			const isVendor = window.localStorage.getItem("isVendor") === "true";
+			if (userId && isVendor) {
+				const response = await viewAVendor(userId);
+				const user = response?.data;
+
+				dispatch({
+					type: HANDLERS.FETCH_USER_DATA,
+					payload: user,
+				});
+			} else {
 				const response = await fetchSingleUser(userId);
 				const user = response?.data;
 
@@ -178,7 +224,9 @@ export const AuthProvider = ({ children }) => {
 	};
 
 	return (
-		<AuthContext.Provider value={{ ...state, setUser, signIn, signOut, fetchUserData }}>
+		<AuthContext.Provider
+			value={{ ...state, setUser, signIn, vendorSignIn, signOut, fetchUserData }}
+		>
 			{children}
 		</AuthContext.Provider>
 	);

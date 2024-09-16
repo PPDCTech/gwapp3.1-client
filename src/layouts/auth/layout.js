@@ -95,8 +95,8 @@ export const Layout = (props) => {
 							</Box>
 						</Typography>
 						<Typography align="center" sx={{ mb: 3 }} variant="subtitle1">
-							A solution by PPDC, to track requisition requests, payment approvals and
-							manage records seamlessly
+							A solution by PPDC, to track requisition requests, payment approvals,
+							vendor listing, procurement management, and financial report generation.
 						</Typography>
 						<img
 							alt=""

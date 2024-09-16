@@ -10,7 +10,6 @@ import {
 	Divider,
 	Typography,
 } from "@mui/material";
-import { useAuth } from "../../hooks/use-auth";
 import { uploadFileAPI } from "../../services/api/uploads.api";
 import { capitalizeFirstLetter } from "../../services/helpers";
 import {
@@ -20,8 +19,7 @@ import {
 import { toast } from "react-toastify";
 import { Cancel } from "@mui/icons-material";
 
-export const AccountProfile = () => {
-	const { user, setUser } = useAuth();
+export const AccountProfile = ({ user, setUser }) => {
 	const [image, setImage] = useState(null);
 	const [signature, setSignature] = useState(null);
 	const [saving, setSaving] = useState(false);
@@ -121,7 +119,8 @@ export const AccountProfile = () => {
 						{user?.email}
 					</Typography>
 					<Typography variant="body2">
-						Role: {user.position
+						Role:{" "}
+						{user?.position
 							.slice(0, 2)
 							.map((pos) => capitalizeFirstLetter(pos))
 							.join(", ")}

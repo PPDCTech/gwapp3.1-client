@@ -3,6 +3,7 @@ import { Layout as AuthLayout } from "./layouts/auth/layout";
 import { Layout as DashboardLayout } from "./layouts/dashboard/layout";
 import Error from "./pages/404";
 import Login from "./pages/auth/login";
+import Register from "./pages/auth/register";
 import Account from "./pages/accounts";
 import Bin from "./pages/bin";
 import Overview from "./pages/overview";
@@ -10,18 +11,42 @@ import Profile from "./pages/profile";
 import Projects from "./pages/projects";
 import Requisitions from "./pages/requisitions";
 import Retirements from "./pages/retirements";
-import Vendors from "./pages/vendors";
 import Members from "./pages/members";
+import VendorList from "./pages/vendor-list";
+import EditProfile from "./pages/vendor-profile-edit";
+import CompleteRegistration from "./pages/complete-registration";
+import VendorProfile from "./pages/vendor-profile";
+import ContractList from "./pages/contract-list";
 
 const Router = () => {
 	return (
 		<BrowserRouter>
 			<Routes>
 				<Route
+					path="/vendor/:vendorId/complete-registration"
+					element={<CompleteRegistration />}
+				/>
+				<Route
 					path="/user/login"
 					element={
 						<AuthLayout>
 							<Login />
+						</AuthLayout>
+					}
+				/>
+				<Route
+					path="/vendor/:token/password-reset?open=true"
+					element={
+						<AuthLayout>
+							<Login />
+						</AuthLayout>
+					}
+				/>
+				<Route
+					path="/vendor/register"
+					element={
+						<AuthLayout>
+							<Register />
 						</AuthLayout>
 					}
 				/>
@@ -38,6 +63,14 @@ const Router = () => {
 					element={
 						<DashboardLayout>
 							<Profile />
+						</DashboardLayout>
+					}
+				/>
+				<Route
+					path="/vendor/:vendorId/profile"
+					element={
+						<DashboardLayout>
+							<VendorProfile />
 						</DashboardLayout>
 					}
 				/>
@@ -82,10 +115,26 @@ const Router = () => {
 					}
 				/>
 				<Route
-					path="/vendors"
+					path="/vendor-list"
 					element={
 						<DashboardLayout>
-							<Vendors />
+							<VendorList />
+						</DashboardLayout>
+					}
+				/>
+				<Route
+					path="/vendor/:vendorId/update-profile"
+					element={
+						<DashboardLayout>
+							<EditProfile />
+						</DashboardLayout>
+					}
+				/>
+				<Route
+					path="/contracts"
+					element={
+						<DashboardLayout>
+							<ContractList />
 						</DashboardLayout>
 					}
 				/>

@@ -25,6 +25,8 @@ const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
 
 export const TopNav = (props) => {
+	const isVendor = window.localStorage.getItem("isVendor") === "true";
+
 	const { onNavOpen } = props;
 	const { user } = useAuth();
 	const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
@@ -42,9 +44,9 @@ export const TopNav = (props) => {
 			// Flatten and merge all messages
 			const allMessages = data.flatMap((n) => n.messages || []);
 			// Count unread messages where user_id matches logged-in user
-			const count = allMessages.filter(
-				(message) => !message.read && message.user_id === user._id,
-			).length.toString();
+			const count = allMessages
+				.filter((message) => !message.read && message.user_id === user._id)
+				.length.toString();
 
 			setUnreadCount(count);
 		} catch (error) {
@@ -93,10 +95,12 @@ export const TopNav = (props) => {
 								</SvgIcon>
 							</IconButton>
 						)}
-						{`${greeting}, ${getFirstName(user?.name)}`}
+						{`${greeting}, ${getFirstName(
+							isVendor ? user?.contactPerson?.name : user?.name,
+						)}`}
 					</Stack>
 					<Stack alignItems="center" direction="row" spacing={2}>
-						<Tooltip 
+						<Tooltip
 							title={
 								unreadCount === "0"
 									? "No new message"

@@ -10,7 +10,6 @@ import {
 	TextField,
 	Unstable_Grid2 as Grid,
 } from "@mui/material";
-import { useAuth } from "../../hooks/use-auth";
 // import { toast } from "react-toastify";
 // import AuthCodeInputModal from "../../components/auth-code-modal";
 // import axios from "axios";
@@ -20,8 +19,7 @@ import { useAuth } from "../../hooks/use-auth";
 // 	VERIFY_PASSWORD_API,
 // } from "../../services/constants";
 
-export const AccountProfileDetails = () => {
-	const { user } = useAuth();
+export const AccountProfileDetails = ({ user, setUser }) => {
 	// const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
 	// const [code, setCode] = useState("");
 	// const [loading, setLoading] = useState(false);
@@ -116,7 +114,7 @@ export const AccountProfileDetails = () => {
 			<form autoComplete="off" noValidate>
 				<Card>
 					<CardHeader
-						subheader="You can change your password, photo and signature"
+						subheader="You can change your photo and signature"
 						title="Profile"
 					/>
 					<CardContent sx={{ pt: 0 }}>

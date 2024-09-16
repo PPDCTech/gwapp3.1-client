@@ -17,7 +17,7 @@ import { getUserRequisitions } from "../services/api/requisition.api";
 import { useNProgress } from "../hooks/use-nprogress";
 
 const Overview = () => {
-	    useNProgress();
+	useNProgress();
 	const { user } = useAuth();
 	const [loading, setLoading] = useState(true);
 	const [requisitions, setRequisitions] = useState([]);
@@ -93,6 +93,5 @@ const Overview = () => {
 		</>
 	);
 };
-
 
 export default Overview;
