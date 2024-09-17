@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
 	Button,
 	Dialog,
@@ -13,7 +13,6 @@ import {
 } from "@mui/material";
 import { toast } from "react-toastify";
 import { awardContract } from "../services/contract-api-Services";
-import { getAllVendors } from "../services/vendor-api-Services";
 
 const AwardContractModal = ({
 	open,
@@ -25,18 +24,10 @@ const AwardContractModal = ({
 	const [selectedContractor, setSelectedContractor] = useState({});
 	const [loading, setLoading] = useState(false);
 
-	const fetchContractors = useCallback(async () => {
-		try {
-			const res = await getAllVendors();
-			setContractors(res.vendors);
-		} catch (error) {
-			console.error("Failed to fetch contractors:", error);
-		}
-	}, []);
-
 	useEffect(() => {
-		fetchContractors();
-	}, [fetchContractors]);
+			setContractors(contractData?.applicants || []);
+		
+	}, [contractData]);
 
 	const handleAwardSubmit = async () => {
 		const payload = {

@@ -17,6 +17,8 @@ import EditProfile from "./pages/vendor-profile-edit";
 import CompleteRegistration from "./pages/complete-registration";
 import VendorProfile from "./pages/vendor-profile";
 import ContractList from "./pages/contract-list";
+import ApplicantList from "./pages/applicant-list";
+import PublicRegister from "./pages/auth/public-register";
 
 const Router = () => {
 	return (
@@ -25,6 +27,10 @@ const Router = () => {
 				<Route
 					path="/vendor/:vendorId/complete-registration"
 					element={<CompleteRegistration />}
+				/>
+				<Route
+					path="/public/vendor/registration"
+					element={<PublicRegister />}
 				/>
 				<Route
 					path="/user/login"
@@ -135,6 +141,14 @@ const Router = () => {
 					element={
 						<DashboardLayout>
 							<ContractList />
+						</DashboardLayout>
+					}
+				/>
+				<Route
+					path="/contract/applicants"
+					element={
+						<DashboardLayout>
+							<ApplicantList />
 						</DashboardLayout>
 					}
 				/>

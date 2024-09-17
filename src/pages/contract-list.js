@@ -82,6 +82,8 @@ const ContractList = () => {
 			setQuery("");
 		} else if (tabIndex === 1) {
 			setQuery("open");
+		} else if (tabIndex === 2) {
+			setQuery("awarded");
 		}
 	}, [tabIndex]);
 
@@ -134,6 +136,7 @@ const ContractList = () => {
 							>
 								<Tab label="All Contracts" />
 								<Tab label="Open Contracts" />
+								<Tab label="Awarded Contracts" />
 							</Tabs>
 							{tabIndex === 0 && (
 								<Box sx={{ mt: 2 }}>
@@ -154,6 +157,22 @@ const ContractList = () => {
 								<Box sx={{ mt: 2 }}>
 									<ContractsTable
 										title={"Open Contracts"}
+										loading={loading}
+										contracts={contracts}
+										totalPages={totalPages}
+										currentPage={currentPage}
+										handleNextPage={handleNextPage}
+										handlePreviousPage={handlePreviousPage}
+										limit={limit}
+										setKeyword={setKeyword}
+										fetchContracts={fetchContracts}
+									/>
+								</Box>
+							)}
+							{tabIndex === 2 && (
+								<Box sx={{ mt: 2 }}>
+									<ContractsTable
+										title={"Awarded Contracts"}
 										loading={loading}
 										contracts={contracts}
 										totalPages={totalPages}
