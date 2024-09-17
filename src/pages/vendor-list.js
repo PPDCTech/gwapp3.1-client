@@ -1,12 +1,32 @@
-import { Box, Container, Stack, Typography, Tab, Tabs } from "@mui/material";
-
 import { useState, useEffect, useCallback } from "react";
+import { Box, Container, Stack, Typography, Tab, Tabs } from "@mui/material";
 import { useNProgress } from "../hooks/use-nprogress";
 import { VendorsTable } from "../sections/vendors/vendors-table";
 import { getAllVendors } from "../services/vendor-api-Services";
+import { fetchSingleUser } from "../services/api/users.api";
+import { useAuth } from "../hooks/use-auth";
 
 const VendorList = () => {
 	useNProgress();
+	const auth = useAuth();
+	const [user, setUser] = useState(auth?.user);
+
+	const fetchUserData = useCallback(async () => {
+		try {
+			const userId = window.localStorage.getItem("gwapp_userId");
+			if (userId) {
+				const response = await fetchSingleUser(userId);
+				setUser(response?.data);
+				auth.fetchUserData();
+			}
+		} catch (error) {
+			console.error("Failed to fetch user data:", error);
+		}
+	}, [auth]);
+
+	useEffect(() => {
+		fetchUserData();
+	}, [fetchUserData]);
 
 	const [tabIndex, setTabIndex] = useState(0);
 	const [vendors, setVendors] = useState([]);
@@ -59,8 +79,31 @@ const VendorList = () => {
 		} else if (tabIndex === 1) {
 			setQuery("verified");
 			fetchVendors();
+		} else if (tabIndex === 2) {
+			setQuery("pending");
+			fetchVendors();
 		}
 	}, [tabIndex, fetchVendors]);
+
+useEffect(() => {
+	const allowedRoles = [
+		"tech",
+		"userManager",
+		"finance",
+		"financeReviewer",
+		"superUser",
+	];
+
+	const hasAllowedRole = user?.position?.some((role) =>
+		allowedRoles.includes(role),
+	);
+
+	if (!hasAllowedRole) {
+		setQuery("verified");
+		setTabIndex(1);
+	}
+}, [user]);
+
 
 	const handleTabChange = (event, newValue) => {
 		setTabIndex(newValue);
@@ -86,8 +129,25 @@ const VendorList = () => {
 								onChange={handleTabChange}
 								indicatorColor="primary"
 							>
-								<Tab label="All Vendors" />
+								{user?.position?.some((role) =>
+									[
+										"tech",
+										"userManager",
+										"finance",
+										"financeReviewer",
+										"superUser",
+									].includes(role),
+								) && <Tab label="All Vendors" />}
 								<Tab label="Verified Vendors" />
+								{user?.position?.some((role) =>
+									[
+										"tech",
+										"userManager",
+										"finance",
+										"financeReviewer",
+										"superUser",
+									].includes(role),
+								) && <Tab label="Pending Verification" />}
 							</Tabs>
 							{tabIndex === 0 && (
 								<Box sx={{ mt: 2 }}>
@@ -111,6 +171,23 @@ const VendorList = () => {
 									<VendorsTable
 										query={query}
 										title={"Verified Vendors"}
+										vendors={vendors}
+										setKeyword={setKeyword}
+										loading={loading}
+										fetchVendors={fetchVendors}
+										currentPage={currentPage}
+										totalPages={totalPages}
+										handleNextPage={handleNextPage}
+										handlePreviousPage={handlePreviousPage}
+										handleSearchChange={handleSearchChange}
+									/>
+								</Box>
+							)}
+							{tabIndex === 2 && (
+								<Box sx={{ mt: 2 }}>
+									<VendorsTable
+										query={query}
+										title={"Pending Verification"}
 										vendors={vendors}
 										setKeyword={setKeyword}
 										loading={loading}

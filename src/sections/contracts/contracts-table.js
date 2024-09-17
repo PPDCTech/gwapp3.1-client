@@ -11,6 +11,7 @@ import {
 	Divider,
 	TextField,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { fetchSingleUser } from "../../services/api/users.api";
 import { toast } from "react-toastify";
@@ -35,6 +36,7 @@ export const ContractsTable = ({
 	fetchContracts,
 	setKeyword,
 }) => {
+	const navigate = useNavigate();
 	const auth = useAuth();
 	const [user, setUser] = useState(auth?.user);
 	const [awardModalOpen, setAwardModalOpen] = useState(false);
@@ -339,6 +341,19 @@ export const ContractsTable = ({
 											) && (
 												<Button onClick={() => handleAward(contract)} color="success">
 													Award Contract
+												</Button>
+											)}
+											{user?.position?.some((role) =>
+												[
+													"tech",
+													"userManager",
+													"finance",
+													"financeReviewer",
+													"superUser",
+												].includes(role),
+											) && (
+												<Button onClick={() => navigate("/contract/applicants", { state: contract })} color="primary">
+													View Applicants
 												</Button>
 											)}
 											{user?.position?.some((role) =>
