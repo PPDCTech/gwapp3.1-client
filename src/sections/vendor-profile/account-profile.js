@@ -59,23 +59,32 @@ const StatusDisplay = ({ status }) => {
 
 const ActivityLogs = ({ history }) => (
 	<Card sx={{ maxHeight: 300, overflowY: "auto", mt: 2 }}>
-		<CardContent>
-			<Typography variant="h6" gutterBottom>
+		<Box
+			sx={{
+				position: "sticky",
+				top: 0,
+				backgroundColor: "white",
+				zIndex: 1,
+			}}
+		>
+			<Typography variant="h6" gutterBottom sx={{ m: 2 }}>
 				Activity Logs
 			</Typography>
+		</Box>
+		<CardContent>
 			{history && history?.length === 0 ? (
 				<Typography variant="body2" color="text.secondary">
 					No history logs available.
 				</Typography>
 			) : (
 				<List>
-					{history && history?.map((log, index) => (
+					{history?.map((log, index) => (
 						<Box key={index} component="span">
 							<ListItem alignItems="flex-start">
 								<ListItemText
 									primary={
 										<Typography variant="caption" sx={{ fontSize: "0.7rem" }}>
-											Activity:
+											Activity: &nbsp;
 										</Typography>
 									}
 									secondary={
@@ -94,7 +103,7 @@ const ActivityLogs = ({ history }) => (
 	</Card>
 );
 
-export const VendorAccountProfile = ({ vendor }) => {
+export const VendorAccountProfile = ({ vendor, isViewingOwnProfile }) => {
 	const contactPersonInfo = [
 		{ label: "Name", value: vendor?.contactPerson?.name },
 		{ label: "Email", value: vendor?.contactPerson?.email },
@@ -119,7 +128,7 @@ export const VendorAccountProfile = ({ vendor }) => {
 			<StatusDisplay status={vendor?.status} />
 
 			{/* Vendor History Logs Section */}
-			<ActivityLogs history={vendor?.history} />
+			{!isViewingOwnProfile && <ActivityLogs history={vendor?.history} />}
 		</Container>
 	);
 };

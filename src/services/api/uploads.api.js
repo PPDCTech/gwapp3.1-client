@@ -25,15 +25,15 @@ export const uploadFileAPI = async (formData) => {
   }
 };
 
-export const removeFileAPI = async (publicId) => {
+export const removeFileAPI = async (publicId, reqId) => {
   try {
     setAuthorizationHeader();
     const response = await axios.delete(`${API}/remove-file`, {
-      data: { publicId },
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+					data: { publicId, reqId },
+					headers: {
+						"Content-Type": "application/json",
+					},
+				});
     return response;
   } catch (error) {
     console.error("Error removing file:", error.message);

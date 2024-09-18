@@ -5,11 +5,8 @@ export const newContract = async (data) => {
 		const res = await httpServices.post("/contract/new", data);
 		return res.data;
 	} catch (err) {
-		let errorMessage = "Unable to create contract. Please try again later.";
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
@@ -18,11 +15,8 @@ export const applyForContract = async (contractId) => {
 		const response = await httpServices.put(`/contract/${contractId}/apply`);
 		return response;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
@@ -31,11 +25,8 @@ export const updateContract = async (id, form) => {
 		const response = await httpServices.put(`/contract/${id}/update`, form);
 		return response;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
@@ -44,11 +35,8 @@ export const deleteContract = async (id) => {
 		const response = await httpServices.delete(`/contract/delete/${id}`);
 		return response;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
@@ -57,11 +45,8 @@ export const awardContract = async (contractId, form) => {
 		const res = await httpServices.patch(`/contract/${contractId}/award`, form);
 		return res.data;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
@@ -70,11 +55,8 @@ export const viewAContract = async (id) => {
 		const res = await httpServices.get(`/contract/${id}/view`);
 		return res;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
@@ -91,10 +73,7 @@ export const getAllContracts = async (page, limit, status, keyword) => {
 		const res = await httpServices.get(url);
 		return res.data;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };

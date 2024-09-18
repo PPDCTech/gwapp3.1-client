@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
 	Button,
 	Dialog,
@@ -11,7 +11,6 @@ import {
 	Select,
 	TextField,
 	Grid,
-	Box,
 	OutlinedInput,
 } from "@mui/material";
 import { useAuth } from "../hooks/use-auth";
@@ -60,74 +59,59 @@ const CreateContractModal = ({
 }) => {
 	const { user } = useAuth();
 	const uniqueCategories = [...new Set(categoriesData)];
-	const [title, setTitle] = useState(contractData?.title || "");
-	const [projectCode, setProjectCode] = useState(
-		contractData?.projectCode || "",
-	);
-	const [category, setCategory] = useState(contractData?.category || "");
-	const [duration, setDuration] = useState(contractData?.duration || "");
-	const [value, setValue] = useState(contractData?.value || "");
-	const [currency, setCurrency] = useState(contractData?.currency || "NGN");
-	const [description, setDescription] = useState(
-		contractData?.description || "",
-	);
-	const [status, setStatus] = useState(contractData?.status || "open");
+	// State initialization
+	const [formFields, setFormFields] = useState({
+		title: "",
+		projectCode: "",
+		category: "",
+		duration: "",
+		value: "",
+		currency: "NGN",
+		description: "",
+		status: "open",
+	});
 
-	const [loadingC, setLoadingC] = useState(false);
-	const [loadingU, setLoadingU] = useState(false);
+	const [loading, setLoading] = useState(false);
 
-	const handleCategoryChange = (event) => {
-		 console.log(event.target.value); 
-			setCategory(event.target.value);
-	 };
-	
-	const handleCreateSubmit = async () => {
-		const contract = {
-			title,
-			projectCode,
-			category,
-			duration,
-			value,
-			currency,
-			description,
-			status,
-		};
-
-		try {
-			setLoadingC(true);
-			await newContract(contract);
-			toast.success("Contract created successfully");
-			setLoadingC(false);
-			onClose();
-			fetchContracts();
-		} catch (error) {
-			toast.error(error.message);
-			setLoadingC(false);
+	// Effect to populate fields in edit mode
+	useEffect(() => {
+		if (isEditMode && contractData) {
+			setFormFields({
+				title: contractData.title || "",
+				projectCode: contractData.projectCode || "",
+				category: contractData.category || "",
+				duration: contractData.duration || "",
+				value: contractData.value || "",
+				currency: contractData.currency || "NGN",
+				description: contractData.description || "",
+				status: contractData.status || "open",
+			});
 		}
+	}, [isEditMode, contractData]);
+
+	// Handle input change
+	const handleInputChange = (e) => {
+		const { name, value } = e.target;
+		setFormFields({ ...formFields, [name]: value });
 	};
-	const handleUpdateSubmit = async () => {
-		const contract = {
-			title,
-			projectCode,
-			category,
-			duration,
-			value,
-			currency,
-			description,
-			status,
-		};
 
-		setLoadingU(true);
-
+	// Create or Update contract
+	const handleSubmit = async () => {
+		setLoading(true);
 		try {
-			await updateContract(contractData._id, contract);
-			toast.success("Contract updated successfully");
-			setLoadingU(false);
-			onClose();
+			if (isEditMode) {
+				await updateContract(contractData._id, formFields);
+				toast.success("Contract updated successfully");
+			} else {
+				await newContract(formFields);
+				toast.success("Contract created successfully");
+			}
 			fetchContracts();
+			onClose();
 		} catch (error) {
 			toast.error(error.message);
-			setLoadingU(false);
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -137,23 +121,23 @@ const CreateContractModal = ({
 			<DialogContent>
 				<Grid container spacing={2}>
 					<Grid item xs={6}>
-						<FormControl fullWidth>
-							<TextField
-								fullWidth
-								label="Project Code or Name"
-								variant="outlined"
-								value={projectCode}
-								onChange={(e) => setProjectCode(e.target.value)}
-							/>
-						</FormControl>
+						<TextField
+							fullWidth
+							label="Project Code or Name"
+							variant="outlined"
+							name="projectCode"
+							value={formFields.projectCode}
+							onChange={handleInputChange}
+						/>
 					</Grid>
 					<Grid item xs={6}>
 						<TextField
 							fullWidth
 							label="Title"
 							variant="outlined"
-							value={title}
-							onChange={(e) => setTitle(e.target.value)}
+							name="title"
+							value={formFields.title}
+							onChange={handleInputChange}
 						/>
 					</Grid>
 					<Grid item xs={6}>
@@ -161,8 +145,9 @@ const CreateContractModal = ({
 							<InputLabel>Category</InputLabel>
 							<Select
 								label="Category"
-								value={category}
-								onChange={handleCategoryChange}
+								name="category"
+								value={formFields.category}
+								onChange={handleInputChange}
 								input={<OutlinedInput label="Category" />}
 							>
 								{uniqueCategories.map((category) => (
@@ -178,8 +163,9 @@ const CreateContractModal = ({
 							fullWidth
 							label="Duration"
 							variant="outlined"
-							value={duration}
-							onChange={(e) => setDuration(e.target.value)}
+							name="duration"
+							value={formFields.duration}
+							onChange={handleInputChange}
 						/>
 					</Grid>
 					<Grid item xs={6}>
@@ -188,8 +174,9 @@ const CreateContractModal = ({
 							label="Value"
 							type="number"
 							variant="outlined"
-							value={value}
-							onChange={(e) => setValue(e.target.value)}
+							name="value"
+							value={formFields.value}
+							onChange={handleInputChange}
 						/>
 					</Grid>
 					<Grid item xs={6}>
@@ -197,8 +184,9 @@ const CreateContractModal = ({
 							<InputLabel>Currency</InputLabel>
 							<Select
 								label="Currency"
-								value={currency}
-								onChange={(e) => setCurrency(e.target.value)}
+								name="currency"
+								value={formFields.currency}
+								onChange={handleInputChange}
 							>
 								<MenuItem value="NGN">NGN</MenuItem>
 								<MenuItem value="USD">USD</MenuItem>
@@ -213,8 +201,9 @@ const CreateContractModal = ({
 							variant="outlined"
 							multiline
 							rows={4}
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
+							name="description"
+							value={formFields.description}
+							onChange={handleInputChange}
 						/>
 					</Grid>
 					<Grid item xs={6}>
@@ -222,8 +211,9 @@ const CreateContractModal = ({
 							<InputLabel>Status</InputLabel>
 							<Select
 								label="Status"
-								value={status}
-								onChange={(e) => setStatus(e.target.value)}
+								name="status"
+								value={formFields.status}
+								onChange={handleInputChange}
 							>
 								<MenuItem value="open">Open</MenuItem>
 								<MenuItem value="closed">Closed</MenuItem>
@@ -236,26 +226,20 @@ const CreateContractModal = ({
 				<Button onClick={onClose} color="error">
 					Cancel
 				</Button>
-				{isEditMode && (
-					<Button
-						onClick={handleUpdateSubmit}
-						color="success"
-						disabled={loadingU}
-						variant="contained"
-					>
-						{loadingU ? "Updating..." : "Update"}
-					</Button>
-				)}
-				{!isEditMode && (
-					<Button
-						onClick={handleCreateSubmit}
-						color="success"
-						disabled={loadingC}
-						variant="contained"
-					>
-						{loadingC ? "Creating..." : "Create"}
-					</Button>
-				)}
+				<Button
+					onClick={handleSubmit}
+					color="success"
+					disabled={loading}
+					variant="contained"
+				>
+					{loading
+						? isEditMode
+							? "Updating..."
+							: "Creating..."
+						: isEditMode
+						? "Update"
+						: "Create"}
+				</Button>
 			</DialogActions>
 		</Dialog>
 	);

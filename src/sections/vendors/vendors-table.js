@@ -252,16 +252,19 @@ export const VendorsTable = ({
 											{vendor?.documents?.map((document, index) => (
 												<Grid item key={index}>
 													{isImage(document.url) ? (
-														<img
-															src={document.url}
-															alt={document.name}
-															style={{
-																width: "100px",
-																height: "100px",
-																cursor: "pointer",
-															}}
-															onClick={() => window.open(document.url, "_blank")}
-														/>
+														<div style={{ display: "flex", flexDirection: "column" }}>
+															<img
+																src={document.url}
+																alt={document.name}
+																style={{
+																	width: "100px",
+																	height: "100px",
+																	cursor: "pointer",
+																}}
+																onClick={() => window.open(document.url, "_blank")}
+															/>
+															<Typography variant="caption">{document.name}</Typography>
+														</div>
 													) : (
 														<div
 															style={{

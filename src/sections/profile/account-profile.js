@@ -120,10 +120,12 @@ export const AccountProfile = ({ user, setUser }) => {
 					</Typography>
 					<Typography variant="body2">
 						Role:{" "}
-						{user?.position
-							.slice(0, 2)
-							.map((pos) => capitalizeFirstLetter(pos))
-							.join(", ")}
+						{Array.isArray(user?.position)
+							? user.position
+									.slice(0, 2)
+									.map((pos) => capitalizeFirstLetter(pos))
+									.join(", ")
+							: ""}
 					</Typography>
 				</Box>
 			</CardContent>

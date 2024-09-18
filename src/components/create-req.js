@@ -570,13 +570,11 @@ const CreateReqModal = ({
 
 	const handleRemoveFile = async (index, id) => {
 		try {
-			const response = await removeFileAPI(id);
-			if (response.status === 204) {
-				if (!retireMode) {
-					setInvoiceArray((prevArray) => prevArray.filter((_, i) => i !== index));
-				} else {
-					setRetirementFiles((prevArray) => prevArray.filter((_, i) => i !== index));
-				}
+			await removeFileAPI(id, requisitionData._id);
+			if (!retireMode) {
+				setInvoiceArray((prevArray) => prevArray.filter((file) => file.id !== id));
+			} else {
+				setRetirementFiles((prevArray) => prevArray.filter((file) => file.id !== id));
 			}
 		} catch (error) {
 			toast.error(`Error deleting file: ${error.message}`);

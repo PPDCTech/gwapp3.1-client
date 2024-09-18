@@ -1,5 +1,5 @@
 import { useCallback, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import {
@@ -25,10 +25,9 @@ const Login = () => {
 	useNProgress();
 	const auth = useAuth();
 	const navigate = useNavigate();
-	const { token } = useParams();
-
 	const [openModal, setOpenModal] = useState(false);
 	const [openResetModal, setOpenResetModal] = useState(false);
+	const [newToken, setNewToken] = useState("");
 
 	const [loadingSubmit, setLoadingSubmit] = useState(false);
 	const [method, setMethod] = useState("staff");
@@ -46,10 +45,12 @@ const Login = () => {
 		// search if vendor = true set method to vendor
 		const urlSearchParams = new URLSearchParams(window.location.search);
 		const open = urlSearchParams.get("open");
+		const token = urlSearchParams.get("token");
 		if (open === "true" && token) {
+			setNewToken(token);
 			setOpenResetModal(true);
 		}
-	}, [token]);
+	}, []);
 
 	const formik = useFormik({
 		initialValues: {
@@ -299,7 +300,7 @@ const Login = () => {
 				<ResetPasswordModal
 					openModal={openResetModal}
 					setOpenModal={setOpenResetModal}
-					token={token}
+					token={newToken}
 				/>
 			</Box>
 		</>

@@ -26,7 +26,7 @@ const ResetPasswordModal = ({ openModal, setOpenModal, token }) => {
 			if (res && res.status === 200) {
 				setLoading(false);
 				setOpenModal(!openModal);
-				toast.success(res.message);
+				toast.success(res.data.message);
 			}
 		} catch (error) {
 			toast.warning(error.message);

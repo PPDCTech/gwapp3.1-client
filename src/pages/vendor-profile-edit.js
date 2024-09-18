@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
 	Box,
 	Button,
@@ -103,9 +103,8 @@ const EditProfile = () => {
 	const [files, setFiles] = useState([]);
 	const [documentNames, setDocumentNames] = useState([]);
 
-	useEffect(() => {
-		// Fetch vendor data and populate state
-		const fetchVendorData = async () => {
+	// Fetch vendor data and populate state
+		const fetchVendorData = useCallback(async () => {
 			try {
 				const response = await viewAVendor(userId);
 				const vendor = response.data;
@@ -117,10 +116,11 @@ const EditProfile = () => {
 			} catch (error) {
 				console.error("Failed to fetch vendor data:", error);
 			}
-		};
+		}, [userId]);
 
+	useEffect(() => {
 		fetchVendorData();
-	}, [userId]);
+	}, [fetchVendorData]);
 
 	const handleAccountDetailsChange = (e) => {
 		setAccountDetails({ ...accountDetails, [e.target.name]: e.target.value });
@@ -140,6 +140,7 @@ const EditProfile = () => {
 		try {
 			await updateProfile(userId, { accountDetails });
 			setSubmittingAccountDetails(false);
+			fetchVendorData();
 			toast.success("Account details updated successfully.");
 		} catch (error) {
 			toast.error(error.message);
@@ -153,6 +154,7 @@ const EditProfile = () => {
 		try {
 			await updateProfile(userId, { contactPerson });
 			setSubmittingContactPerson(false);
+			fetchVendorData();
 			toast.success("Contact person updated successfully.");
 		} catch (error) {
 			toast.error(error.message);
@@ -166,6 +168,7 @@ const EditProfile = () => {
 		try {
 			await updateProfile(userId, { businessDetails });
 			setSubmittingBusinessDetails(false);
+			fetchVendorData();
 			toast.success("Business details updated successfully.");
 		} catch (error) {
 			toast.error(error.message);
@@ -179,6 +182,7 @@ const EditProfile = () => {
 		try {
 			await updateProfile(userId, { categories });
 			setSubmittingCategories(false);
+			fetchVendorData();
 			toast.success("Categories updated successfully.");
 		} catch (error) {
 			toast.error(error.message);
@@ -222,9 +226,9 @@ const EditProfile = () => {
 		event.preventDefault();
 		setSubmittingFiles(true);
 
-		// Ensure that files and documentNames arrays have the same length
-		if (files.length !== documentNames.length) {
-			toast.error("The number of files must match the number of document names.");
+		// validate and ensure that files and documentNames arrays are not empty
+		if (files.length === 0 || documentNames.length === 0) {
+			toast.error("Please select files and provide corresponding document names.");
 			setSubmittingFiles(false);
 			return;
 		}
@@ -241,6 +245,7 @@ const EditProfile = () => {
 			// Call the API to upload files and form data
 			await updateProfile(userId, formData);
 			setSubmittingFiles(false);
+			fetchVendorData();
 			toast.success("Files uploaded successfully.");
 		} catch (error) {
 			toast.error(error.message);
@@ -278,7 +283,8 @@ const EditProfile = () => {
 
 	const handleDelete = async (doc) => {
 		try {
-			await removeFile(doc._id, doc)
+			await removeFile(doc)
+			fetchVendorData();
 			toast.success("Document deleted successfully");
 		} catch (error) {
 			toast.error(error.message);

@@ -28,10 +28,7 @@ const Router = () => {
 					path="/vendor/:vendorId/complete-registration"
 					element={<CompleteRegistration />}
 				/>
-				<Route
-					path="/public/vendor/registration"
-					element={<PublicRegister />}
-				/>
+				<Route path="/public/vendor/registration" element={<PublicRegister />} />
 				<Route
 					path="/user/login"
 					element={
@@ -41,7 +38,7 @@ const Router = () => {
 					}
 				/>
 				<Route
-					path="/vendor/:token/password-reset?open=true"
+					path="/vendor/password-reset"
 					element={
 						<AuthLayout>
 							<Login />

@@ -5,11 +5,8 @@ export const signin = async (userData) => {
 		const res = await httpServices.post("/public/vendor/signin", userData);
 		return res.data;
 	} catch (err) {
-		let errorMessage = "Unable to login. Please try again later.";
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
@@ -18,11 +15,8 @@ export const signup = async (form) => {
 		const response = await httpServices.post("/public/vendor/signup", form);
 		return response;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
@@ -34,25 +28,18 @@ export const updateProfile = async (id, form) => {
 		);
 		return res.data;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
 export const requestResetPassword = async (form) => {
 	try {
 		const res = await httpServices.post("/public/vendor/reset-password", form);
-
-		return res.data;
+		return res;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
@@ -62,13 +49,10 @@ export const verifyTokenAndResetPassword = async (form) => {
 			"/public/vendor/confirm-reset-password",
 			form,
 		);
-		return res.data;
+		return res;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
@@ -77,27 +61,18 @@ export const changePassword = async (form) => {
 		const res = await httpServices.patch("/public/vendor/change-password", form);
 		return res.data;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
-export const removeFile = async (fileId, doc) => {
+export const removeFile = async (doc) => {
 	try {
-		const res = await httpServices.delete(
-			`/public/vendor/remove-file/${fileId}`,
-			doc,
-		);
+		const res = await httpServices.post("/public/vendor/remove-file", doc);
 		return res.data;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
@@ -109,11 +84,8 @@ export const adminChangeStatus = async (form) => {
 		);
 		return res.data;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
@@ -122,11 +94,8 @@ export const adminDeleteVendor = async (id) => {
 		const res = await httpServices.delete(`/public/vendor/admin/delete/${id}`);
 		return res.data;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
@@ -143,11 +112,8 @@ export const getAllVendors = async (page, limit, status, keyword) => {
 		const res = await httpServices.get(url);
 		return res.data;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
 
@@ -156,10 +122,7 @@ export const viewAVendor = async (id) => {
 		const res = await httpServices.get(`/public/vendor/${id}/view`);
 		return res;
 	} catch (err) {
-		let errorMessage;
-		if (err.response && err.response.data && err.response.data.message) {
-			errorMessage = err.response.data.message;
-		}
-		throw new Error(errorMessage);
+		console.error("Error occurred:", err);
+		throw new Error(err.response.data.message || err.response.data.error);
 	}
 };
