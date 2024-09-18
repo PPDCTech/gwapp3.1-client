@@ -25,6 +25,7 @@ const VendorProfile = ({ user }) => {
 	const [loading, setLoading] = useState(true);
 	const [isViewingOwnProfile, setIsViewingOwnProfile] = useState(false);
 
+	console.log("VEN::", vendor)
 	useEffect(() => {
 		if (user) {
 			setIsViewingOwnProfile(true);

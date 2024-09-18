@@ -298,20 +298,24 @@ export const ContractsTable = ({
 												<Button
 													onClick={() => handleIndicateInterest(contract._id)}
 													color={
-														contract?.applicants?.includes(user?._id) ||
-														contract?.awardedVendor
+														contract?.applicants?.some(
+															(applicant) => applicant._id === user?._id,
+														) || contract?.awardedVendor
 															? "success"
 															: "warning"
 													}
-													// if contract applicants contains the user id, disable the button
-													// if constract has awardedVendor, disable the button
 													disabled={
-														contract?.applicants?.includes(user?._id) ||
-														contract?.awardedVendor
+														contract?.applicants?.some(
+															(applicant) => applicant._id === user?._id,
+														) || contract?.awardedVendor
 													}
 													variant="outlined"
 												>
-													Indicate Interest
+													{contract?.applicants?.some(
+														(applicant) => applicant._id === user?._id,
+													)
+														? "Applied"
+														: "Indicate Interest"}
 												</Button>
 											)}
 											{user?.position?.some((role) =>
@@ -352,7 +356,12 @@ export const ContractsTable = ({
 													"superUser",
 												].includes(role),
 											) && (
-												<Button onClick={() => navigate("/contract/applicants", { state: contract })} color="primary">
+												<Button
+													onClick={() =>
+														navigate("/contract/applicants", { state: contract })
+													}
+													color="primary"
+												>
 													View Applicants
 												</Button>
 											)}
