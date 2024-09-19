@@ -25,7 +25,7 @@ const Router = () => {
 		<BrowserRouter>
 			<Routes>
 				<Route
-					path="/vendor/:vendorId/complete-registration"
+					path="/vendor/complete-registration"
 					element={<CompleteRegistration />}
 				/>
 				<Route path="/public/vendor/registration" element={<PublicRegister />} />

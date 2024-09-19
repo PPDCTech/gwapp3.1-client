@@ -6,6 +6,7 @@ import { useAuth } from "../../hooks/use-auth";
 import { useNProgress } from "../../hooks/use-nprogress";
 import { signup } from "../../services/vendor-api-Services";
 import { toast } from "react-toastify";
+import InfoIcon from "@mui/icons-material/Info"; // Add an info icon for the notice
 
 const Register = () => {
 	useNProgress();
@@ -71,7 +72,17 @@ const Register = () => {
 				>
 					<div>
 						<Stack spacing={1} sx={{ mb: 3 }}>
-							<Typography variant="h6">Vendor Register</Typography>
+							<Typography variant="h6">
+								Sign up to our vendor list to receive firsthand information on
+								procurement listings and advertisements.
+							</Typography>
+							<Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 3 }}>
+								<InfoIcon color="info" />
+								<Typography variant="body2">
+									Fill out the form, and a unique link will be sent to your email for
+									profile completion.
+								</Typography>
+							</Stack>
 						</Stack>
 						<form noValidate onSubmit={formik.handleSubmit}>
 							<Stack spacing={3}>

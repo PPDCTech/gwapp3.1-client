@@ -249,66 +249,74 @@ export const VendorsTable = ({
 													</Typography>
 												)
 											}
-											{vendor?.documents?.map((document, index) => (
-												<Grid item key={index}>
-													{isImage(document.url) ? (
-														<div style={{ display: "flex", flexDirection: "column" }}>
-															<img
-																src={document.url}
-																alt={document.name}
+											<Grid container spacing={2}>
+												{vendor?.documents?.map((document, index) => (
+													<Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+														{isImage(document.url) ? (
+															<div
 																style={{
-																	width: "100px",
-																	height: "100px",
+																	display: "flex",
+																	flexDirection: "column",
+																	alignItems: "center",
+																}}
+															>
+																<img
+																	src={document.url}
+																	alt={document.name}
+																	style={{
+																		width: "100px",
+																		height: "100px",
+																		cursor: "pointer",
+																	}}
+																	onClick={() => window.open(document.url, "_blank")}
+																/>
+																<Typography variant="caption">{document.name}</Typography>
+															</div>
+														) : (
+															<div
+																style={{
+																	width: "fit-content",
+																	height: "fit-content",
+																	padding: "5px",
+																	backgroundColor: "#E5E7EB",
+																	textAlign: "center",
+																	display: "flex",
+																	flexDirection: "column",
+																	justifyContent: "center",
+																	alignItems: "center",
 																	cursor: "pointer",
+																	borderRadius: "5px",
+																	transition: "background-color 0.3s ease",
 																}}
-																onClick={() => window.open(document.url, "_blank")}
-															/>
-															<Typography variant="caption">{document.name}</Typography>
-														</div>
-													) : (
-														<div
-															style={{
-																width: "fit-content",
-																height: "fit-content",
-																padding: "5px",
-																backgroundColor: "#E5E7EB",
-																textAlign: "center",
-																display: "flex",
-																flexDirection: "column",
-																justifyContent: "center",
-																alignItems: "center",
-																cursor: "pointer",
-																borderRadius: "5px",
-																transition: "background-color 0.3s ease",
-															}}
-															onClick={() => {
-																if (
-																	document.name.endsWith(".xlsx") ||
-																	document.name.endsWith(".csv")
-																) {
-																	downloadFile(document.url, document.name);
-																} else {
-																	window.open(document.url, "_blank");
+																onClick={() => {
+																	if (
+																		document.name.endsWith(".xlsx") ||
+																		document.name.endsWith(".csv")
+																	) {
+																		downloadFile(document.url, document.name);
+																	} else {
+																		window.open(document.url, "_blank");
+																	}
+																}}
+																onMouseEnter={(e) =>
+																	(e.currentTarget.style.backgroundColor = "#D2D6DB")
 																}
-															}}
-															onMouseEnter={(e) =>
-																(e.currentTarget.style.backgroundColor = "#D2D6DB")
-															}
-															onMouseLeave={(e) =>
-																(e.currentTarget.style.backgroundColor = "#E5E7EB")
-															}
-														>
-															<DocumentIcon
-																style={{
-																	height: 24,
-																	width: 24,
-																}}
-															/>
-															<Typography variant="caption">{document.name}</Typography>
-														</div>
-													)}
-												</Grid>
-											))}
+																onMouseLeave={(e) =>
+																	(e.currentTarget.style.backgroundColor = "#E5E7EB")
+																}
+															>
+																<DocumentIcon
+																	style={{
+																		height: 24,
+																		width: 24,
+																	}}
+																/>
+																<Typography variant="caption">{document.name}</Typography>
+															</div>
+														)}
+													</Grid>
+												))}
+											</Grid>
 										</Grid>
 
 										{/* Contact Person */}
