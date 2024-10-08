@@ -77,30 +77,38 @@ export const getDateYearMonthDay = (dateString) => {
 // };
 
 export const tobase64 = (url) => {
-  return new Promise((resolve, reject) => {
-    const canvas = document.createElement("canvas");
-    const img = new Image();
-    const ctx = canvas.getContext("2d");
+	console.log("URL: ", url);
 
-    img.crossOrigin = "anonymous";
+	return new Promise((resolve, reject) => {
+		// Handle null or undefined URL
+		if (!url) {
+			console.warn("No URL provided, returning empty string.");
+			resolve(""); // Resolve with an empty string if URL is null or undefined
+			return;
+		}
 
-    img.onload = function () {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-      const dataUrl = canvas.toDataURL("image/png");
-      resolve(dataUrl);
-    };
+		const canvas = document.createElement("canvas");
+		const img = new Image();
+		const ctx = canvas.getContext("2d");
 
-    img.onerror = function (e) {
-      console.error("Failed to load image:", e.message);
-      reject(new Error(`Failed to load image from URL: ${url}. Error: ${e.message}`));
-    };
+		img.crossOrigin = "anonymous";
 
-    img.src = url;
-  });
+		img.onload = function () {
+			canvas.width = img.width;
+			canvas.height = img.height;
+			ctx.drawImage(img, 0, 0);
+			const dataUrl = canvas.toDataURL("image/png");
+			resolve(dataUrl);
+		};
+
+		img.onerror = function (e) {
+			console.error("Failed to load image:", e.message);
+			resolve(""); // Resolve with an empty string instead of rejecting
+		};
+
+		img.src = url;
+	});
 };
-
 
 export const capitalizeFirstLetter = (str) => {
   if (!str) {

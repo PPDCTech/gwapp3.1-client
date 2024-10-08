@@ -177,7 +177,7 @@ export const RequisitionTable = ({
 				</Typography>
 			)}
 
-			{(!loading && requisitions?.length === 0) && (
+			{!loading && requisitions?.length === 0 && (
 				<Typography sx={{ mt: 2 }}>No requisitions found.</Typography>
 			)}
 			{requisitions && requisitions?.length > 0 && (
@@ -404,7 +404,8 @@ export const RequisitionTable = ({
 														) : null}
 
 														{/* Conditions for Printing */}
-														{requisition?.status === "approved" &&
+														{(requisition?.status === "approved" ||
+															user?.position?.some((role) => ["tech"].includes(role))) &&
 														(requisition?.user?.name === user?.name ||
 															requisition?.user?.email === user?.email ||
 															user?.position?.some((role) => ["tech"].includes(role))) ? (
