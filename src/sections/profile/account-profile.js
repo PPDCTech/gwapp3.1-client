@@ -142,7 +142,7 @@ export const AccountProfile = ({ user, setUser }) => {
 						Upload picture
 					</Button>
 					<input
-						accept="png jpg jpeg"
+						accept=".png, .jpg, .jpeg" // Updated to use proper format for file types
 						style={{ display: "none" }}
 						id="upload-button"
 						type="file"
@@ -200,7 +200,7 @@ export const AccountProfile = ({ user, setUser }) => {
 						Upload Signature
 					</Button>
 					<input
-						accept="png jpg jpeg"
+						accept=".png, .jpg, .jpeg" // Updated to use proper format for file types
 						style={{ display: "none" }}
 						id="upload-sig-button"
 						type="file"
