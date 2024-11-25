@@ -56,7 +56,7 @@ const Router = () => {
 					}
 				/>
 				<Route
-					path="/"
+					path="/dashboard"
 					element={
 						<DashboardLayout>
 							<Overview />
@@ -160,7 +160,6 @@ const Router = () => {
 					}
 				/>
 				<Route path="*" element={<Error />} />
-				{/* Add more routes as needed */}
 			</Routes>
 		</BrowserRouter>
 	);
