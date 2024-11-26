@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     Toolbar,
     Typography,
@@ -186,6 +186,15 @@ const LandingPage = () => {
 
     const redirectTo = auth.isAuthenticated ? "/dashboard" : "/user/login";
 
+    const featuresRef = useRef(null);
+    const pricingRef = useRef(null);
+
+    const scrollToSection = (ref) => {
+        if (ref && ref.current) {
+            ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    };
+
     return (
         <>
             <CssBaseline />
@@ -232,17 +241,15 @@ const LandingPage = () => {
                         <Box>
                             <Button
                                 color="inherit"
-                                component={Link}
-                                to="#features"
                                 sx={{ color: "white" }}
+                                onClick={() => scrollToSection(featuresRef)}
                             >
                                 Features
                             </Button>
                             <Button
                                 color="inherit"
-                                component={Link}
-                                to="#pricing"
                                 sx={{ color: "white" }}
+                                onClick={() => scrollToSection(pricingRef)}
                             >
                                 Pricing
                             </Button>
@@ -294,7 +301,7 @@ const LandingPage = () => {
             </Box>
 
             <Container maxWidth="lg">
-                <Box py={8} id="features">
+                <Box py={8} id="features" ref={featuresRef}>
                     <SectionTitle
                         variant="h2"
                         component="h2"
@@ -350,7 +357,7 @@ const LandingPage = () => {
                 </Box>
             </Container>
 
-            <Box py={8} id="pricing" sx={{ backgroundColor: neutral[100] }}>
+            <Box py={8} id="pricing" sx={{ backgroundColor: neutral[100] }} ref={pricingRef}>
                 <SectionTitle
                     variant="h2"
                     component="h2"
