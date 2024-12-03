@@ -23,7 +23,7 @@ import DownloadingOutlinedIcon from "@mui/icons-material/DownloadingOutlined";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
 import {
-	getApprovedForPrint,
+	getForDownload,
 	searchFilterRequisitions,
 } from "../../services/api/requisition.api";
 import { currentDate } from "../../services/helpers";
@@ -55,9 +55,9 @@ export const FilterRequisitions = ({
 		}
 	}, []);
 
-		useEffect(() => {
-			fetchUserData();
-		}, [fetchUserData]);
+	useEffect(() => {
+		fetchUserData();
+	}, [fetchUserData]);
 
 	const [filters, setFilters] = useState({
 		user_email: "",
@@ -158,7 +158,7 @@ export const FilterRequisitions = ({
 				return acc;
 			}, {});
 
-			const response = await getApprovedForPrint(activeFilters);
+			const response = await getForDownload(activeFilters);
 
 			// Create a blob object from the response data
 			const blob = new Blob([response.data], { type: "text/csv" });
@@ -169,7 +169,12 @@ export const FilterRequisitions = ({
 			// Create a temporary anchor element
 			const link = document.createElement("a");
 			link.href = url;
-			link.setAttribute("download", `approved_requisitions-${currentDate}.csv`);
+			link.setAttribute(
+				"download",
+				`${
+					filters.status ? filters.status : "all"
+				}_requisitions-${currentDate}.csv`,
+			);
 
 			// Append the anchor element to the body
 			document.body.appendChild(link);
@@ -183,6 +188,7 @@ export const FilterRequisitions = ({
 			setDownloadingCSV(false);
 			setFetchingForDownload(false);
 		} catch (error) {
+			console.error("Error downloading CSV:", error);
 			toast.error("An error occurred. Please try again.");
 			setDownloadingCSV(false);
 			setFetchingForDownload(false);
@@ -249,7 +255,8 @@ export const FilterRequisitions = ({
 					) && (
 						<Grid item xs={6} md={4}>
 							<Autocomplete
-								options={users.map((user) => user.name)}
+								options={users.map((user) => ({ label: user.name, id: user.email }))}
+								getOptionLabel={(option) => option.label}
 								renderInput={(params) => (
 									<TextField
 										{...params}
@@ -259,7 +266,7 @@ export const FilterRequisitions = ({
 									/>
 								)}
 								onChange={(event, value) => {
-									const selectedUser = users.find((user) => user.name === value);
+									const selectedUser = users.find((user) => user.email === value?.id);
 									if (selectedUser) {
 										setFilters((prevFilters) => ({
 											...prevFilters,

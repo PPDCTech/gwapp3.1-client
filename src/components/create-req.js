@@ -568,13 +568,13 @@ const CreateReqModal = ({
 		setSelectedFiles(updatedFiles);
 	};
 
-	const handleRemoveFile = async (index, id) => {
+	const handleRemoveFile = async (del) => {
 		try {
-			await removeFileAPI(id, requisitionData._id);
+			await removeFileAPI(del.id, requisitionData._id);
 			if (!retireMode) {
-				setInvoiceArray((prevArray) => prevArray.filter((file) => file.id !== id));
+				setInvoiceArray((prevArray) => prevArray.filter((file) => file.id !== del.id));
 			} else {
-				setRetirementFiles((prevArray) => prevArray.filter((file) => file.id !== id));
+				setRetirementFiles((prevArray) => prevArray.filter((file) => file.id !== del.id));
 			}
 		} catch (error) {
 			toast.error(`Error deleting file: ${error.message}`);
@@ -954,7 +954,7 @@ const CreateReqModal = ({
 														</SvgIcon>
 													</IconButton>
 													<IconButton
-														onClick={() => handleRemoveFile(index, file.id)}
+														onClick={() => handleRemoveFile(file)}
 														aria-label="Delete"
 														color="error"
 														sx={{ fontSize: "10px" }}
@@ -986,7 +986,7 @@ const CreateReqModal = ({
 												</IconButton>
 												{!retireMode ? (
 													<IconButton
-														onClick={() => handleRemoveFile(index, file.id)}
+														onClick={() => handleRemoveFile(file)}
 														aria-label="Delete"
 														color="error"
 														sx={{ fontSize: "10px" }}
