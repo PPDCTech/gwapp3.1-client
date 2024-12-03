@@ -4,10 +4,11 @@ let API = "https://gwapp3-api.vercel.app";
 // let SOCKET_API = "wss://gwapp-api.onrender.com";
 let SOCKET_API = "wss://gwapp3-api.vercel.app";
 
-// if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
-// 	API = "http://localhost:3333";
-// } else {
-// 	API = process.env.REACT_APP_API;
-// }
+if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
+	API = "http://localhost:3333";
+} else {
+	// API = process.env.REACT_APP_API;
+	API = "https://gwapp3-api.vercel.app";
+}
 
 export { API, SOCKET_API };
