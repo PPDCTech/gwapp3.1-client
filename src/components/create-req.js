@@ -569,8 +569,9 @@ const CreateReqModal = ({
 	};
 
 	const handleRemoveFile = async (del) => {
+		const redId = requisitionData ? requisitionData._id : "";
 		try {
-			await removeFileAPI(del.id, requisitionData._id);
+			await removeFileAPI(del.id, redId);
 			if (!retireMode) {
 				setInvoiceArray((prevArray) => prevArray.filter((file) => file.id !== del.id));
 			} else {

@@ -41,6 +41,7 @@ import {
 	sendBackRequisition,
 } from "../../services/api/requisition.api";
 import { getDateMDY } from "../../services/helpers";
+import { fetchSingleUser } from "../../services/api/users.api";
 import CreateReqModal from "../../components/create-req";
 import { printDocument } from "../../utils/print-document";
 import { toast } from "react-toastify";
@@ -62,7 +63,24 @@ export const RequisitionTable = ({
 	onPageChange,
 	onLimitChange,
 }) => {
-	const { user } = useAuth();
+	const auth = useAuth();
+	const userId = window.localStorage.getItem("gwapp_userId");
+	const [user, setUser] = useState(auth?.user);
+
+	const fetchUserData = useCallback(async () => {
+		try {
+			const response = await fetchSingleUser(userId);
+			setUser(response?.data);
+			auth.fetchUserData();
+		} catch (error) {
+			console.error("Failed to fetch user data:", error);
+		}
+	}, [auth, userId]);
+
+	useEffect(() => {
+		fetchUserData();
+	}, [fetchUserData]);
+
 	const [isChatModalOpen, setIsChatModalOpen] = useState(false);
 	const [selectedId, setSelectedId] = useState("");
 	const [isReqDetailsOpen, setIsReqDetailsOpen] = useState(false);
@@ -403,12 +421,9 @@ export const RequisitionTable = ({
 															</Tooltip>
 														) : null}
 
-														{/* Conditions for Printing */}
-														{(requisition?.status === "approved" ||
-															user?.position?.some((role) => ["tech"].includes(role))) &&
-														(requisition?.user?.name === user?.name ||
-															requisition?.user?.email === user?.email ||
-															user?.position?.some((role) => ["tech"].includes(role))) ? (
+														{/* Conditions for Printing for users */}
+														{requisition?.status === "approved" &&
+														user?.position?.some((role) => ["user"].includes(role)) ? (
 															<Tooltip placement="left-start" title="Print">
 																<MenuItem
 																	value="print"
@@ -435,12 +450,15 @@ export const RequisitionTable = ({
 																</MenuItem>
 															</Tooltip>
 														) : null}
-														{/* Conditions for Printing for finance*/}
+
+														{/* Conditions for Printing */}
 														{(requisition?.status === "approved" ||
 															requisition?.status === "reviewed" ||
 															requisition?.status === "checked") &&
 														user?.position?.some((role) =>
-															["financeReviewer", "finance", "financeUser"].includes(role),
+															["financeReviewer", "finance", "financeUser", "tech"].includes(
+																role,
+															),
 														) ? (
 															<Tooltip placement="left-start" title="Print">
 																<MenuItem
