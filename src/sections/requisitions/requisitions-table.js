@@ -421,6 +421,36 @@ export const RequisitionTable = ({
 															</Tooltip>
 														) : null}
 
+														{/* Conditions for Printing for users */}
+														{requisition?.status === "approved" &&
+														user?.position?.some((role) => ["user"].includes(role)) ? (
+															<Tooltip placement="left-start" title="Print">
+																<MenuItem
+																	value="print"
+																	onClick={() => handlePrint(requisition?._id)}
+																>
+																	<ListItemIcon
+																		sx={{
+																			width: "16px",
+																			height: "16px",
+																		}}
+																	>
+																		{printLoading[requisition?._id] ? (
+																			<CircularProgress size={20} />
+																		) : (
+																			<PrinterIcon />
+																		)}
+																	</ListItemIcon>
+																	<ListItemText
+																		primaryTypographyProps={{
+																			fontSize: "small",
+																		}}
+																		primary="Print"
+																	/>
+																</MenuItem>
+															</Tooltip>
+														) : null}
+
 														{/* Conditions for Printing */}
 														{(requisition?.status === "approved" ||
 															requisition?.status === "reviewed" ||
