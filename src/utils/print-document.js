@@ -26,16 +26,22 @@ export const printDocument = async (req) => {
 		// let reqDate = formatDate(req.date);
 		let date = formatDateSpace(req.date);
 
-		if (req.type === "Fund Req" || req.type === "Requisition") {
-			title = "FUND REQUISITON";
-		} else if (req.type === "Petty") {
-			title = "PETTY CASH";
-		} else if (req.type === "Reimbursement") {
-			title = "REIMBURSEMENT";
-		} else if (req.type === "Advance") {
-			title = "ADVANCE PAYMENT";
+		// if (req.type === "Fund Req" || req.type === "Requisition") {
+		// 	title = "FUND REQUISITON";
+		// } else if (req.type === "Petty") {
+		// 	title = "PETTY CASH";
+		// } else if (req.type === "Reimbursement") {
+		// 	title = "REIMBURSEMENT";
+		// } else if (req.type === "Advance") {
+		// 	title = "ADVANCE PAYMENT";
+		// } else {
+		// 	title = "Fund Requisition";
+		// }
+
+		if (req.type === "Advance") {
+			title = "STAFF ADVANCE";
 		} else {
-			title = "Fund Requisition";
+			title = "PAYMENT VOUCHER";
 		}
 
 		let userSignature =
@@ -223,9 +229,17 @@ export const printDocument = async (req) => {
 						height: 30,
 					},
 					{
-						text: `${ref}/${req.approvalNumber}`,
+						stack: [
+							{
+								text: `Approval Number: ${ref}/${req.approvalNumber}`,
+								style: "reference",
+							},
+							{
+								text: `Serial Number: ${req.serialNumber}`,
+								style: "reference",
+							},
+						],
 						margin: [130, 0, 0, 0],
-						style: "reference",
 					},
 				],
 				margin: [20, 10],
