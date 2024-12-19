@@ -779,7 +779,9 @@ const RequisitionDetailsModal = ({
 										<Typography sx={{ color: indigo.main }}>
 											Request Awaiting Finance Check
 										</Typography>
-									) : ["checked", "sentBack"].includes(requisition?.status) &&
+									) : ["checked", "sentBack", "reviewed"].includes(
+											requisition?.status,
+									  ) &&
 									  user?.position?.some((role) =>
 											["financeReviewer"].includes(role),
 									  ) ? (
