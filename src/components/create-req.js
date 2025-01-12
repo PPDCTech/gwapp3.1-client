@@ -77,6 +77,12 @@ const CreateReqModal = ({
 	const [newItemTitle, setNewItemTitle] = useState("");
 	const [newItemAmount, setNewItemAmount] = useState("");
 	const [newItemCode, setNewItemCode] = useState("");
+	useEffect(() => {
+		if (newItemCode) {
+			setNewItemTitle(newItemCode.description);
+		} 
+	}, [newItemCode]);
+
 	let budgetLineItems = [];
 	const [itemsArray, setItemsArray] = useState([]);
 	const [totalItemsAmount, setTotalItemsAmount] = useState(0);
@@ -95,6 +101,7 @@ const CreateReqModal = ({
 	const [newBankName, setNewBankName] = useState("");
 	const [newAccountNumber, setNewAccountNumber] = useState("");
 	const [newAccountName, setNewAccountName] = useState("");
+	const [newVendorTIN, setNewVendorTIN] = useState("");
 
 	const [projects, setProjects] = useState([]);
 	const [budgetCodes, setBudgetCodes] = useState([]);
@@ -136,6 +143,7 @@ const CreateReqModal = ({
 				bankName: newBankName,
 				accountName: newAccountName,
 				accountNumber: newAccountNumber,
+				vendorTIN: newVendorTIN,
 				userId: user._id,
 			};
 			const response = await addVendor(new_account);
@@ -145,6 +153,7 @@ const CreateReqModal = ({
 				bankName: response.data.bankName,
 				accountNumber: response.data.accountNumber,
 				accountName: response.data.accountName,
+				vendorTIN: response.data?.vendorTIN ? response.data?.vendorTIN : "",
 			});
 		} catch (error) {
 			toast.error(`Error: ${error.message}`);
@@ -210,6 +219,7 @@ const CreateReqModal = ({
 		setNewBankName("");
 		setNewAccountNumber("");
 		setNewAccountName("");
+		setNewVendorTIN("");
 
 		setProjects([]);
 		setBudgetCodes([]);
@@ -258,6 +268,7 @@ const CreateReqModal = ({
 				accountName: beneficiary?.accountName || newAccountName || "Nil",
 				accountNumber: beneficiary?.accountNumber || newAccountNumber || "Nil",
 				bankName: beneficiary?.bankName || newBankName || "Nil",
+				vendorTIN: beneficiary?.vendorTIN || "",
 				attentionTo: attentionToUser?.email || "",
 				projectChargedTo: beingChargedTo,
 				budgetLineItems,
@@ -343,6 +354,9 @@ const CreateReqModal = ({
 				bankName: beneficiary?.bankName
 					? beneficiary.bankName
 					: newBankName || requisitionData.bankName || "Nil",
+				vendorTIN: beneficiary?.vendorTIN
+					? beneficiary.vendorTIN
+					: newVendorTIN || requisitionData.vendorTIN || "",
 				attentionTo: attentionToUser?.email
 					? attentionToUser.email
 					: requisitionData.attentionTo,
@@ -664,9 +678,9 @@ const CreateReqModal = ({
 						</Grid>
 						<TextField
 							multiline
-							rows={4}
+							rows={2}
 							fullWidth
-							label="Description"
+							label="Purpose of Request (Do not include Budget Line Code here)"
 							variant="outlined"
 							margin="normal"
 							value={title}
@@ -702,29 +716,6 @@ const CreateReqModal = ({
 									<Grid container spacing={2}>
 										<Grid item xs={12} sm={6} md={4}>
 											<FormControl fullWidth sx={{ mt: 1 }}>
-												<TextField
-													label="Enter desc"
-													value={newItemTitle}
-													onChange={(e) => setNewItemTitle(e.target.value)}
-													variant="outlined"
-													fullWidth
-												/>
-											</FormControl>
-										</Grid>
-										<Grid item xs={12} sm={6} md={4}>
-											<FormControl fullWidth sx={{ mt: 1 }}>
-												<TextField
-													label="Enter amount"
-													type="number"
-													value={newItemAmount}
-													onChange={(e) => setNewItemAmount(e.target.value)}
-													variant="outlined"
-													fullWidth
-												/>
-											</FormControl>
-										</Grid>
-										<Grid item xs={12} sm={6} md={4}>
-											<FormControl fullWidth sx={{ mt: 1 }}>
 												<Autocomplete
 													fullWidth
 													options={budgetCodes.filter((budgetCode) =>
@@ -747,6 +738,31 @@ const CreateReqModal = ({
 												/>
 											</FormControl>
 										</Grid>
+										<Grid item xs={12} sm={6} md={4}>
+											<FormControl fullWidth sx={{ mt: 1 }}>
+												<TextField
+													label="Budget Line Description"
+													value={newItemTitle}
+													InputProps={{ readOnly: true }}
+													onChange={(e) => setNewItemTitle(e.target.value)}
+													variant="outlined"
+													fullWidth
+												/>
+											</FormControl>
+										</Grid>
+										<Grid item xs={12} sm={6} md={4}>
+											<FormControl fullWidth sx={{ mt: 1 }}>
+												<TextField
+													label="Enter amount"
+													type="number"
+													value={newItemAmount}
+													onChange={(e) => setNewItemAmount(e.target.value)}
+													variant="outlined"
+													fullWidth
+												/>
+											</FormControl>
+										</Grid>
+
 										<Grid item xs={12} sm={6} md={4} sx={{ mt: 0 }}>
 											<Button
 												variant="outlined"
@@ -1092,6 +1108,12 @@ const CreateReqModal = ({
 											Bank:&nbsp;
 											<strong>{beneficiary.bankName}</strong>
 										</Typography>
+										<Typography variant="subtitle1">
+											TIN:&nbsp;
+											<strong>
+												{beneficiary.vendorTIN ? beneficiary.vendorTIN : "Nil"}
+											</strong>
+										</Typography>
 									</div>
 								)}
 							{attentionTo && (
@@ -1124,7 +1146,7 @@ const CreateReqModal = ({
 								{addingNewBeneficiary && (
 									<>
 										<Grid container spacing={2}>
-											<Grid item xs={12} sm={6} md={4}>
+											<Grid item xs={12} sm={6} md={3}>
 												<TextField
 													value={newBankName}
 													onChange={(e) => setNewBankName(e.target.value)}
@@ -1134,7 +1156,7 @@ const CreateReqModal = ({
 													margin="normal"
 												/>
 											</Grid>
-											<Grid item xs={12} sm={6} md={4}>
+											<Grid item xs={12} sm={6} md={3}>
 												<TextField
 													value={newAccountNumber}
 													onChange={(e) => setNewAccountNumber(e.target.value)}
@@ -1144,12 +1166,22 @@ const CreateReqModal = ({
 													margin="normal"
 												/>
 											</Grid>
-											<Grid item xs={12} sm={6} md={4}>
+											<Grid item xs={12} sm={6} md={3}>
 												<TextField
 													value={newAccountName}
 													onChange={(e) => setNewAccountName(e.target.value)}
 													fullWidth
 													label="Holder Name"
+													variant="outlined"
+													margin="normal"
+												/>
+											</Grid>
+											<Grid item xs={12} sm={6} md={3}>
+												<TextField
+													value={newVendorTIN}
+													onChange={(e) => setNewVendorTIN(e.target.value)}
+													fullWidth
+													label="Vendor TIN"
 													variant="outlined"
 													margin="normal"
 												/>
