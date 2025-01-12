@@ -33,6 +33,7 @@ const BinRequisitions = () => {
 		setIsLoading(true);
 		try {
 			const response = await binRequisitions();
+			console.log("DDDD", response.data);
 			setRequisitions(response.data);
 		} catch (error) {
 			console.error("Error fetching bin requisitions:", error);
