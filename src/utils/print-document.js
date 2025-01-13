@@ -297,7 +297,7 @@ export const printDocument = async (req) => {
 								style: "labelStyle",
 							},
 							{
-								text: req.accountName,
+								text: req.accountName || "N/A",
 								style: "fieldStyle",
 							},
 						],
@@ -307,7 +307,7 @@ export const printDocument = async (req) => {
 								style: "labelStyle",
 							},
 							{
-								text: req.bankName,
+								text: req.bankName || "N/A",
 								style: "fieldStyle",
 							},
 						],
@@ -317,7 +317,31 @@ export const printDocument = async (req) => {
 								style: "labelStyle",
 							},
 							{
-								text: req.accountNumber,
+								text: req.accountNumber || "N/A",
+								style: "fieldStyle",
+							},
+							],
+					],
+				},
+				{
+					columns: [
+						[
+							{
+								text: "Vendor Business Name",
+								style: "labelStyle",
+							},
+							{
+								text: req.vendorBusinessName || "N/A",
+								style: "fieldStyle",
+							},
+						],
+						[
+							{
+								text: "Vendor TIN",
+								style: "labelStyle",
+							},
+							{
+								text: req.vendorTIN || "N/A",
 								style: "fieldStyle",
 							},
 						],
