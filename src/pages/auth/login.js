@@ -105,11 +105,10 @@ const Login = () => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setSubmiting(true);
 		try {
-			// validate form
 			if (!formData.email || !formData.password) {
 				toast.error("All fields are required");
 				setSubmiting(false);

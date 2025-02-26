@@ -19,11 +19,13 @@ import VendorProfile from "./pages/vendor-profile";
 import ContractList from "./pages/contract-list";
 import ApplicantList from "./pages/applicant-list";
 import PublicRegister from "./pages/auth/public-register";
+import LandingPage from "./pages/landing-page";
 
 const Router = () => {
 	return (
 		<BrowserRouter>
 			<Routes>
+				<Route path="/" element={<LandingPage />} />
 				<Route
 					path="/vendor/complete-registration"
 					element={<CompleteRegistration />}
@@ -54,7 +56,7 @@ const Router = () => {
 					}
 				/>
 				<Route
-					path="/"
+					path="/dashboard"
 					element={
 						<DashboardLayout>
 							<Overview />
@@ -158,7 +160,6 @@ const Router = () => {
 					}
 				/>
 				<Route path="*" element={<Error />} />
-				{/* Add more routes as needed */}
 			</Routes>
 		</BrowserRouter>
 	);

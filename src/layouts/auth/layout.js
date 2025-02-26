@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+// import io from "socket.io-client";
 import PropTypes from "prop-types";
 import { Box, Typography, Unstable_Grid2 as Grid } from "@mui/material";
 import { Logo } from "../../components/logo";
@@ -7,17 +8,26 @@ import { Link } from "react-router-dom";
 
 export const Layout = (props) => {
 	const { children } = props;
+	const [welcomeMessage, setWelcomeMessage] = useState("Welcome to");
 
-	// useEffect(() => {
-	// 	const socket = io(SOCKET_API, { withCredentials: true });
-	// 	socket.on("ping", (data) => {
-	// 		console.log(`Received ping: ${data}`);
-	// 	});
+	useEffect(() => {
+		const messages = [
+			"Welcome to",
+			"Maraba da",
+			"Ekaabo si",
+			"Nnoo na",
+			"Willkommen in",
+			"Bienvenue a",
+			"Bienvenido a",
+		];
+		let index = 0;
+		const interval = setInterval(() => {
+			index = (index + 1) % messages.length;
+			setWelcomeMessage(messages[index]);
+		}, 3000);
 
-	// 	return () => {
-	// 		socket.disconnect();
-	// 	};
-	// }, []);
+		return () => clearInterval(interval);
+	}, []);
 
 	return (
 		<Box
@@ -88,7 +98,7 @@ export const Layout = (props) => {
 							}}
 							variant="h1"
 						>
-							Welcome to{" "}
+							{welcomeMessage}{" "}
 							<Box component="a" sx={{ color: "#15B79E" }} target="_blank">
 								GWAPP
 							</Box>
