@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
-import io from "socket.io-client";
 import { withAuthGuard } from "../../hocs/with-auth-guard";
 import { SideNav } from "./side-nav";
 import { TopNav } from "./top-nav";
 import { useLocation } from "react-router-dom";
-// import { SOCKET_API } from "../../services/base-url";
 import ReloginModal from "../../components/re-login-modal";
 import { useAuthContext } from "../../contexts/auth-context";
 import { jwtDecode } from "jwt-decode";

@@ -1,8 +1,7 @@
-import { Link as NextLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Box, Button, Link, Stack, TextField, Typography } from "@mui/material";
-import { useAuth } from "../../hooks/use-auth";
 import { useNProgress } from "../../hooks/use-nprogress";
 import { signup } from "../../services/vendor-api-Services";
 import { toast } from "react-toastify";
@@ -11,7 +10,6 @@ import InfoIcon from "@mui/icons-material/Info"; // Add an info icon for the not
 const Register = () => {
 	useNProgress();
 	const navigate = useNavigate();
-	const auth = useAuth();
 	const formik = useFormik({
 		initialValues: {
 			email: "",

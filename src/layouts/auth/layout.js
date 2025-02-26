@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import io from "socket.io-client";
+import React from "react";
 import PropTypes from "prop-types";
 import { Box, Typography, Unstable_Grid2 as Grid } from "@mui/material";
 import { Logo } from "../../components/logo";
